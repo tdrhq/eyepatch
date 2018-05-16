@@ -2,6 +2,7 @@ package com.tdrhq.eyepatch;
 
 import com.android.dx.*;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class EyePatchClassLoader {
@@ -29,13 +30,16 @@ public class EyePatchClassLoader {
         DexMaker dexmaker = new DexMaker();
         TypeId<?> typeId = TypeId.get("L" + name.replace(".", "/") + ";");
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
-        generateFooMethod(dexmaker, typeId, original);
+
+        for (Method methodTemplate : original.getDeclaredMethods()) {
+            generateMethod(dexmaker, methodTemplate, typeId, original);
+        }
         return dexmaker;
     }
 
-    private void generateFooMethod(DexMaker dexmaker, TypeId<?> typeId, Class original) {
-        MethodId foo = typeId.getMethod(TypeId.STRING, "foo");
-        Code code = dexmaker.declare(foo, Modifier.PUBLIC | Modifier.STATIC);
+    private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
+        MethodId foo = typeId.getMethod(TypeId.STRING, methodTemplate.getName());
+        Code code = dexmaker.declare(foo, methodTemplate.getModifiers());
 
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
@@ -58,7 +62,7 @@ public class EyePatchClassLoader {
         Local<String> castedReturnValue = code.newLocal(TypeId.STRING);
 
         code.loadConstant(callerClass, original);
-        code.loadConstant(callerMethod, "foo");
+        code.loadConstant(callerMethod, methodTemplate.getName());
         code.loadConstant(callerArgs, null);
         code.invokeStatic(invokeStaticMethod, returnValue, callerClass, callerMethod, callerArgs);
 
