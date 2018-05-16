@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 public class EyePatchTest {
     @Test
-    public void testBasics() {
+    public void testBasics() throws Exception {
         EyePatch.patch(Bar.class,
                 Bar.class.getMethod("foo"),
                 new EyePatch.Callback() {
@@ -15,7 +15,7 @@ public class EyePatchTest {
                         return "car";
                     }
                 });
-        
+
     }
 
     public static class Bar {
