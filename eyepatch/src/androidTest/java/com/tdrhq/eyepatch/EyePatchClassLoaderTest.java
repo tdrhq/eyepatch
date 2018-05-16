@@ -72,7 +72,7 @@ public class EyePatchClassLoaderTest {
         Class barWrapped = mEyePatchClassLoader.wrapClass(Bar.class);
         Object instance = barWrapped.newInstance();
         Method method = barWrapped.getMethod("nonStatic");
-        //assertEquals("foo3", method.invoke(instance));
+        assertEquals("foo3", method.invoke(instance));
     }
 
     public static class Bar {
