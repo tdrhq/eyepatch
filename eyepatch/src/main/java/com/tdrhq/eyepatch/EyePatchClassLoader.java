@@ -1,6 +1,5 @@
 package com.tdrhq.eyepatch;
 
-import android.util.Log;
 import com.android.dx.*;
 import java.io.*;
 import java.lang.reflect.Modifier;
@@ -17,14 +16,7 @@ public class EyePatchClassLoader {
             ClassLoader loader = dexmaker.generateAndLoad
                 (new ClassLoaderWithBlacklist(realClass.getClassLoader(), realClass),
                  mDataDir);
-            Log.i("EyePatchClassLoader", "Loader class is " + loader.getClass());
-            Log.i("EyePatchClassLoader", "Loader parent: " + loader.getParent().hashCode());
-            Log.i("EyePatchClassLoader", "Loader hash code: " + loader.hashCode());
-            Log.i("EyePatchClassLoader", "Current loader hash code: " + realClass.getClassLoader().hashCode());
-            Log.i("EyePatchClassLoader", "new path: " + loader.toString());
-            Log.i("EyePatchClassLoader", "original path: " + realClass.getClassLoader().toString());
             Class ret =  loader.loadClass(realClass.getName());
-            Log.i("EyePatchClassLoader", "classloader of loaded class is: " + ret.getClassLoader().hashCode());
             return ret;
         } catch (IOException e) {
             throw new RuntimeException(e);
