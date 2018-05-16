@@ -97,6 +97,25 @@ public class EyePatchClassLoaderTest {
         assertEquals("foo3", method.invoke(instance));
     }
 
+    @Test
+    public void testOtherReturnType() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        Class barWrapped = mEyePatchClassLoader.wrapClass(Bar.class);
+        Object instance = barWrapped.newInstance();
+
+        when(handler.handleInvocation(any(Class.class),
+                                      same(instance),
+                                      eq("otherReturnType"),
+                                      (Object[]) eq(null)))
+                .thenReturn(Integer.valueOf(30));
+
+        Method method = barWrapped.getMethod("otherReturnType");
+        assertEquals(Integer.valueOf(30), method.invoke(instance));
+    }
+
+
     public static class Bar {
         public static String foo() {
             return "foot";
@@ -112,6 +131,10 @@ public class EyePatchClassLoaderTest {
 
         public final String finalMethod() {
             return "zoidberg";
+        }
+
+        public final Integer otherReturnType() {
+            return 20;
         }
     }
 }
