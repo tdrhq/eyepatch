@@ -59,6 +59,21 @@ public class EyePatchClassLoaderTest {
         assertEquals("car3", method.invoke(null));
     }
 
+    @Test
+    public void testNonStatic() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        when(handler.handleInvocation(any(Class.class),
+                                      eq("nonStatic"),
+                                      (Object[]) eq(null)))
+                .thenReturn("foo3");
+
+        Class barWrapped = mEyePatchClassLoader.wrapClass(Bar.class);
+        Object instance = barWrapped.newInstance();
+        Method method = barWrapped.getMethod("nonStatic");
+        //assertEquals("foo3", method.invoke(instance));
+    }
 
     public static class Bar {
         public static String foo() {
@@ -67,6 +82,10 @@ public class EyePatchClassLoaderTest {
 
         public static String car() {
             return "foot";
+        }
+
+        public String nonStatic() {
+            return "zoidberg";
         }
     }
 }

@@ -31,10 +31,20 @@ public class EyePatchClassLoader {
         TypeId<?> typeId = TypeId.get("L" + name.replace(".", "/") + ";");
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
 
+        generateZeroArgumentConstructor(dexmaker, typeId, original);
+
         for (Method methodTemplate : original.getDeclaredMethods()) {
             generateMethod(dexmaker, methodTemplate, typeId, original);
         }
         return dexmaker;
+    }
+
+    private void generateZeroArgumentConstructor(DexMaker dexmaker, TypeId<?> typeId, Class original) {
+        MethodId cons = typeId.getConstructor();
+        TypeId parent = TypeId.get(original.getSuperclass());
+        Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
+        code.invokeDirect(parent.getConstructor(), null, code.getThis(typeId));
+        code.returnVoid();
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
