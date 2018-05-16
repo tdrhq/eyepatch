@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 
 public class EyePatchClassLoaderTest {
     private EyePatchClassLoader mEyePatchClassLoader;
+    private StaticInvocationHandler oldHandler;
 
     @Rule
     public TemporaryFolder tmpdir = new TemporaryFolder();
@@ -15,6 +16,7 @@ public class EyePatchClassLoaderTest {
     @Before
     public void before() throws Exception {
         mEyePatchClassLoader = new EyePatchClassLoader(tmpdir.getRoot());
+        oldHandler = StaticInvocationHandler.sHandler;
     }
 
 
@@ -23,6 +25,7 @@ public class EyePatchClassLoaderTest {
         for (String s : tmpdir.getRoot().list()) {
             Log.i("EyePatchClassLoaderTest", "After: " + s);
         }
+        StaticInvocationHandler.sHandler = oldHandler;
     }
 
     @Test
