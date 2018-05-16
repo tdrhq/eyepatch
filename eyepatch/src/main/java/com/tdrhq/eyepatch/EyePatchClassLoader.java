@@ -43,12 +43,12 @@ public class EyePatchClassLoader {
         TypeId stringType = TypeId.get(String.class);
         TypeId objectArType = TypeId.get(Object[].class);
 
-        MethodId invokeStaticMethod = staticInvoker.getMethod
-            (objectType,
-             "invokeStatic",
-             classType,
-             stringType,
-             objectArType);
+        MethodId invokeStaticMethod = staticInvoker.getMethod(
+                objectType,
+                "invokeStatic",
+                classType,
+                stringType,
+                objectArType);
 
         Local<Object> returnValue = code.newLocal(TypeId.OBJECT);
 
