@@ -13,9 +13,9 @@ public class EyePatchClassLoader {
     public Class wrapClass(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
-            ClassLoader loader = dexmaker.generateAndLoad
-                (new ClassLoaderWithBlacklist(realClass.getClassLoader(), realClass),
-                 mDataDir);
+            ClassLoader loader = dexmaker.generateAndLoad(
+                    new ClassLoaderWithBlacklist(realClass.getClassLoader(), realClass),
+                    mDataDir);
             Class ret =  loader.loadClass(realClass.getName());
             return ret;
         } catch (IOException e) {
