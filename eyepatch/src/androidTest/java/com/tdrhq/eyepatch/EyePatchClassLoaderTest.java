@@ -79,6 +79,24 @@ public class EyePatchClassLoaderTest {
         assertEquals("foo3", method.invoke(instance));
     }
 
+    @Test
+    public void testFinalMethod() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        Class barWrapped = mEyePatchClassLoader.wrapClass(Bar.class);
+        Object instance = barWrapped.newInstance();
+
+        when(handler.handleInvocation(any(Class.class),
+                                      same(instance),
+                                      eq("finalMethod"),
+                                      (Object[]) eq(null)))
+                .thenReturn("foo3");
+
+        Method method = barWrapped.getMethod("finalMethod");
+        assertEquals("foo3", method.invoke(instance));
+    }
+
     public static class Bar {
         public static String foo() {
             return "foot";
@@ -89,6 +107,10 @@ public class EyePatchClassLoaderTest {
         }
 
         public String nonStatic() {
+            return "zoidberg";
+        }
+
+        public final String finalMethod() {
             return "zoidberg";
         }
     }
