@@ -45,15 +45,27 @@ public class EyePatchClassLoaderTest {
                                       eq("foo"),
                                       (Object[]) eq(null)))
                 .thenReturn("foo3");
+
+        when(handler.handleInvocation(any(Class.class),
+                                      eq("car"),
+                                      (Object[]) eq(null)))
+                .thenReturn("car3");
+
         Class barWrapped = mEyePatchClassLoader.wrapClass(Bar.class);
         Method method = barWrapped.getMethod("foo");
         assertEquals("foo3", method.invoke(null));
 
+        method = barWrapped.getMethod("car");
+        assertEquals("car3", method.invoke(null));
     }
 
 
     public static class Bar {
         public static String foo() {
+            return "foot";
+        }
+
+        public static String car() {
             return "foot";
         }
     }
