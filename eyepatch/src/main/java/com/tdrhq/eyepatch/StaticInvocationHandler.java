@@ -8,7 +8,7 @@ public abstract class StaticInvocationHandler {
 
     public static StaticInvocationHandler sHandler = new StaticInvocationHandler() {
             @Override
-            public Object handleInvocation(Class klass, String method, Object[] args) {
+            public Object handleInvocation(Class klass, Object instance, String method, Object[] args) {
                 return "foo2";
             }
         };
@@ -16,12 +16,12 @@ public abstract class StaticInvocationHandler {
     public StaticInvocationHandler() {
     }
 
-    public abstract Object handleInvocation(Class klass, String method, Object[] args);
+    public abstract Object handleInvocation(Class klass, Object instance,  String method, Object[] args);
 
-    public static Object invokeStatic(Class klass, String method, Object[] args) {
+    public static Object invokeStatic(Class klass, Object instance, String method, Object[] args) {
         Log.i("StaticInvocationHandler", "Invoked: " + method);
         if (sHandler != null) {
-            return sHandler.handleInvocation(klass, method, args);
+            return sHandler.handleInvocation(klass, instance, method, args);
         }
 
         return null;

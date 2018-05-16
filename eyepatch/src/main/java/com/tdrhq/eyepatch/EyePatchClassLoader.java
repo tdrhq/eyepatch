@@ -53,6 +53,7 @@ public class EyePatchClassLoader {
 
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
+        TypeId instance = TypeId.OBJECT;
         TypeId objectType = TypeId.get(Object.class);
         TypeId stringType = TypeId.get(String.class);
         TypeId objectArType = TypeId.get(Object[].class);
@@ -61,20 +62,33 @@ public class EyePatchClassLoader {
                 objectType,
                 "invokeStatic",
                 classType,
+                objectType,
                 stringType,
                 objectArType);
 
         Local<Object> returnValue = code.newLocal(TypeId.OBJECT);
 
         Local<Class> callerClass = code.newLocal(TypeId.get(Class.class));
+        Local instanceArg = code.newLocal(TypeId.OBJECT);
         Local<String> callerMethod = code.newLocal(TypeId.STRING);
         Local<Object[]> callerArgs = code.newLocal(TypeId.get(Object[].class));
         Local<String> castedReturnValue = code.newLocal(TypeId.STRING);
 
         code.loadConstant(callerClass, original);
+        if (Modifier.isStatic(methodTemplate.getModifiers())) {
+            code.loadConstant(instanceArg, null);
+        } else {
+            instanceArg = code.getThis(typeId);
+        }
         code.loadConstant(callerMethod, methodTemplate.getName());
         code.loadConstant(callerArgs, null);
-        code.invokeStatic(invokeStaticMethod, returnValue, callerClass, callerMethod, callerArgs);
+        code.invokeStatic(
+                invokeStaticMethod,
+                returnValue,
+                callerClass,
+                instanceArg,
+                callerMethod,
+                callerArgs);
 
         code.cast(castedReturnValue, returnValue);
         code.returnValue(castedReturnValue);
