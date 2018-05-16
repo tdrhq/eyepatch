@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import org.junit.*;
 import org.junit.rules.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class EyePatchClassLoaderTest {
     private EyePatchClassLoader mEyePatchClassLoader;
@@ -34,6 +35,12 @@ public class EyePatchClassLoaderTest {
         Method method = barWrapped.getMethod("foo");
         assertEquals("foo2", method.invoke(null));
     }
+
+    @Test
+    public void testHandlerArgs() throws Exception {
+        StaticInvocationHandler.sHandler = mock(StaticInvocationHandler.class);
+    }
+
 
     public static class Bar {
         public static String foo() {
