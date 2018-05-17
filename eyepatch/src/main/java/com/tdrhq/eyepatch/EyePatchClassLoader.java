@@ -67,8 +67,11 @@ public class EyePatchClassLoader {
                 stringType,
                 objectArType);
 
-        Local<Object> returnValue = code.newLocal(TypeId.OBJECT);
+        Local<Object> returnValue = null;
 
+        if (returnType != TypeId.VOID) {
+            returnValue = code.newLocal(TypeId.OBJECT);
+        }
 
         Local<Class> callerClass = code.newLocal(TypeId.get(Class.class));
         Local instanceArg = code.newLocal(TypeId.OBJECT);
@@ -78,7 +81,7 @@ public class EyePatchClassLoader {
 
         Local boxedReturnValue = null;
 
-        if (Primitives.isPrimitive(returnType)) {
+        if (Primitives.isPrimitive(returnType) && returnType != TypeId.VOID) {
             boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
         }
 
@@ -109,10 +112,15 @@ public class EyePatchClassLoader {
                     castedReturnValue,
                     boxedReturnValue);
 
-        } else {
+        } else if (returnType != TypeId.VOID) {
             code.cast(castedReturnValue, returnValue);
         }
-        code.returnValue(castedReturnValue);
+
+        if (returnType == TypeId.VOID) {
+            code.returnVoid();
+        } else {
+            code.returnValue(castedReturnValue);
+        }
     }
 
     public static void invokeHelper(Class klass, String name) {

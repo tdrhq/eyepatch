@@ -153,6 +153,25 @@ public class EyePatchClassLoaderTest {
         assertEquals(30.0f, method.invoke(instance));
     }
 
+    @Test
+    public void testVoidReturn() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        String functionName = "doSomething";
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithVoid.class);
+        Object instance = barWrapped.newInstance();
+
+
+        Method method = barWrapped.getMethod(functionName);
+        method.invoke(instance);
+
+        verify(handler).handleInvocation(any(Class.class),
+                                         same(instance),
+                                         eq(functionName),
+                                         (Object[]) eq(null));
+
+    }
 
 
     public static class Bar {
@@ -186,6 +205,12 @@ public class EyePatchClassLoaderTest {
     public static class BarWithfloat {
         public float floatType() {
             return 20.0f;
+        }
+    }
+
+
+    public static class BarWithVoid {
+        public void doSomething() {
         }
     }
 
