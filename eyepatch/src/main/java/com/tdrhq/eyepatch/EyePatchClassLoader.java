@@ -49,15 +49,15 @@ public class EyePatchClassLoader {
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
+        String methodName = methodTemplate.getName();
+        int modifiers = methodTemplate.getModifiers();
         TypeId returnType = TypeId.get(methodTemplate.getReturnType());
         Class[] parameterTypes = methodTemplate.getParameterTypes();
         TypeId[] arguments = new TypeId[parameterTypes.length];
         for (int i = 0 ;i < parameterTypes.length; i++) {
             arguments[i] = TypeId.get(parameterTypes[i]);
         }
-        String methodName = methodTemplate.getName();
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
-        int modifiers = methodTemplate.getModifiers();
         Code code = dexmaker.declare(foo, modifiers);
 
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
