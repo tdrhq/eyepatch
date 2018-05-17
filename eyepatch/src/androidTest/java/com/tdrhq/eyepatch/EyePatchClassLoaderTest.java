@@ -319,4 +319,21 @@ public class EyePatchClassLoaderTest {
             fail("never called");
         }
     }
+
+    @Test
+    public void testCallsConstructorWithArgs() throws Throwable {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithTwoArgumentWithPrim.class);
+        Object instance = barWrapped.newInstance();
+
+        verify(handler).handleInvocation(any(Class.class),
+                                         same(instance),
+                                         eq("__construct__"),
+                                         (Object[]) aryEq(new Object[] {}));
+    }
+
+    public static class Foo {
+    }
 }

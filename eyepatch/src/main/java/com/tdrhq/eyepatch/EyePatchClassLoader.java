@@ -1,8 +1,8 @@
 package com.tdrhq.eyepatch;
 
 import com.android.dx.*;
-import com.android.dx.UnaryOp;
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -32,7 +32,9 @@ public class EyePatchClassLoader {
         TypeId<?> typeId = TypeId.get("L" + name.replace(".", "/") + ";");
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
 
-        generateZeroArgumentConstructor(dexmaker, typeId, original);
+        for (Constructor constructor : original.getDeclaredConstructors()) {
+            generateConstructor(dexmaker, constructor, typeId, original);
+        }
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
             generateMethod(dexmaker, methodTemplate, typeId, original);
@@ -40,12 +42,33 @@ public class EyePatchClassLoader {
         return dexmaker;
     }
 
-    private void generateZeroArgumentConstructor(DexMaker dexmaker, TypeId<?> typeId, Class original) {
+    private void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+        String methodName = "__construct__";
+        int modifiers = constructor.getModifiers();
+        TypeId returnType = TypeId.VOID;
+        Class[] parameterTypes = constructor.getParameterTypes();
+        TypeId[] arguments = new TypeId[parameterTypes.length];
+        for (int i = 0 ;i < parameterTypes.length; i++) {
+            arguments[i] = TypeId.get(parameterTypes[i]);
+        }
         MethodId cons = typeId.getConstructor();
-        TypeId parent = TypeId.get(original.getSuperclass());
-        Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
-        code.invokeDirect(parent.getConstructor(), null, code.getThis(typeId));
-        code.returnVoid();
+        final TypeId parent = TypeId.get(original.getSuperclass());
+        final Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
+        generateMethodContents(
+                code,
+                typeId,
+                returnType,
+                parameterTypes,
+                original,
+                modifiers,
+                methodName,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        code.invokeDirect(parent.getConstructor(), null, code.getThis(typeId));
+
+                    }
+                });
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
@@ -60,7 +83,11 @@ public class EyePatchClassLoader {
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
         Code code = dexmaker.declare(foo, modifiers);
         generateMethodContents(code, typeId, returnType, parameterTypes, original, modifiers,
-                               methodName);
+                               methodName, new Runnable() {
+                                       @Override
+                                       public void run() {
+                                       }
+                                   });
     }
 
     private void generateMethodContents(
@@ -68,7 +95,8 @@ public class EyePatchClassLoader {
             TypeId typeId,
             TypeId returnType, Class[] parameterTypes, Class original,
             int modifiers,
-            String methodName) {
+            String methodName,
+            Runnable afterLocals) {
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
@@ -104,6 +132,7 @@ public class EyePatchClassLoader {
             boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
         }
 
+        afterLocals.run();
         code.loadConstant(parameterLength, parameterTypes.length);
 
         buildCallerArray(callerArgs, parameterLength, tmp, parameterTypes, code);
