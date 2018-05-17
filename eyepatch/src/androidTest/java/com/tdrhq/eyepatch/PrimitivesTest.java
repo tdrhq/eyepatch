@@ -19,4 +19,14 @@ public class PrimitivesTest {
         }
         assertFalse(Primitives.isPrimitive(TypeId.STRING));
     }
+
+    @Test
+    public void testGetBoxedtype() throws Throwable {
+        checkBoxType(Integer.class, int.class);
+    }
+
+    private void checkBoxType(Class box, Class primitive) {
+        assertEquals(TypeId.get(box),
+                     Primitives.getBoxedType(TypeId.get(primitive)));
+    }
 }
