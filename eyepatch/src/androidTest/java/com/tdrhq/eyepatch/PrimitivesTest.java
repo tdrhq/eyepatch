@@ -42,6 +42,8 @@ public class PrimitivesTest {
             String boxClassName = Primitives.getBoxedType(TypeId.get(primitive)).getName();
             Class boxClass = Class.forName(
                     boxClassName.substring(1, boxClassName.length() -1 ).replace("/", "."));
+
+            boxClass.getMethod(Primitives.getUnboxFunction(TypeId.get(primitive)));
         }
     }
 }

@@ -47,12 +47,23 @@ public class Primitives {
     }
 
     public static String getUnboxFunction(TypeId primitive) {
-        if (primitive.equals(TypeId.INT)) {
-            return "intValue";
-        }
-        if (primitive.equals(TypeId.FLOAT)) {
+        if (primitive == TypeId.BOOLEAN)
+            return "booleanValue";
+        if (primitive == TypeId.BYTE)
+            return "byteValue";
+        if (primitive == TypeId.CHAR)
+            return "charValue";
+        if (primitive ==  TypeId.DOUBLE)
+            return "doubleValue";
+        if (primitive == TypeId.FLOAT)
             return "floatValue";
-        }
+        if (primitive ==  TypeId.INT)
+            return "intValue";
+        if (primitive == TypeId.LONG)
+            return "longValue";
+        if (primitive ==  TypeId.SHORT)
+            return "shortValue";
+
 
         throw new RuntimeException("not supported");
     }
