@@ -55,8 +55,10 @@ public class EyePatchClassLoader {
         for (int i = 0 ;i < parameterTypes.length; i++) {
             arguments[i] = TypeId.get(parameterTypes[i]);
         }
-        MethodId foo = typeId.getMethod(returnType, methodTemplate.getName(), arguments);
-        Code code = dexmaker.declare(foo, methodTemplate.getModifiers());
+        String methodName = methodTemplate.getName();
+        MethodId foo = typeId.getMethod(returnType, methodName, arguments);
+        int modifiers = methodTemplate.getModifiers();
+        Code code = dexmaker.declare(foo, modifiers);
 
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
@@ -98,12 +100,12 @@ public class EyePatchClassLoader {
         buildCallerArray(callerArgs, parameterLength, tmp, parameterTypes, code);
 
         code.loadConstant(callerClass, original);
-        if (Modifier.isStatic(methodTemplate.getModifiers())) {
+        if (Modifier.isStatic(modifiers)) {
             code.loadConstant(instanceArg, null);
         } else {
             instanceArg = code.getThis(typeId);
         }
-        code.loadConstant(callerMethod, methodTemplate.getName());
+        code.loadConstant(callerMethod, methodName);
         code.invokeStatic(
                 invokeStaticMethod,
                 returnValue,
