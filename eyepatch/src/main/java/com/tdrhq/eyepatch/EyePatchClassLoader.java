@@ -102,7 +102,7 @@ public class EyePatchClassLoader {
             MethodId intValue = getBoxedType(returnType)
                     .getMethod(
                             returnType,
-                            "intValue");
+                            getUnboxFunction(returnType));
             code.cast(boxedReturnValue, returnValue);
             code.invokeVirtual(
                     intValue,
@@ -127,6 +127,13 @@ public class EyePatchClassLoader {
             return true;
         }
         return false;
+    }
+
+    private String getUnboxFunction(TypeId primitive) {
+        if (primitive.equals(TypeId.INT)) {
+            return "intValue";
+        }
+        throw new RuntimeException("not supported");
     }
 
     public static void invokeHelper(Class klass, String name) {
