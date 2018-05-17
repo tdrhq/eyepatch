@@ -321,7 +321,7 @@ public class EyePatchClassLoaderTest {
     }
 
     @Test
-    public void testCallsConstructorWithArgs() throws Throwable {
+    public void testCallsConstructorWithoutArgs() throws Throwable {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         StaticInvocationHandler.sHandler = handler;
 
