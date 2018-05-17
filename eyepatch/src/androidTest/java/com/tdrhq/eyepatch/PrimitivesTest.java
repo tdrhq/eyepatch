@@ -35,4 +35,13 @@ public class PrimitivesTest {
         assertEquals(TypeId.get(box),
                      Primitives.getBoxedType(TypeId.get(primitive)));
     }
+
+    @Test
+    public void testCheckUnboxFunction() throws Throwable {
+        for (Class primitive : Primitives.allPrimitives) {
+            String boxClassName = Primitives.getBoxedType(TypeId.get(primitive)).getName();
+            Class boxClass = Class.forName(
+                    boxClassName.substring(1, boxClassName.length() -1 ).replace("/", "."));
+        }
+    }
 }
