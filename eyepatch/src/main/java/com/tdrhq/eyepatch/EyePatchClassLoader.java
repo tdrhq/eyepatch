@@ -98,7 +98,7 @@ public class EyePatchClassLoader {
                 callerMethod,
                 callerArgs);
 
-        if (returnType.equals(TypeId.INT)) {
+        if (isPrimitive(returnType)) {
             MethodId intValue = getBoxedType(returnType)
                     .getMethod(
                             returnType,
@@ -118,12 +118,14 @@ public class EyePatchClassLoader {
     TypeId getBoxedType(TypeId primitive) {
         if (primitive.equals(TypeId.INT)) {
             return TypeId.get(Integer.class);
+        } else if (primitive.equals(TypeId.FLOAT)) {
+            return TypeId.get(Float.class);
         }
         throw new RuntimeException("not supported");
     }
 
     private boolean isPrimitive(TypeId type) {
-        if (type.equals(TypeId.INT)) {
+        if (type.equals(TypeId.INT) || type.equals(TypeId.FLOAT)) {
             return true;
         }
         return false;
@@ -133,6 +135,10 @@ public class EyePatchClassLoader {
         if (primitive.equals(TypeId.INT)) {
             return "intValue";
         }
+        if (primitive.equals(TypeId.FLOAT)) {
+            return "floatValue";
+        }
+
         throw new RuntimeException("not supported");
     }
 

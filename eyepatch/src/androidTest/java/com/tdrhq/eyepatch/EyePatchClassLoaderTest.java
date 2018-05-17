@@ -134,6 +134,26 @@ public class EyePatchClassLoaderTest {
         assertEquals(30, method.invoke(instance));
     }
 
+    @Test
+    public void testFloatType() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        String functionName = "floatType";
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithfloat.class);
+        Object instance = barWrapped.newInstance();
+
+        when(handler.handleInvocation(any(Class.class),
+                                      same(instance),
+                                      eq(functionName),
+                                      (Object[]) eq(null)))
+                .thenReturn(Float.valueOf(30.0f));
+
+        Method method = barWrapped.getMethod(functionName);
+        assertEquals(30.0f, method.invoke(instance));
+    }
+
+
 
     public static class Bar {
         public static String foo() {
@@ -162,4 +182,11 @@ public class EyePatchClassLoaderTest {
             return 20;
         }
     }
+
+    public static class BarWithfloat {
+        public float floatType() {
+            return 20.0f;
+        }
+    }
+
 }
