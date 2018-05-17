@@ -5,6 +5,17 @@ package com.tdrhq.eyepatch;
 import com.android.dx.TypeId;
 
 public class Primitives {
+    static final Class[] allPrimitives = new Class[] {
+          boolean.class,
+          byte.class,
+          char.class,
+          double.class,
+          float.class,
+          int.class,
+          long.class,
+          short.class
+    };
+
     public static TypeId getBoxedType(TypeId primitive) {
         if (primitive.equals(TypeId.INT)) {
             return TypeId.get(Integer.class);
@@ -15,8 +26,10 @@ public class Primitives {
     }
 
     public static boolean isPrimitive(TypeId type) {
-        if (type.equals(TypeId.INT) || type.equals(TypeId.FLOAT)) {
-            return true;
+        for (Class primitive : allPrimitives) {
+            if (type == TypeId.get(primitive)) {
+                return true;
+            }
         }
         return false;
     }
