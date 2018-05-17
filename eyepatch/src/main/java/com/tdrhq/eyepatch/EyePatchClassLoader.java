@@ -59,7 +59,16 @@ public class EyePatchClassLoader {
         }
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
         Code code = dexmaker.declare(foo, modifiers);
+        generateMethodContents(code, typeId, returnType, parameterTypes, original, modifiers,
+                               methodName);
+    }
 
+    private void generateMethodContents(
+            Code code,
+            TypeId typeId,
+            TypeId returnType, Class[] parameterTypes, Class original,
+            int modifiers,
+            String methodName) {
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
