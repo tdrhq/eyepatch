@@ -293,4 +293,30 @@ public class EyePatchClassLoaderTest {
             fail("never called");
         }
     }
+
+    @Test
+    public void testTwoArgsWithPrim() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        String functionName = "doSomething";
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithTwoArgumentWithPrim.class);
+        Object instance = barWrapped.newInstance();
+
+
+        Method method = barWrapped.getDeclaredMethod(functionName, String.class, int.class);
+        method.invoke(instance, "foo", 20);
+
+        verify(handler).handleInvocation(any(Class.class),
+                                         same(instance),
+                                         eq(functionName),
+                                         (Object[]) aryEq(new Object[] { "foo" , new Integer(20)}));
+
+    }
+
+    public static class BarWithTwoArgumentWithPrim {
+        public void doSomething(String arg, int arg2) {
+            fail("never called");
+        }
+    }
 }
