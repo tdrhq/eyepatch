@@ -46,6 +46,10 @@ public class Primitives {
         return false;
     }
 
+    public static boolean isPrimitive(Class type) {
+        return isPrimitive(TypeId.get(type));
+    }
+
     public static String getUnboxFunction(TypeId primitive) {
         if (primitive == TypeId.BOOLEAN)
             return "booleanValue";

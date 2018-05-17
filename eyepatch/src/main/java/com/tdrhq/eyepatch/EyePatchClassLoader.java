@@ -85,6 +85,7 @@ public class EyePatchClassLoader {
         Local<Object[]> callerArgs = code.newLocal(TypeId.get(Object[].class));
         Local castedReturnValue = code.newLocal(returnType);
         Local<Integer> parameterLength = code.newLocal(TypeId.INT);
+        Local<Object> tmp = code.newLocal(TypeId.OBJECT);
 
         Local boxedReturnValue = null;
 
@@ -94,7 +95,7 @@ public class EyePatchClassLoader {
 
         code.loadConstant(parameterLength, parameterTypes.length);
 
-        buildCallerArray(callerArgs, parameterLength, parameterTypes, code);
+        buildCallerArray(callerArgs, parameterLength, tmp, parameterTypes, code);
 
         code.loadConstant(callerClass, original);
         if (Modifier.isStatic(methodTemplate.getModifiers())) {
@@ -135,11 +136,21 @@ public class EyePatchClassLoader {
 
     private void buildCallerArray(
             Local<Object[]> callerArgs, Local<Integer> parameterLength,
+            Local<Object> tmp,
             Class[] parameterTypes, Code code) {
         code.newArray(callerArgs, parameterLength);
         for (int i = parameterTypes.length - 1; i>= 0; i--) {
             code.loadConstant(parameterLength, i);
-            code.aput(callerArgs, parameterLength, code.getParameter(i, TypeId.get(parameterTypes[i])));
+            if (Primitives.isPrimitive(parameterTypes[i])) {
+                code.newInstance(
+                        tmp,
+                        Primitives.getBoxedType(TypeId.get(parameterTypes[i])).getConstructor(
+                                TypeId.get(parameterTypes[i])),
+                        code.getParameter(i, TypeId.get(parameterTypes[i])));
+            } else {
+                code.cast(tmp, code.getParameter(i, TypeId.get(parameterTypes[i])));
+            }
+            code.aput(callerArgs, parameterLength, tmp);
         }
     }
 
