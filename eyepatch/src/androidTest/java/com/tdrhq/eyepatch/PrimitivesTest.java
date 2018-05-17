@@ -23,6 +23,12 @@ public class PrimitivesTest {
     @Test
     public void testGetBoxedtype() throws Throwable {
         checkBoxType(Integer.class, int.class);
+        checkBoxType(Byte.class, byte.class);
+        checkBoxType(Character.class, char.class);
+        checkBoxType(Double.class, double.class);
+        checkBoxType(Float.class, float.class);
+        checkBoxType(Long.class, long.class);
+        checkBoxType(Short.class, short.class);
     }
 
     private void checkBoxType(Class box, Class primitive) {

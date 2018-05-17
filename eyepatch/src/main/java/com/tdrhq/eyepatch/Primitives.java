@@ -17,12 +17,28 @@ public class Primitives {
     };
 
     public static TypeId getBoxedType(TypeId primitive) {
-        if (primitive.equals(TypeId.INT)) {
-            return TypeId.get(Integer.class);
-        } else if (primitive.equals(TypeId.FLOAT)) {
+        if (primitive == TypeId.BOOLEAN)
+            return TypeId.get(Boolean.class);
+        if (primitive == TypeId.BYTE)
+            return TypeId.get(Byte.class);
+        if (primitive == TypeId.CHAR)
+            return TypeId.get(Character.class);
+        if (primitive ==  TypeId.DOUBLE)
+            return TypeId.get(Double.class);
+        if (primitive == TypeId.FLOAT)
             return TypeId.get(Float.class);
-        }
-        throw new RuntimeException("not supported");
+        if (primitive ==  TypeId.INT)
+            return TypeId.get(Integer.class);
+        if (primitive == TypeId.LONG)
+            return TypeId.get(Long.class);
+        if (primitive ==  TypeId.SHORT)
+            return TypeId.get(Short.class);
+
+        throw new RuntimeException("unknown type");
+    }
+
+    private static String upcaseFirst(String input) {
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
     }
 
     public static boolean isPrimitive(TypeId type) {
