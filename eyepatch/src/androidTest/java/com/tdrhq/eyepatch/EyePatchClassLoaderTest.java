@@ -115,6 +115,25 @@ public class EyePatchClassLoaderTest {
         assertEquals(Integer.valueOf(30), method.invoke(instance));
     }
 
+    @Test
+    public void testPrimitiveReturnType() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        String functionName = "primitiveReturnType";
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithPrimitive.class);
+        Object instance = barWrapped.newInstance();
+
+        when(handler.handleInvocation(any(Class.class),
+                                      same(instance),
+                                      eq(functionName),
+                                      (Object[]) eq(null)))
+                .thenReturn(Integer.valueOf(30));
+
+        Method method = barWrapped.getMethod(functionName);
+        assertEquals(30, method.invoke(instance));
+    }
+
 
     public static class Bar {
         public static String foo() {
@@ -134,6 +153,12 @@ public class EyePatchClassLoaderTest {
         }
 
         public final Integer otherReturnType() {
+            return 20;
+        }
+    }
+
+    public static class BarWithPrimitive {
+        public int primitiveReturnType() {
             return 20;
         }
     }

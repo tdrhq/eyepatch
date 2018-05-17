@@ -69,11 +69,18 @@ public class EyePatchClassLoader {
 
         Local<Object> returnValue = code.newLocal(TypeId.OBJECT);
 
+
         Local<Class> callerClass = code.newLocal(TypeId.get(Class.class));
         Local instanceArg = code.newLocal(TypeId.OBJECT);
         Local<String> callerMethod = code.newLocal(TypeId.STRING);
         Local<Object[]> callerArgs = code.newLocal(TypeId.get(Object[].class));
-        Local<String> castedReturnValue = code.newLocal(returnType);
+        Local castedReturnValue = code.newLocal(returnType);
+
+        Local boxedReturnValue = null;
+
+        if (returnType.equals(TypeId.INT)) {
+            boxedReturnValue = code.newLocal(TypeId.get(Integer.class));
+        }
 
         code.loadConstant(callerClass, original);
         if (Modifier.isStatic(methodTemplate.getModifiers())) {
@@ -91,7 +98,20 @@ public class EyePatchClassLoader {
                 callerMethod,
                 callerArgs);
 
-        code.cast(castedReturnValue, returnValue);
+        if (returnType.equals(TypeId.INT)) {
+            MethodId intValue = TypeId.get(Integer.class)
+                    .getMethod(
+                            TypeId.INT,
+                            "intValue");
+            code.cast(boxedReturnValue, returnValue);
+            code.invokeVirtual(
+                    intValue,
+                    castedReturnValue,
+                    boxedReturnValue);
+
+        } else {
+            code.cast(castedReturnValue, returnValue);
+        }
         code.returnValue(castedReturnValue);
     }
 
