@@ -241,4 +241,31 @@ public class EyePatchClassLoaderTest {
         }
     }
 
+    @Test
+    public void testTwoArgs() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        String functionName = "doSomething";
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithTwoArgument.class);
+        Object instance = barWrapped.newInstance();
+
+
+        Method method = barWrapped.getDeclaredMethod(functionName, String.class, Integer.class);
+        method.invoke(instance, "foo", new Integer(20));
+
+        verify(handler).handleInvocation(any(Class.class),
+                                         same(instance),
+                                         eq(functionName),
+                                         (Object[]) aryEq(new Object[] { "foo" , new Integer(20)}));
+
+    }
+
+    public static class BarWithTwoArgument {
+        public void doSomething(String arg, Integer arg2) {
+            fail("never called");
+        }
+    }
+
+
 }
