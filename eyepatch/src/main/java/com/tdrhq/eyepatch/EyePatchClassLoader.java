@@ -53,7 +53,7 @@ public class EyePatchClassLoader {
         Class[] parameterTypes = methodTemplate.getParameterTypes();
         TypeId[] arguments = new TypeId[parameterTypes.length];
         for (int i = 0 ;i < parameterTypes.length; i++) {
-            arguments[i] = TypeId.get(methodTemplate.getParameterTypes()[i]);
+            arguments[i] = TypeId.get(parameterTypes[i]);
         }
         MethodId foo = typeId.getMethod(returnType, methodTemplate.getName(), arguments);
         Code code = dexmaker.declare(foo, methodTemplate.getModifiers());
