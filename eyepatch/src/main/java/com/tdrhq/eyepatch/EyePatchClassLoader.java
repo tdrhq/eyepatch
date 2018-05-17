@@ -78,8 +78,8 @@ public class EyePatchClassLoader {
 
         Local boxedReturnValue = null;
 
-        if (isPrimitive(returnType)) {
-            boxedReturnValue = code.newLocal(getBoxedType(returnType));
+        if (Primitives.isPrimitive(returnType)) {
+            boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
         }
 
         code.loadConstant(callerClass, original);
@@ -98,11 +98,11 @@ public class EyePatchClassLoader {
                 callerMethod,
                 callerArgs);
 
-        if (isPrimitive(returnType)) {
-            MethodId intValue = getBoxedType(returnType)
+        if (Primitives.isPrimitive(returnType)) {
+            MethodId intValue = Primitives.getBoxedType(returnType)
                     .getMethod(
                             returnType,
-                            getUnboxFunction(returnType));
+                            Primitives.getUnboxFunction(returnType));
             code.cast(boxedReturnValue, returnValue);
             code.invokeVirtual(
                     intValue,
@@ -113,33 +113,6 @@ public class EyePatchClassLoader {
             code.cast(castedReturnValue, returnValue);
         }
         code.returnValue(castedReturnValue);
-    }
-
-    TypeId getBoxedType(TypeId primitive) {
-        if (primitive.equals(TypeId.INT)) {
-            return TypeId.get(Integer.class);
-        } else if (primitive.equals(TypeId.FLOAT)) {
-            return TypeId.get(Float.class);
-        }
-        throw new RuntimeException("not supported");
-    }
-
-    private boolean isPrimitive(TypeId type) {
-        if (type.equals(TypeId.INT) || type.equals(TypeId.FLOAT)) {
-            return true;
-        }
-        return false;
-    }
-
-    private String getUnboxFunction(TypeId primitive) {
-        if (primitive.equals(TypeId.INT)) {
-            return "intValue";
-        }
-        if (primitive.equals(TypeId.FLOAT)) {
-            return "floatValue";
-        }
-
-        throw new RuntimeException("not supported");
     }
 
     public static void invokeHelper(Class klass, String name) {
