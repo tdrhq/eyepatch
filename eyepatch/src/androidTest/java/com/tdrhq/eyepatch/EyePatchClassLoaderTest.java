@@ -6,6 +6,7 @@ import org.junit.*;
 import org.junit.rules.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.AdditionalMatchers.*;
 
 public class EyePatchClassLoaderTest {
     private EyePatchClassLoader mEyePatchClassLoader;
@@ -44,13 +45,13 @@ public class EyePatchClassLoaderTest {
         when(handler.handleInvocation(any(Class.class),
                                       (Object) eq(null),
                                       eq("foo"),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn("foo3");
 
         when(handler.handleInvocation(any(Class.class),
                                       (Object) eq(null),
                                       eq("car"),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn("car3");
 
         Class barWrapped = mEyePatchClassLoader.wrapClass(Bar.class);
@@ -72,7 +73,7 @@ public class EyePatchClassLoaderTest {
         when(handler.handleInvocation(any(Class.class),
                                       same(instance),
                                       eq("nonStatic"),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn("foo3");
 
         Method method = barWrapped.getMethod("nonStatic");
@@ -90,7 +91,7 @@ public class EyePatchClassLoaderTest {
         when(handler.handleInvocation(any(Class.class),
                                       same(instance),
                                       eq("finalMethod"),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn("foo3");
 
         Method method = barWrapped.getMethod("finalMethod");
@@ -108,7 +109,7 @@ public class EyePatchClassLoaderTest {
         when(handler.handleInvocation(any(Class.class),
                                       same(instance),
                                       eq("otherReturnType"),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn(Integer.valueOf(30));
 
         Method method = barWrapped.getMethod("otherReturnType");
@@ -127,7 +128,7 @@ public class EyePatchClassLoaderTest {
         when(handler.handleInvocation(any(Class.class),
                                       same(instance),
                                       eq(functionName),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn(Integer.valueOf(30));
 
         Method method = barWrapped.getMethod(functionName);
@@ -146,7 +147,7 @@ public class EyePatchClassLoaderTest {
         when(handler.handleInvocation(any(Class.class),
                                       same(instance),
                                       eq(functionName),
-                                      (Object[]) eq(null)))
+                                      any(Object[].class)))
                 .thenReturn(Float.valueOf(30.0f));
 
         Method method = barWrapped.getMethod(functionName);
@@ -169,7 +170,7 @@ public class EyePatchClassLoaderTest {
         verify(handler).handleInvocation(any(Class.class),
                                          same(instance),
                                          eq(functionName),
-                                         (Object[]) eq(null));
+                                         any(Object[].class));
 
     }
 
@@ -211,6 +212,32 @@ public class EyePatchClassLoaderTest {
 
     public static class BarWithVoid {
         public void doSomething() {
+        }
+    }
+
+    @Test
+    public void testSingleArg() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        String functionName = "doSomething";
+        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithArgument.class);
+        Object instance = barWrapped.newInstance();
+
+
+        Method method = barWrapped.getDeclaredMethod(functionName, String.class);
+        method.invoke(instance, "foo");
+
+        verify(handler).handleInvocation(any(Class.class),
+                                         same(instance),
+                                         eq(functionName),
+                                         (Object[]) aryEq(new String[] { "foo" }));
+
+    }
+
+    public static class BarWithArgument {
+        public void doSomething(String arg) {
+            fail("never called");
         }
     }
 

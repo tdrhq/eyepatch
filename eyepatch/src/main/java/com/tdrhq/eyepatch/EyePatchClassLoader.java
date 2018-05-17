@@ -1,6 +1,7 @@
 package com.tdrhq.eyepatch;
 
 import com.android.dx.*;
+import com.android.dx.UnaryOp;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -49,7 +50,12 @@ public class EyePatchClassLoader {
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
         TypeId returnType = TypeId.get(methodTemplate.getReturnType());
-        MethodId foo = typeId.getMethod(returnType, methodTemplate.getName());
+        Class[] parameterTypes = methodTemplate.getParameterTypes();
+        TypeId[] arguments = new TypeId[parameterTypes.length];
+        for (int i = 0 ;i < parameterTypes.length; i++) {
+            arguments[i] = TypeId.get(methodTemplate.getParameterTypes()[i]);
+        }
+        MethodId foo = typeId.getMethod(returnType, methodTemplate.getName(), arguments);
         Code code = dexmaker.declare(foo, methodTemplate.getModifiers());
 
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
@@ -78,12 +84,17 @@ public class EyePatchClassLoader {
         Local<String> callerMethod = code.newLocal(TypeId.STRING);
         Local<Object[]> callerArgs = code.newLocal(TypeId.get(Object[].class));
         Local castedReturnValue = code.newLocal(returnType);
+        Local<Integer> parameterLength = code.newLocal(TypeId.INT);
 
         Local boxedReturnValue = null;
 
         if (Primitives.isPrimitive(returnType) && returnType != TypeId.VOID) {
             boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
         }
+
+        code.loadConstant(parameterLength, parameterTypes.length);
+
+        buildCallerArray(callerArgs, parameterLength, parameterTypes, code);
 
         code.loadConstant(callerClass, original);
         if (Modifier.isStatic(methodTemplate.getModifiers())) {
@@ -92,7 +103,6 @@ public class EyePatchClassLoader {
             instanceArg = code.getThis(typeId);
         }
         code.loadConstant(callerMethod, methodTemplate.getName());
-        code.loadConstant(callerArgs, null);
         code.invokeStatic(
                 invokeStaticMethod,
                 returnValue,
@@ -120,6 +130,16 @@ public class EyePatchClassLoader {
             code.returnVoid();
         } else {
             code.returnValue(castedReturnValue);
+        }
+    }
+
+    private void buildCallerArray(
+            Local<Object[]> callerArgs, Local<Integer> parameterLength,
+            Class[] parameterTypes, Code code) {
+        code.newArray(callerArgs, parameterLength);
+        for (int i = parameterTypes.length - 1; i>= 0; i--) {
+            code.loadConstant(parameterLength, i);
+            code.aput(callerArgs, parameterLength, code.getParameter(i, TypeId.get(parameterTypes[i])));
         }
     }
 
