@@ -78,7 +78,7 @@ public class EyePatchClassLoader {
 
         Local boxedReturnValue = null;
 
-        if (returnType.equals(TypeId.INT)) {
+        if (isPrimitive(returnType)) {
             boxedReturnValue = code.newLocal(getBoxedType(returnType));
         }
 
@@ -120,6 +120,13 @@ public class EyePatchClassLoader {
             return TypeId.get(Integer.class);
         }
         throw new RuntimeException("not supported");
+    }
+
+    private boolean isPrimitive(TypeId type) {
+        if (type.equals(TypeId.INT)) {
+            return true;
+        }
+        return false;
     }
 
     public static void invokeHelper(Class klass, String name) {
