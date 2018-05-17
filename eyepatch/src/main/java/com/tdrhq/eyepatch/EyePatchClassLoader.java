@@ -1,10 +1,12 @@
 package com.tdrhq.eyepatch;
 
+import android.util.Log;
 import com.android.dx.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public class EyePatchClassLoader {
     private File mDataDir;
@@ -51,7 +53,7 @@ public class EyePatchClassLoader {
         for (int i = 0 ;i < parameterTypes.length; i++) {
             arguments[i] = TypeId.get(parameterTypes[i]);
         }
-        MethodId cons = typeId.getConstructor();
+        MethodId cons = typeId.getConstructor(arguments);
         final TypeId parent = TypeId.get(original.getSuperclass());
         final Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         generateMethodContents(
@@ -179,6 +181,7 @@ public class EyePatchClassLoader {
             Local<Object> tmp,
             Class[] parameterTypes, Code code) {
         code.newArray(callerArgs, parameterLength);
+        Log.i("EyePatchClassLoader", "class: " + Arrays.toString(parameterTypes));
         for (int i = parameterTypes.length - 1; i>= 0; i--) {
             code.loadConstant(parameterLength, i);
             if (Primitives.isPrimitive(parameterTypes[i])) {

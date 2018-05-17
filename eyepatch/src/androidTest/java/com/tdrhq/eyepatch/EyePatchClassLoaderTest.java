@@ -1,12 +1,13 @@
 package com.tdrhq.eyepatch;
 
 import android.util.Log;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import org.junit.*;
 import org.junit.rules.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class EyePatchClassLoaderTest {
     private EyePatchClassLoader mEyePatchClassLoader;
@@ -325,7 +326,7 @@ public class EyePatchClassLoaderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         StaticInvocationHandler.sHandler = handler;
 
-        Class barWrapped = mEyePatchClassLoader.wrapClass(BarWithTwoArgumentWithPrim.class);
+        Class barWrapped = mEyePatchClassLoader.wrapClass(Foo.class);
         Object instance = barWrapped.newInstance();
 
         verify(handler).handleInvocation(any(Class.class),
@@ -336,4 +337,25 @@ public class EyePatchClassLoaderTest {
 
     public static class Foo {
     }
+
+    @Test
+    public void testCallsConstructorWithArgs() throws Throwable {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.sHandler = handler;
+
+        Class barWrapped = mEyePatchClassLoader.wrapClass(FooWithArg.class);
+        Constructor constructor = barWrapped.getConstructor(int.class);
+        Object instance = constructor.newInstance(20);
+
+        verify(handler).handleInvocation(any(Class.class),
+                                         same(instance),
+                                         eq("__construct__"),
+                                         (Object[]) aryEq(new Object[] {20}));
+    }
+
+    public static class FooWithArg {
+        public FooWithArg(int val) {
+        }
+    }
+
 }
