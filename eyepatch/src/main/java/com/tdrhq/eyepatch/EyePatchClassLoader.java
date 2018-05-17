@@ -79,7 +79,7 @@ public class EyePatchClassLoader {
         Local boxedReturnValue = null;
 
         if (returnType.equals(TypeId.INT)) {
-            boxedReturnValue = code.newLocal(TypeId.get(Integer.class));
+            boxedReturnValue = code.newLocal(getBoxedType(returnType));
         }
 
         code.loadConstant(callerClass, original);
@@ -99,9 +99,9 @@ public class EyePatchClassLoader {
                 callerArgs);
 
         if (returnType.equals(TypeId.INT)) {
-            MethodId intValue = TypeId.get(Integer.class)
+            MethodId intValue = getBoxedType(returnType)
                     .getMethod(
-                            TypeId.INT,
+                            returnType,
                             "intValue");
             code.cast(boxedReturnValue, returnValue);
             code.invokeVirtual(
@@ -113,6 +113,13 @@ public class EyePatchClassLoader {
             code.cast(castedReturnValue, returnValue);
         }
         code.returnValue(castedReturnValue);
+    }
+
+    TypeId getBoxedType(TypeId primitive) {
+        if (primitive.equals(TypeId.INT)) {
+            return TypeId.get(Integer.class);
+        }
+        throw new RuntimeException("not supported");
     }
 
     public static void invokeHelper(Class klass, String name) {
