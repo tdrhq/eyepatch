@@ -37,10 +37,6 @@ public class Primitives {
         throw new RuntimeException("unknown type");
     }
 
-    private static String upcaseFirst(String input) {
-        return input.substring(0, 1).toUpperCase() + input.substring(1);
-    }
-
     public static boolean isPrimitive(TypeId type) {
         for (Class primitive : allPrimitives) {
             if (type == TypeId.get(primitive)) {
