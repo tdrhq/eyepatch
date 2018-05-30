@@ -13,6 +13,11 @@ public class AndroidClassLoaderTest {
     }
 
     @Test
+    public void testVerifyDefaultClassLoader() throws Throwable {
+        assertEquals("dalvik.system.PathClassLoader", getClass().getClassLoader().getClass().getName());
+    }
+
+    @Test
     public void testSimpleCreation() throws Throwable {
         Class<?> klass = classLoader.loadClass(Foo.class.getName());
     }
