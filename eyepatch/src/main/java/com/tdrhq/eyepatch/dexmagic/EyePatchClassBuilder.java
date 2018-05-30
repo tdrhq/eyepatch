@@ -9,9 +9,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
-public class EyePatchClassLoader {
+public class EyePatchClassBuilder {
     private File mDataDir;
-    public EyePatchClassLoader(File dataDir) {
+    public EyePatchClassBuilder(File dataDir) {
         mDataDir = dataDir;
     }
 
@@ -182,7 +182,7 @@ public class EyePatchClassLoader {
             Local<Object> tmp,
             Class[] parameterTypes, Code code) {
         code.newArray(callerArgs, parameterLength);
-        Log.i("EyePatchClassLoader", "class: " + Arrays.toString(parameterTypes));
+        Log.i("EyePatchClassBuilder", "class: " + Arrays.toString(parameterTypes));
         for (int i = parameterTypes.length - 1; i>= 0; i--) {
             code.loadConstant(parameterLength, i);
             if (Primitives.isPrimitive(parameterTypes[i])) {
