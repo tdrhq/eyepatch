@@ -45,4 +45,13 @@ public class EyePatchTestRunnerTest {
                 EyePatchTestRunner.class.getClassLoader().getClass());
 
     }
+
+    @Test
+    public void testGetTestClassLoader() throws Throwable {
+        assertNotNull(getTestClassLoader());
+    }
+
+    private AndroidClassLoader getTestClassLoader() {
+        return (AndroidClassLoader) getClass().getClassLoader();
+    }
 }
