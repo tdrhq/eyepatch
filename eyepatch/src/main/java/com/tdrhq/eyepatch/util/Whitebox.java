@@ -1,4 +1,4 @@
-package com.tdrhq.eyepatch;
+package com.tdrhq.eyepatch.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

@@ -1,6 +1,6 @@
 // (c) 2018 Arnold Noronha <arnold@tdrhq.com>
 
-package com.tdrhq.eyepatch;
+package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.TypeId;
 

@@ -1,4 +1,4 @@
-package io.jippo;
+package com.tdrhq.eyepatch.dexmagic;
 
 import org.junit.Test;
 

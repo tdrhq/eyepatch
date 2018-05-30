@@ -1,7 +1,8 @@
-package com.tdrhq.eyepatch;
+package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
 import com.android.dx.*;
+
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

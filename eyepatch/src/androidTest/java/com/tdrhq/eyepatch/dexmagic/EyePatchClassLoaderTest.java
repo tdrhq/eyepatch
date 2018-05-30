@@ -1,6 +1,10 @@
-package com.tdrhq.eyepatch;
+package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+
+import com.tdrhq.eyepatch.dexmagic.EyePatchClassLoader;
+import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import org.junit.*;

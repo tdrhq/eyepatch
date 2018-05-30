@@ -1,6 +1,8 @@
-package com.tdrhq.eyepatch;
+package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.TypeId;
+import com.tdrhq.eyepatch.dexmagic.Primitives;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
