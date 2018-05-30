@@ -1,6 +1,8 @@
 package com.tdrhq.eyepatch.runner;
 
+import com.android.dx.Code;
 import com.tdrhq.eyepatch.classloader.AndroidClassLoader;
+import dalvik.system.PathClassLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
@@ -27,5 +29,12 @@ public class EyePatchTestRunnerTest {
         assertEquals(
                 AndroidClassLoader.class.getName(),
                 Foo.class.getClassLoader().getClass().getName());
+    }
+
+    @Test
+    public void testDexmakerHasInternalClass() throws Throwable {
+        assertSame(
+                PathClassLoader.class,
+                Code.class.getClassLoader().getClass());
     }
 }

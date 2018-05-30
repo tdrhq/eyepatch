@@ -48,6 +48,10 @@ public class AndroidClassLoader extends ClassLoader {
             return true;
         }
 
+        if (name.startsWith("com.android.dx")) {
+            return true;
+        }
+
         return false;
     }
 
