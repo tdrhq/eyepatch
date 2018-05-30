@@ -1,10 +1,10 @@
 package com.tdrhq.eyepatch.classloader;
 
-import java.util.ArrayList;
+import com.tdrhq.eyepatch.util.Whitebox;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 public class AndroidClassLoaderTest {
     private AndroidClassLoader classLoader;
@@ -27,6 +27,13 @@ public class AndroidClassLoaderTest {
     }
 
     @Test
+    public void testNestedCreation() throws Throwable {
+        Class<?> klass = classLoader.loadClass(OtherClass.class.getName());
+
+        Whitebox.invoke(klass.newInstance(), "doStuff", new Class[] {});
+    }
+
+    @Test
     public void testgetOriginalDexPath() throws Throwable {
         assertThat(
                 classLoader.getOriginalDexPath(),
@@ -34,5 +41,13 @@ public class AndroidClassLoaderTest {
     }
 
     public static class Foo {
+    }
+
+    public static class OtherClass {
+        public void doStuff() {
+            assertEquals(
+                    AndroidClassLoader.class.getName(),
+                    Foo.class.getClassLoader().getClass().getName());
+        }
     }
 }
