@@ -2,6 +2,8 @@
 
 package com.tdrhq.eyepatch.classloader;
 
+import dalvik.system.PathClassLoader;
+
 /**
  * A class-loader that's kind of like the build-in Android class
  * loader, with places to hook into it.
