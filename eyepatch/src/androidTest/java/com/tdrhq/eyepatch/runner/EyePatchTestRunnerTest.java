@@ -37,4 +37,12 @@ public class EyePatchTestRunnerTest {
                 PathClassLoader.class,
                 Code.class.getClassLoader().getClass());
     }
+
+    @Test
+    public void testEyePatchInternals() throws Throwable {
+        assertSame(
+                PathClassLoader.class,
+                EyePatchTestRunner.class.getClassLoader().getClass());
+
+    }
 }

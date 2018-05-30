@@ -52,6 +52,17 @@ public class AndroidClassLoader extends ClassLoader {
             return true;
         }
 
+        if (name.startsWith("com.tdrhq.eyepatch.")) {
+            // But.. we need to make sure test classes don't get blacklisted
+            if (name.endsWith("Test") ||
+                name.contains("Test$") ||
+                name.contains("Blacklisted")) {
+                Log.i("AndroidClassLoader", "Whitelisting: " + name);
+                return false;
+            }
+            return true;
+        }
+
         return false;
     }
 
