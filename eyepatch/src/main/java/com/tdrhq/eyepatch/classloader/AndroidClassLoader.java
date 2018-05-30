@@ -2,6 +2,8 @@
 
 package com.tdrhq.eyepatch.classloader;
 
+import com.tdrhq.eyepatch.util.Whitebox;
+import dalvik.system.BaseDexClassLoader;
 import dalvik.system.PathClassLoader;
 
 /**
@@ -9,11 +11,19 @@ import dalvik.system.PathClassLoader;
  * loader, with places to hook into it.
  */
 public class AndroidClassLoader extends ClassLoader {
+    private PathClassLoader parent;
+
     public AndroidClassLoader(ClassLoader realClassLoader) {
-        super(); // no parent
+        super(realClassLoader);
+        parent = (PathClassLoader) realClassLoader;
     }
 
     public Class<?> findClass(String name) {
+        String path = getOriginalDexPath();
         return getClass(); // lies!
+    }
+
+    String getOriginalDexPath() {
+        return (String) Whitebox.getField(parent, BaseDexClassLoader.class, "originalPath");
     }
 }

@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 
 public class Whitebox {
-    static Object invoke(Object instance, String name, Class[] argTypes, Object... args) {
+    public static Object invoke(Object instance, String name, Class[] argTypes, Object... args) {
         try {
             Method method = instance.getClass().getDeclaredMethod(name, argTypes);
             method.setAccessible(true);
@@ -21,19 +21,32 @@ public class Whitebox {
         }
     }
 
-    static Object getField(Object instance, Class type, String fieldName) {
+    public static Object getField(Object instance, Class type, String fieldName) {
         try {
             Field field = type.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field.get(instance);
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                    "No such field, should be one of: " +
+                    getFieldList(type),
+                    e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    static Object getField(Object instance, String fieldName) {
+    private static String getFieldList(Class type) {
+        Field[] fields = type.getDeclaredFields();
+        String ret = "";
+        for (Field f: fields) {
+            ret += f.getName() + "; ";
+        }
+        return ret;
+    }
+
+
+    public static Object getField(Object instance, String fieldName) {
         return getField(instance, instance.getClass(), fieldName);
     }
 
