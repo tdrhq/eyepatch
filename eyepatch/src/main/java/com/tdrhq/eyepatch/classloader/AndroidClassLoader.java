@@ -8,5 +8,10 @@ package com.tdrhq.eyepatch.classloader;
  */
 public class AndroidClassLoader extends ClassLoader {
     public AndroidClassLoader(ClassLoader realClassLoader) {
+        super(); // no parent
+    }
+
+    public Class<?> findClass(String name) {
+        return getClass(); // lies!
     }
 }
