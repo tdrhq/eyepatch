@@ -1,5 +1,7 @@
 package com.tdrhq.eyepatch.classloader;
 
+import android.os.Bundle;
+import android.view.View;
 import com.tdrhq.eyepatch.util.Whitebox;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +50,14 @@ public class AndroidClassLoaderTest {
             assertEquals(
                     AndroidClassLoader.class.getName(),
                     Foo.class.getClassLoader().getClass().getName());
+
+            assertEquals(
+                    "java.lang.BootClassLoader",
+                    Bundle.class.getClassLoader().getClass().getName());
+
+            assertEquals(
+                    "java.lang.BootClassLoader",
+                    View.class.getClassLoader().getClass().getName());
         }
     }
 }
