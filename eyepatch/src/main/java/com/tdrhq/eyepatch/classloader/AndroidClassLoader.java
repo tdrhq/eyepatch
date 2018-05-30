@@ -10,7 +10,9 @@ import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A class-loader that's kind of like the build-in Android class
@@ -19,10 +21,20 @@ import java.util.List;
 public class AndroidClassLoader extends ClassLoader {
     private PathClassLoader parent;
 
-    List<DexFile> dexFiles = new ArrayList();
+    List<DexFile> dexFiles = new ArrayList<>();
+    Set<String> mockables = new HashSet<>();
+
     public AndroidClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
+    }
+
+    public void addMockable(String className) {
+        mockables.add(className);
+    }
+
+    public Set<String> getMockables() {
+        return mockables;
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
