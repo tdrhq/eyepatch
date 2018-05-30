@@ -60,6 +60,10 @@ public class AndroidClassLoader extends ClassLoader {
             return true;
         }
 
+        if (name.startsWith("org.hamcrest")) {
+            return true;
+        }
+
         if (name.startsWith("com.android.dx")) {
             return true;
         }

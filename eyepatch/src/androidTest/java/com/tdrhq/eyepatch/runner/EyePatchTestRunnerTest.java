@@ -6,6 +6,7 @@ import dalvik.system.PathClassLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
 @EyePatchMockable( { EyePatchTestRunnerTest.Mockable.class })
 @RunWith(EyePatchTestRunner.class)
@@ -57,5 +58,12 @@ public class EyePatchTestRunnerTest {
 
     private AndroidClassLoader getTestClassLoader() {
         return (AndroidClassLoader) getClass().getClassLoader();
+    }
+
+    @Test
+    public void testGetMockables() throws Throwable {
+        assertThat(
+                getTestClassLoader().getMockables(),
+                containsInAnyOrder(Mockable.class.getName()));
     }
 }
