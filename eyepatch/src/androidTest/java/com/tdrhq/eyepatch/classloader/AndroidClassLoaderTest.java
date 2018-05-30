@@ -1,8 +1,10 @@
 package com.tdrhq.eyepatch.classloader;
 
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
 public class AndroidClassLoaderTest {
     private AndroidClassLoader classLoader;
@@ -20,6 +22,13 @@ public class AndroidClassLoaderTest {
     @Test
     public void testSimpleCreation() throws Throwable {
         Class<?> klass = classLoader.loadClass(Foo.class.getName());
+    }
+
+    @Test
+    public void testgetOriginalDexPath() throws Throwable {
+        assertThat(
+                classLoader.getOriginalDexPath(),
+                hasSize(greaterThan(1)));
     }
 
     public static class Foo {
