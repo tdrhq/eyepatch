@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.runner;
 
+import com.tdrhq.eyepatch.classloader.AndroidClassLoader;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
@@ -12,6 +13,12 @@ public class EyePatchTestRunner extends Runner {
     private Runner delegate;
 
     public EyePatchTestRunner(Class testClass) throws InitializationError {
+        AndroidClassLoader classLoader = new AndroidClassLoader(getClass().getClassLoader());
+        try {
+            testClass = classLoader.loadClass(testClass.getName());
+        } catch (ClassNotFoundException e) {
+            throw new InitializationError(e);
+        }
         delegate = new JUnit4(testClass);
     }
 

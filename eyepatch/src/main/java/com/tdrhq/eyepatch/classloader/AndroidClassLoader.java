@@ -26,6 +26,10 @@ public class AndroidClassLoader extends ClassLoader {
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        if (isBlacklisted(name)) {
+            return parent.loadClass(name);
+        }
+
         try {
             Class ret = findClass(name);
             resolveClass(ret);
@@ -33,6 +37,18 @@ public class AndroidClassLoader extends ClassLoader {
         } catch (ClassNotFoundException e) {
             return parent.loadClass(name);
         }
+    }
+
+    /**
+     * If anything is blacklisted, all its dependencies *must* be
+     * blacklisted too, otherwise bad things can happen.
+     */
+    private boolean isBlacklisted(String name) {
+        if (name.startsWith("org.junit")) {
+            return true;
+        }
+
+        return false;
     }
 
     public Class<?> findClass(String name) throws ClassNotFoundException {
