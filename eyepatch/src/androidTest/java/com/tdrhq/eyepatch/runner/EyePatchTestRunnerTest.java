@@ -18,4 +18,14 @@ public class EyePatchTestRunnerTest {
                 AndroidClassLoader.class.getName(),
                 getClass().getClassLoader().getClass().getName());
     }
+
+    public static class Foo {
+    }
+
+    @Test
+    public void testVerifyClassLoaderForOtherClass() throws Throwable {
+        assertEquals(
+                AndroidClassLoader.class.getName(),
+                Foo.class.getClassLoader().getClass().getName());
+    }
 }
