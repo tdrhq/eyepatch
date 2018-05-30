@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
+@EyePatchMockable( { EyePatchTestRunnerTest.Mockable.class })
 @RunWith(EyePatchTestRunner.class)
 public class EyePatchTestRunnerTest {
     @Test
@@ -22,6 +23,9 @@ public class EyePatchTestRunnerTest {
     }
 
     public static class Foo {
+    }
+
+    public static class Mockable {
     }
 
     @Test
