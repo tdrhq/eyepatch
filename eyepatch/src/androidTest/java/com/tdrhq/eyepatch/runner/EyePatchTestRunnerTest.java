@@ -8,5 +8,6 @@ import static org.junit.Assert.*;
 public class EyePatchTestRunnerTest {
     @Test
     public void testPreconditions() throws Throwable {
+        assertEquals(4, 2 + 2);
     }
 }
