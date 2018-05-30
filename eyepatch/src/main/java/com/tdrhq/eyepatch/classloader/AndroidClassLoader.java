@@ -24,6 +24,9 @@ public class AndroidClassLoader extends ClassLoader {
     }
 
     String getOriginalDexPath() {
-        return (String) Whitebox.getField(parent, BaseDexClassLoader.class, "originalPath");
+        Object dexPathList = Whitebox.getField(parent, BaseDexClassLoader.class, "pathList");
+        Object dexElements = Whitebox.getField(dexPathList, "dexElements");
+        return null;
     }
+
 }
