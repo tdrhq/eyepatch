@@ -2,11 +2,13 @@
 
 package com.tdrhq.eyepatch.classloader;
 
+import android.util.Log;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +19,53 @@ import java.util.List;
 public class AndroidClassLoader extends ClassLoader {
     private PathClassLoader parent;
 
+    List<DexFile> dexFiles = new ArrayList();
     public AndroidClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
     }
 
-    public Class<?> findClass(String name) {
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        try {
+            Class ret = findClass(name);
+            resolveClass(ret);
+            return ret;
+        } catch (ClassNotFoundException e) {
+            return parent.loadClass(name);
+        }
+    }
+
+    public Class<?> findClass(String name) throws ClassNotFoundException {
+        Log.i("AndroidClassLoader", "totally getting there");
+        if (dexFiles.size() == 0) {
+            try {
+                buildDexFiles();
+            } catch (IOException e) {
+                Log.e("AndroidClassLoader", "Exception while loading class", e);
+                throw new ClassNotFoundException();
+            }
+        }
+
+        Log.i("AndroidClassLoader", "Getting started");
+        for (DexFile dexFile : dexFiles) {
+            Class klass;
+            klass = dexFile.loadClass(name, this);
+            if (klass != null) {
+                Log.i("AndroidClassLoader", "found stuff");
+                return klass;
+            }
+        }
+
+        Log.i("AndroidClassLoader", "did not find the stuff");
+        throw new ClassNotFoundException(name);
+    }
+
+    private void buildDexFiles() throws IOException {
         List<String> path = getOriginalDexPath();
-        return getClass(); // lies!
+
+        for (String file : path) {
+            dexFiles.add(new DexFile(file));
+        }
     }
 
     List<String> getOriginalDexPath() {

@@ -22,6 +22,8 @@ public class AndroidClassLoaderTest {
     @Test
     public void testSimpleCreation() throws Throwable {
         Class<?> klass = classLoader.loadClass(Foo.class.getName());
+
+        assertSame(classLoader, klass.getClassLoader());
     }
 
     @Test
