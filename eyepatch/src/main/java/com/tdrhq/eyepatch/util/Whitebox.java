@@ -21,6 +21,20 @@ public class Whitebox {
         }
     }
 
+    public static Object invokeStatic(Class klass, String name, Class[] argTypes, Object... args) {
+        try {
+            Method method = klass.getDeclaredMethod(name, argTypes);
+            method.setAccessible(true);
+            return method.invoke(null, args);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Object getField(Object instance, Class type, String fieldName) {
         try {
             Field field = type.getDeclaredField(fieldName);
