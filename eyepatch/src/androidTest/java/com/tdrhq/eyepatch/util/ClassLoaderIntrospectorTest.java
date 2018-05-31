@@ -1,8 +1,9 @@
 package com.tdrhq.eyepatch.util;
 
+import dalvik.system.PathClassLoader;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 public class ClassLoaderIntrospectorTest {
     @Test
@@ -10,6 +11,16 @@ public class ClassLoaderIntrospectorTest {
         assertThat(
                 ClassLoaderIntrospector.getOriginalDexPath(getClass().getClassLoader()),
                 hasSize(greaterThan(1)));
+    }
+
+    @Test
+    public void testAddDexPath() throws Throwable {
+        ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader().getParent());
+        assertThat(ClassLoaderIntrospector.getOriginalDexPath(classLoader),
+                   is(empty()));
+
+
+
     }
 
     @Test
