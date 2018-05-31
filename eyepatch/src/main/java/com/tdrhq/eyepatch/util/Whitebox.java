@@ -19,12 +19,6 @@ public class Whitebox {
         return arg;
     }
 
-    public static Object invoke(Object instance, String name, Arg... args) {
-        return invoke_(instance, name,
-                getClasses(args),
-                getValues(args));
-    }
-
     private static Class[] getClasses(Arg... args) {
         Class[] ret = new Class[args.length];
         for (int i = 0; i < args.length; i++) {
@@ -42,11 +36,11 @@ public class Whitebox {
     }
 
 
-    public static Object invoke_(Object instance, String name, Class[] argTypes, Object... args) {
+    public static Object invoke(Object instance, String name, Arg... args) {
         try {
-            Method method = instance.getClass().getDeclaredMethod(name, argTypes);
+            Method method = instance.getClass().getDeclaredMethod(name, getClasses(args));
             method.setAccessible(true);
-            return method.invoke(instance, args);
+            return method.invoke(instance, getValues(args));
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
