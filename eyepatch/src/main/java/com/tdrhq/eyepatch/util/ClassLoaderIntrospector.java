@@ -9,6 +9,7 @@ import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import static com.tdrhq.eyepatch.util.Whitebox.arg;
 
 public class ClassLoaderIntrospector {
     private ClassLoaderIntrospector() {
@@ -30,6 +31,17 @@ public class ClassLoaderIntrospector {
         }
 
         return ret;
+    }
+
+    public static void addDexPaths(ClassLoader classLoader, List<String> dexPaths) {
+        Object dexPathList = Whitebox.getField(classLoader, BaseDexClassLoader.class, "pathList");
+        assert(dexPathList != null);
+
+        String dexPath = TextUtils.join(":", dexPaths);
+        Whitebox.invoke(dexPathList,
+                        "addDexPath",
+                        arg(String.class, dexPath),
+                        arg(File.class, null));
     }
 
     public static List<String> getOriginalNativeLibPath(ClassLoader parent) {

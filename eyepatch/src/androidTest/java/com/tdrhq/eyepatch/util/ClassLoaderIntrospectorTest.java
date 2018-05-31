@@ -1,6 +1,8 @@
 package com.tdrhq.eyepatch.util;
 
 import dalvik.system.PathClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -19,8 +21,16 @@ public class ClassLoaderIntrospectorTest {
         assertThat(ClassLoaderIntrospector.getOriginalDexPath(classLoader),
                    is(empty()));
 
+        List<String> dexPaths = new ArrayList<>();
+        String sampleDex = ClassLoaderIntrospector.getOriginalDexPath(getClass().getClassLoader())
+                .get(0);
+        dexPaths.add(sampleDex);
+        ClassLoaderIntrospector.addDexPaths(
+                classLoader,
+                dexPaths);
 
-
+        assertThat(ClassLoaderIntrospector.getOriginalDexPath(classLoader),
+                   contains(sampleDex));
     }
 
     @Test

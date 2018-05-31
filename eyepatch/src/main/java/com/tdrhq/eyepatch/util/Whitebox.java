@@ -12,7 +12,7 @@ public class Whitebox {
         Object value;
     }
 
-    private static <T> Arg arg(Class<T> type, T value) {
+    public static <T> Arg arg(Class<T> type, T value) {
         Arg arg = new Arg();
         arg.type = type;
         arg.value = value;
@@ -30,7 +30,7 @@ public class Whitebox {
     private static Object[] getValues(Arg... args) {
         Object[] ret = new Object[args.length];
         for (int i = 0; i < args.length; i++) {
-            ret[i] = args[i].type;
+            ret[i] = args[i].value;
         }
         return ret;
     }
