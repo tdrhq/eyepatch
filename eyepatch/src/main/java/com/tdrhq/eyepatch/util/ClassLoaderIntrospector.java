@@ -3,7 +3,6 @@
 package com.tdrhq.eyepatch.util;
 
 import android.text.TextUtils;
-import android.util.Log;
 import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
@@ -61,8 +60,6 @@ public class ClassLoaderIntrospector {
 
             PathClassLoader cloned = new PathClassLoader(dexPathAsStr, nativeLibPathAsStr, classLoader.getParent());
 
-            Log.i("ClassLoaderIntrospector", "old CL before clone: " + classLoader);
-            Log.i("ClassLoaderIntrospector", "new CL after clone : " + cloned);
             return cloned;
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
