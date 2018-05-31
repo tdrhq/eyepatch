@@ -35,13 +35,6 @@ public class AndroidClassLoaderTest {
         Whitebox.invoke(klass.newInstance(), "doStuff");
     }
 
-    @Test
-    public void testgetOriginalDexPath() throws Throwable {
-        assertThat(
-                classLoader.getOriginalDexPath(),
-                hasSize(greaterThan(1)));
-    }
-
     public static class Foo {
     }
 

@@ -3,8 +3,7 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
-import com.tdrhq.eyepatch.util.Whitebox;
-import dalvik.system.BaseDexClassLoader;
+import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
@@ -108,28 +107,10 @@ public class AndroidClassLoader extends ClassLoader {
     }
 
     private void buildDexFiles() throws IOException {
-        List<String> path = getOriginalDexPath();
+        List<String> path = ClassLoaderIntrospector.getOriginalDexPath(parent);
 
         for (String file : path) {
             dexFiles.add(new DexFile(file));
         }
     }
-
-    List<String> getOriginalDexPath() {
-        Object dexPathList = Whitebox.getField(parent, BaseDexClassLoader.class, "pathList");
-        assert(dexPathList != null);
-        Object[] dexElements = (Object[]) Whitebox.getField(dexPathList, "dexElements");
-        assert(dexElements != null);
-
-        List<String> ret = new ArrayList<>();
-        for (Object dexElement : dexElements) {
-            DexFile file = (DexFile) Whitebox.getField(dexElement, "dexFile");
-            if (file != null) {
-                ret.add(file.getName());
-            }
-        }
-
-        return ret;
-    }
-
 }
