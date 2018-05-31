@@ -56,11 +56,11 @@ public class Whitebox {
         }
     }
 
-    public static Object invokeStatic(Class klass, String name, Class[] argTypes, Object... args) {
+    public static Object invokeStatic(Class klass, String name, Arg... args) {
         try {
-            Method method = klass.getDeclaredMethod(name, argTypes);
+            Method method = klass.getDeclaredMethod(name, getClasses(args));
             method.setAccessible(true);
-            return method.invoke(null, args);
+            return method.invoke(null, getValues(args));
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
