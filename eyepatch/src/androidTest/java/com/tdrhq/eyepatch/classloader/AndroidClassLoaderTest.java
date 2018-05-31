@@ -32,7 +32,7 @@ public class AndroidClassLoaderTest {
     public void testNestedCreation() throws Throwable {
         Class<?> klass = classLoader.loadClass(OtherClass.class.getName());
 
-        Whitebox.invoke(klass.newInstance(), "doStuff", new Class[] {});
+        Whitebox.invoke(klass.newInstance(), "doStuff");
     }
 
     @Test

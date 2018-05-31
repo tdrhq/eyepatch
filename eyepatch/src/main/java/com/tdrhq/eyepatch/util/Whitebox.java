@@ -7,7 +7,42 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 
 public class Whitebox {
-    public static Object invoke(Object instance, String name, Class[] argTypes, Object... args) {
+    public static class Arg {
+        Class type;
+        Object value;
+    }
+
+    private static <T> Arg arg(Class<T> type, T value) {
+        Arg arg = new Arg();
+        arg.type = type;
+        arg.value = value;
+        return arg;
+    }
+
+    public static Object invoke(Object instance, String name, Arg... args) {
+        return invoke_(instance, name,
+                getClasses(args),
+                getValues(args));
+    }
+
+    private static Class[] getClasses(Arg... args) {
+        Class[] ret = new Class[args.length];
+        for (int i = 0; i < args.length; i++) {
+            ret[i] = args[i].type;
+        }
+        return ret;
+    }
+
+    private static Object[] getValues(Arg... args) {
+        Object[] ret = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            ret[i] = args[i].type;
+        }
+        return ret;
+    }
+
+
+    public static Object invoke_(Object instance, String name, Class[] argTypes, Object... args) {
         try {
             Method method = instance.getClass().getDeclaredMethod(name, argTypes);
             method.setAccessible(true);
