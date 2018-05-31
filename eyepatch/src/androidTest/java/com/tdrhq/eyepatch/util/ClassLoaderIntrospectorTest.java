@@ -11,4 +11,22 @@ public class ClassLoaderIntrospectorTest {
                 ClassLoaderIntrospector.getOriginalDexPath(getClass().getClassLoader()),
                 hasSize(greaterThan(1)));
     }
+
+    @Test
+    public void testClone() throws Throwable {
+        ClassLoader clone = ClassLoaderIntrospector.clone(
+                getClass().getClassLoader());
+        Class clonedClass = clone.loadClass(Foo.class.getName());
+        assertThat(
+                clonedClass,
+                not(sameInstance((Class) Foo.class)));
+
+        assertThat(
+                clonedClass.getClassLoader(),
+                not(sameInstance(getClass().getClassLoader())));
+
+    }
+
+    public static class Foo {
+    }
 }

@@ -2,8 +2,10 @@
 
 package com.tdrhq.eyepatch.util;
 
+import android.text.TextUtils;
 import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexFile;
+import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +32,15 @@ public class ClassLoaderIntrospector {
         return ret;
     }
 
+    public static ClassLoader clone(ClassLoader classLoader) {
+        if (!(classLoader instanceof BaseDexClassLoader)) {
+            throw new IllegalArgumentException("needs an android classloader to clone");
+        }
 
+        List<String> dexPath = getOriginalDexPath(classLoader);
+        String dexPathAsStr = TextUtils.join(":", dexPath);
+        PathClassLoader cloned = new PathClassLoader(dexPathAsStr, classLoader.getParent());
+
+        return cloned;
+    }
 }
