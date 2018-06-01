@@ -2,12 +2,13 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.EyePatch;
+import com.tdrhq.eyepatch.EyePatchMockito;
 import java.util.HashMap;
 import java.util.Map;
 import static org.mockito.Mockito.verify;
 
 public class MockitoClassHandler implements ClassHandler {
+    public static Class verifyStaticClass = null;
     private Class klass;
     private MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
 
@@ -42,9 +43,9 @@ public class MockitoClassHandler implements ClassHandler {
     public Object handleInvocation(Invocation invocation) {
         MockDelegate mockDelegate = getMockDelegate(invocation.getMethod(), invocation.getInstance());
 
-        if (klass == EyePatch.verifyStaticClass) {
+        if (klass == verifyStaticClass) {
             mockDelegate = verify(mockDelegate);
-            EyePatch.verifyStaticClass = null;
+            verifyStaticClass = null;
         }
 
         Object[] args = invocation.getArgs();
