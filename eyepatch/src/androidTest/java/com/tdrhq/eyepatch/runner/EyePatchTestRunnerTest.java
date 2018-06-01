@@ -87,7 +87,7 @@ public class EyePatchTestRunnerTest {
                      Mockito.any(Object.class),
                      Mockito.anyString(),
                      Mockito.any(Object[].class))).thenReturn("blah");
-        StaticInvocationHandler.sHandler = handler;
+        StaticInvocationHandler.setHandler(handler);
 
         assertEquals("blah", new Mockable().foo());
     }

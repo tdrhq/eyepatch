@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.util.Checks;
 
 public abstract class StaticInvocationHandler {
 
@@ -13,9 +14,14 @@ public abstract class StaticInvocationHandler {
             }
         };
 
-    public static StaticInvocationHandler sHandler = DEFAULT_HANDLER;
+    private static StaticInvocationHandler sHandler = DEFAULT_HANDLER;
+
     public static void setDefaultHandler() {
         sHandler = DEFAULT_HANDLER;
+    }
+
+    public static void setHandler(StaticInvocationHandler handler) {
+        sHandler = Checks.notNull(handler);
     }
 
     public StaticInvocationHandler() {
