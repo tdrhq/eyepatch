@@ -2,9 +2,10 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.EyePatch;
 import java.util.HashMap;
 import java.util.Map;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class MockitoClassHandler implements ClassHandler {
     private Class klass;
@@ -40,6 +41,12 @@ public class MockitoClassHandler implements ClassHandler {
     @Override
     public Object handleInvocation(Invocation invocation) {
         MockDelegate mockDelegate = getMockDelegate(invocation.getMethod(), invocation.getInstance());
+
+        if (klass == EyePatch.verifyStaticClass) {
+            mockDelegate = verify(mockDelegate);
+            EyePatch.verifyStaticClass = null;
+        }
+
         Object[] args = invocation.getArgs();
         // See gen-switch.el
         switch (args.length) {

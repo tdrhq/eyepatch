@@ -1,11 +1,11 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.EyePatch;
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -32,10 +32,23 @@ public class ExampleIntegrationTest {
         assertEquals("toyota", Foo.bar("car"));
     }
 
+    @Test
+    public void testCaptureOnVoidMethod() throws Throwable {
+        Foo.voidMethod("blah");
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        EyePatch.verifyStatic(Foo.class);
+        Foo.voidMethod(captor.capture());
+
+        assertEquals("blah", captor.getValue());
+    }
+
 
     public static class Foo {
         public static String bar(String arg) {
             return "notseenever";
+        }
+
+        public static void voidMethod(String arg) {
         }
     }
 }

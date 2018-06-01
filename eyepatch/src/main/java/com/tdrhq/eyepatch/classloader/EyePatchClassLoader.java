@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.EyePatch;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
