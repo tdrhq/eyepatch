@@ -28,8 +28,22 @@ public class MockitoClassHandlerFactoryTest {
         assertEquals("blah", Foo.foo());
     }
 
+    @Test
+    public void testDifferentArgs() throws Throwable {
+        when(Foo.bar("zoid")).thenReturn("berg");
+        when(Foo.bar("car")).thenReturn("toyota");
+
+        assertEquals("toyota", Foo.bar("car"));
+        assertEquals("berg", Foo.bar("zoid"));
+        assertEquals("toyota", Foo.bar("car"));
+    }
+
     public static class Foo {
         public static String foo() {
+            return "notseenever";
+        }
+
+        public static String bar(String arg) {
             return "notseenever";
         }
     }
