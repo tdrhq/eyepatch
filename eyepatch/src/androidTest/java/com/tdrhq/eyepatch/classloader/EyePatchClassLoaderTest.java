@@ -2,18 +2,24 @@ package com.tdrhq.eyepatch.classloader;
 
 import android.os.Bundle;
 import android.view.View;
+import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.util.Whitebox;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class EyePatchClassLoaderTest {
     private EyePatchClassLoader classLoader;
+    private EyePatchClassBuilder classBuilder;
 
     @Before
     public void before() throws Throwable {
-        classLoader = new EyePatchClassLoader(getClass().getClassLoader());
+        classBuilder = mock(EyePatchClassBuilder.class);
+        classLoader = new EyePatchClassLoader(
+                getClass().getClassLoader(),
+                classBuilder);
     }
 
     @Test

@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
@@ -23,7 +24,7 @@ public class EyePatchClassLoader extends ClassLoader {
     List<DexFile> dexFiles = new ArrayList<>();
     Set<String> mockables = new HashSet<>();
 
-    public EyePatchClassLoader(ClassLoader realClassLoader) {
+    public EyePatchClassLoader(ClassLoader realClassLoader, EyePatchClassBuilder mockClassBuilder) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
     }
