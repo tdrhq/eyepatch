@@ -1,7 +1,7 @@
 package com.tdrhq.eyepatch.runner;
 
 import com.android.dx.Code;
-import com.tdrhq.eyepatch.classloader.AndroidClassLoader;
+import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import dalvik.system.PathClassLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +19,7 @@ public class EyePatchTestRunnerTest {
     @Test
     public void testVerifyClassLoader() throws Throwable {
         assertEquals(
-                AndroidClassLoader.class.getName(),
+                EyePatchClassLoader.class.getName(),
                 getClass().getClassLoader().getClass().getName());
     }
 
@@ -32,7 +32,7 @@ public class EyePatchTestRunnerTest {
     @Test
     public void testVerifyClassLoaderForOtherClass() throws Throwable {
         assertEquals(
-                AndroidClassLoader.class.getName(),
+                EyePatchClassLoader.class.getName(),
                 Foo.class.getClassLoader().getClass().getName());
     }
 
@@ -56,8 +56,8 @@ public class EyePatchTestRunnerTest {
         assertNotNull(getTestClassLoader());
     }
 
-    private AndroidClassLoader getTestClassLoader() {
-        return (AndroidClassLoader) getClass().getClassLoader();
+    private EyePatchClassLoader getTestClassLoader() {
+        return (EyePatchClassLoader) getClass().getClassLoader();
     }
 
     @Test

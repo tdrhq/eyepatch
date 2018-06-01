@@ -17,13 +17,13 @@ import java.util.Set;
  * A class-loader that's kind of like the build-in Android class
  * loader, with places to hook into it.
  */
-public class AndroidClassLoader extends ClassLoader {
+public class EyePatchClassLoader extends ClassLoader {
     private PathClassLoader parent;
 
     List<DexFile> dexFiles = new ArrayList<>();
     Set<String> mockables = new HashSet<>();
 
-    public AndroidClassLoader(ClassLoader realClassLoader) {
+    public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
     }
@@ -72,7 +72,7 @@ public class AndroidClassLoader extends ClassLoader {
             if (name.endsWith("Test") ||
                 name.contains("Test$") ||
                 name.contains("Blacklisted")) {
-                Log.i("AndroidClassLoader", "Whitelisting: " + name);
+                Log.i("EyePatchClassLoader", "Whitelisting: " + name);
                 return false;
             }
             return true;
@@ -82,27 +82,27 @@ public class AndroidClassLoader extends ClassLoader {
     }
 
     public Class<?> findClass(String name) throws ClassNotFoundException {
-        Log.i("AndroidClassLoader", "totally getting there");
+        Log.i("EyePatchClassLoader", "totally getting there");
         if (dexFiles.size() == 0) {
             try {
                 buildDexFiles();
             } catch (IOException e) {
-                Log.e("AndroidClassLoader", "Exception while loading class", e);
+                Log.e("EyePatchClassLoader", "Exception while loading class", e);
                 throw new ClassNotFoundException();
             }
         }
 
-        Log.i("AndroidClassLoader", "Getting started");
+        Log.i("EyePatchClassLoader", "Getting started");
         for (DexFile dexFile : dexFiles) {
             Class klass;
             klass = dexFile.loadClass(name, this);
             if (klass != null) {
-                Log.i("AndroidClassLoader", "found stuff");
+                Log.i("EyePatchClassLoader", "found stuff");
                 return klass;
             }
         }
 
-        Log.i("AndroidClassLoader", "did not find the stuff");
+        Log.i("EyePatchClassLoader", "did not find the stuff");
         throw new ClassNotFoundException(name);
     }
 

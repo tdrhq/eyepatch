@@ -8,12 +8,12 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-public class AndroidClassLoaderTest {
-    private AndroidClassLoader classLoader;
+public class EyePatchClassLoaderTest {
+    private EyePatchClassLoader classLoader;
 
     @Before
     public void before() throws Throwable {
-        classLoader = new AndroidClassLoader(getClass().getClassLoader());
+        classLoader = new EyePatchClassLoader(getClass().getClassLoader());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class AndroidClassLoaderTest {
     public static class OtherClass {
         public void doStuff() {
             assertEquals(
-                    AndroidClassLoader.class.getName(),
+                    EyePatchClassLoader.class.getName(),
                     Foo.class.getClassLoader().getClass().getName());
 
             assertEquals(

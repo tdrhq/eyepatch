@@ -2,7 +2,7 @@
 
 package com.tdrhq.eyepatch.runner;
 
-import com.tdrhq.eyepatch.classloader.AndroidClassLoader;
+import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import java.text.Annotation;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -14,7 +14,7 @@ public class EyePatchTestRunner extends Runner {
     private Runner delegate;
 
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
-        AndroidClassLoader classLoader = new AndroidClassLoader(getClass().getClassLoader());
+        EyePatchClassLoader classLoader = new EyePatchClassLoader(getClass().getClassLoader());
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         for (Class<?> mockable : mockableAnnotation.value()) {
             classLoader.addMockable(mockable.getName());
