@@ -7,9 +7,11 @@ import java.util.Map;
 
 public class DefaultInvocationHandler extends StaticInvocationHandler {
 
+    private ClassHandlerFactory classHandlerFactory;
     private Map<Class, ClassHandler> classHandlerMap = new HashMap<>();
 
-    DefaultInvocationHandler() {
+    DefaultInvocationHandler(ClassHandlerFactory classHandlerFactory) {
+        this.classHandlerFactory = classHandlerFactory;
     }
 
     @Override
@@ -23,18 +25,13 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
             return classHandlerMap.get(klass);
         }
 
-        ClassHandler ret = new ClassHandler() {
-            @Override
-            public Object handleInvocation(Invocation invocation) {
-                return null;
-            }
-        };
+        ClassHandler ret = classHandlerFactory.create(klass);
 
         classHandlerMap.put(klass, ret);
         return ret;
     }
 
     public static DefaultInvocationHandler newInstance() {
-        return new DefaultInvocationHandler();
+        return new DefaultInvocationHandler(new DefaultClassHandlerFactory());
     }
 }

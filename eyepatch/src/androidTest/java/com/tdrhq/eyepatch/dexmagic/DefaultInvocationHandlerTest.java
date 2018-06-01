@@ -3,13 +3,21 @@ package com.tdrhq.eyepatch.dexmagic;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class DefaultInvocationHandlerTest {
     private DefaultInvocationHandler handler;
+    private ClassHandlerFactory classHandlerFactory;
 
     @Before
     public void before() throws Throwable {
-        handler = new DefaultInvocationHandler();
+        classHandlerFactory = new ClassHandlerFactory() {
+                @Override
+                public ClassHandler create(Class klass) {
+                    return mock(ClassHandler.class);
+                }
+            };
+        handler = new DefaultInvocationHandler(classHandlerFactory);
     }
 
     @Test
