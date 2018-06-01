@@ -2,8 +2,8 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-public class DefaultClassHandlerFactory implements ClassHandlerFactory {
-    public DefaultClassHandlerFactory() {
+public class MockitoClassHandlerFactory implements ClassHandlerFactory {
+    public MockitoClassHandlerFactory() {
     }
 
     @Override
@@ -11,7 +11,7 @@ public class DefaultClassHandlerFactory implements ClassHandlerFactory {
         return new ClassHandler() {
             @Override
             public Object handleInvocation(Invocation invocation) {
-                return null;
+                throw new RuntimeException("not called");
             }
         };
     }

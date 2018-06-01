@@ -32,6 +32,6 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
     }
 
     public static DefaultInvocationHandler newInstance() {
-        return new DefaultInvocationHandler(new DefaultClassHandlerFactory());
+        return new DefaultInvocationHandler(new MockitoClassHandlerFactory());
     }
 }
