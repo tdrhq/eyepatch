@@ -3,11 +3,15 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 public class DefaultInvocationHandler extends StaticInvocationHandler {
-    public DefaultInvocationHandler() {
+    DefaultInvocationHandler() {
     }
 
     @Override
     public Object handleInvocation(Invocation invocation) {
         return null;
+    }
+
+    public static DefaultInvocationHandler newInstance() {
+        return new DefaultInvocationHandler();
     }
 }
