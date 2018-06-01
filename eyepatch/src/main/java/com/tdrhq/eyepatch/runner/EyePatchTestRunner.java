@@ -34,6 +34,8 @@ public class EyePatchTestRunner extends Runner {
         }
     }
 
+    private ExposedTemporaryFolder tmpdir = new ExposedTemporaryFolder();
+
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
                 getClass().getClassLoader(),
