@@ -25,7 +25,24 @@ public class MockitoClassHandler implements ClassHandler {
     public Object handleInvocation(Invocation invocation) {
         return mockDelegate.invoke(
                 invocation.getMethod(),
-                invocation.getInstance(),
+                new Reference(invocation.getInstance()),
                 invocation.getArgs());
+    }
+
+    public static class Reference {
+        private Object object;
+        public Reference(Object object) {
+            this.object = object;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof Reference)) {
+                return false;
+            }
+
+            Reference otherRef = (Reference) other;
+            return object == otherRef.object;
+        }
     }
 }
