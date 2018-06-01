@@ -4,6 +4,7 @@ package com.tdrhq.eyepatch.runner;
 
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
+import com.tdrhq.eyepatch.dexmagic.MockDelegateFactory;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -42,6 +43,8 @@ public class EyePatchTestRunner extends Runner {
                 getClass().getClassLoader(),
                 new EyePatchClassBuilder(tmpdir.getRoot()));
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
+
+        MockDelegateFactory.getInstance();
         for (Class<?> mockable : mockableAnnotation.value()) {
             classLoader.addMockable(mockable.getName());
         }

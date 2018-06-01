@@ -20,6 +20,11 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
                 .handleInvocation(invocation);
     }
 
+    @Override
+    public void prepare(Class klass) {
+        getClassHandler(klass);
+    }
+
     ClassHandler getClassHandler(Class klass) {
 
         if (classHandlerMap.containsKey(klass)) {
