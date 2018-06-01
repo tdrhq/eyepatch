@@ -9,6 +9,7 @@ import org.junit.rules.*;
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.*;
 import static org.mockito.Mockito.*;
+import org.hamcrest.Matchers;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder mEyePatchClassBuilder;
@@ -360,4 +361,12 @@ public class EyePatchClassBuilderTest {
         }
     }
 
+    @Test
+    public void testCantUseSameClassLoader() throws Throwable {
+        try {
+            mEyePatchClassBuilder.wrapClass(Bar.class, Bar.class.getClassLoader());
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), Matchers.containsString("different"));
+        }
+    }
 }
