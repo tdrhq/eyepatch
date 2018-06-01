@@ -37,9 +37,10 @@ public class EyePatchTestRunner extends Runner {
     private ExposedTemporaryFolder tmpdir = new ExposedTemporaryFolder();
 
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
+        tmpdir.before();
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
                 getClass().getClassLoader(),
-                new EyePatchClassBuilder(null));
+                new EyePatchClassBuilder(tmpdir.getRoot()));
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         for (Class<?> mockable : mockableAnnotation.value()) {
             classLoader.addMockable(mockable.getName());
@@ -61,5 +62,6 @@ public class EyePatchTestRunner extends Runner {
     @Override
     public void run(RunNotifier runNotifier) {
         delegate.run(runNotifier);
+        tmpdir.after();
     }
 }
