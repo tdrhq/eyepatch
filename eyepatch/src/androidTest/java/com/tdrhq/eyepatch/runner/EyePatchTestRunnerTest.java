@@ -27,9 +27,6 @@ public class EyePatchTestRunnerTest {
     }
 
     public static class Mockable {
-        public String foo() {
-            return "car";
-        }
     }
 
     @Test
