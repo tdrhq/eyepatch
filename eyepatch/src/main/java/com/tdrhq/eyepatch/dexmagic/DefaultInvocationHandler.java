@@ -2,7 +2,13 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DefaultInvocationHandler extends StaticInvocationHandler {
+
+    private Map<Class, ClassHandler> classHandlerMap = new HashMap<>();
+
     DefaultInvocationHandler() {
     }
 
@@ -12,12 +18,20 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
     }
 
     ClassHandler getClassHandler(Class klass) {
-        return new ClassHandler() {
+
+        if (classHandlerMap.containsKey(klass)) {
+            return classHandlerMap.get(klass);
+        }
+
+        ClassHandler ret = new ClassHandler() {
             @Override
             public Object handleInvocation(Invocation invocation) {
                 return null;
             }
         };
+
+        classHandlerMap.put(klass, ret);
+        return ret;
     }
 
     public static DefaultInvocationHandler newInstance() {

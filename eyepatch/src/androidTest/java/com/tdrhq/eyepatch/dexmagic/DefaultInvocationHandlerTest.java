@@ -36,6 +36,8 @@ public class DefaultInvocationHandlerTest {
 
         assertNotSame(handler1, handler2);
 
+        assertSame(handler1, handler.getClassHandler(Foo.class));
+
     }
     public static class Foo {
         public String bar() {
