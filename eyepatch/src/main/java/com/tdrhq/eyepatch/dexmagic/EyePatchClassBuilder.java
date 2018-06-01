@@ -2,7 +2,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
 import com.android.dx.*;
-
+import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -11,21 +11,25 @@ import java.util.Arrays;
 
 public class EyePatchClassBuilder {
     private File mDataDir;
+    private int counter = 0;
+
     public EyePatchClassBuilder(File dataDir) {
         mDataDir = dataDir;
     }
 
-    public Class wrapClass(Class realClass) {
+    public Class wrapClass(Class realClass, ClassLoader classLoader) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
-            ClassLoader loader = dexmaker.generateAndLoad(
-                    new ClassLoaderWithBlacklist(realClass.getClassLoader(), realClass),
-                    mDataDir);
-            Class ret =  loader.loadClass(realClass.getName());
-            return ret;
+            byte[] dex = dexmaker.generate();
+
+            File of = new File(mDataDir, "EyePatch_Generated" + (++counter) + ".dex");
+            FileOutputStream os = new FileOutputStream(of);
+            os.write(dex);
+            os.close();
+
+            DexFile dexFile = new DexFile(of);
+            return dexFile.loadClass(realClass.getName(), classLoader);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
