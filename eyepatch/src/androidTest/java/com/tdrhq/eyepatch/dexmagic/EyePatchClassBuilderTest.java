@@ -365,6 +365,7 @@ public class EyePatchClassBuilderTest {
     public void testCantUseSameClassLoader() throws Throwable {
         try {
             mEyePatchClassBuilder.wrapClass(Bar.class, Bar.class.getClassLoader());
+            fail("expected exception");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), Matchers.containsString("different"));
         }

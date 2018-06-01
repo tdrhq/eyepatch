@@ -18,6 +18,12 @@ public class EyePatchClassBuilder {
     }
 
     public Class wrapClass(Class realClass, ClassLoader classLoader) {
+        if (realClass.getClassLoader() == classLoader) {
+            throw new IllegalArgumentException(
+                    "The classLoader provided must be different from the one " +
+                    "used to load realClass");
+        }
+
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             byte[] dex = dexmaker.generate();
