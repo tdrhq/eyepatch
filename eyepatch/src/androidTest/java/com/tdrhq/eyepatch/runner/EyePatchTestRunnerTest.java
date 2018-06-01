@@ -2,6 +2,7 @@ package com.tdrhq.eyepatch.runner;
 
 import com.android.dx.Code;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
+import com.tdrhq.eyepatch.dexmagic.Invocation;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
 import dalvik.system.PathClassLoader;
 import org.junit.After;
@@ -83,10 +84,7 @@ public class EyePatchTestRunnerTest {
     public void testCallsToStaticHandler() throws Throwable {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Mockito.when(handler.handleInvocation(
-                     Mockito.any(Class.class),
-                     Mockito.any(Object.class),
-                     Mockito.anyString(),
-                     Mockito.any(Object[].class))).thenReturn("blah");
+                             Mockito.any(Invocation.class))).thenReturn("blah");
         StaticInvocationHandler.setHandler(handler);
 
         assertEquals("blah", new Mockable().foo());

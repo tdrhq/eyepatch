@@ -45,16 +45,21 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         StaticInvocationHandler.setHandler(handler);
 
-        when(handler.handleInvocation(any(Class.class),
-                                      (Object) eq(null),
-                                      eq("foo"),
-                                      any(Object[].class)))
+        Invocation expectedInvocation = new Invocation(
+                Bar.class,
+                null,
+                "foo",
+                new Object[] {});
+
+        when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("foo3");
 
-        when(handler.handleInvocation(any(Class.class),
-                                      (Object) eq(null),
-                                      eq("car"),
-                                      any(Object[].class)))
+        Invocation expectedCarInvocation = new Invocation(
+                Bar.class,
+                null,
+                "car",
+                new Object[] {});
+        when(handler.handleInvocation(expectedCarInvocation))
                 .thenReturn("car3");
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
@@ -73,10 +78,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
 
-        when(handler.handleInvocation(any(Class.class),
-                                      same(instance),
-                                      eq("nonStatic"),
-                                      any(Object[].class)))
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                "nonStatic",
+                new Object[] {});
+
+        when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
 
         Method method = barWrapped.getMethod("nonStatic");
@@ -91,10 +99,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
 
-        when(handler.handleInvocation(any(Class.class),
-                                      same(instance),
-                                      eq("finalMethod"),
-                                      any(Object[].class)))
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                "finalMethod",
+                new Object[] {});
+
+        when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
 
         Method method = barWrapped.getMethod("finalMethod");
@@ -109,10 +120,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
 
-        when(handler.handleInvocation(any(Class.class),
-                                      same(instance),
-                                      eq("otherReturnType"),
-                                      any(Object[].class)))
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                "otherReturnType",
+                new Object[] {});
+
+        when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
 
         Method method = barWrapped.getMethod("otherReturnType");
@@ -128,10 +142,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithPrimitive.class, classLoader);
         Object instance = barWrapped.newInstance();
 
-        when(handler.handleInvocation(any(Class.class),
-                                      same(instance),
-                                      eq(functionName),
-                                      any(Object[].class)))
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Object[] {});
+
+        when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
 
         Method method = barWrapped.getMethod(functionName);
@@ -147,10 +164,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithfloat.class, classLoader);
         Object instance = barWrapped.newInstance();
 
-        when(handler.handleInvocation(any(Class.class),
-                                      same(instance),
-                                      eq(functionName),
-                                      any(Object[].class)))
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Object[] {});
+
+        when(handler.handleInvocation(invocation))
                 .thenReturn(Float.valueOf(30.0f));
 
         Method method = barWrapped.getMethod(functionName);
@@ -169,11 +189,13 @@ public class EyePatchClassBuilderTest {
 
         Method method = barWrapped.getMethod(functionName);
         method.invoke(instance);
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Object[] {});
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq(functionName),
-                                         any(Object[].class));
+        verify(handler).handleInvocation(invocation);
 
     }
 
@@ -231,10 +253,13 @@ public class EyePatchClassBuilderTest {
         Method method = barWrapped.getDeclaredMethod(functionName, String.class);
         method.invoke(instance, "foo");
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq(functionName),
-                                         (Object[]) aryEq(new String[] { "foo" }));
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Object[] {"foo"});
+
+        verify(handler).handleInvocation(invocation);
 
     }
 
@@ -257,10 +282,13 @@ public class EyePatchClassBuilderTest {
         Method method = barWrapped.getDeclaredMethod(functionName, String.class, Integer.class);
         method.invoke(instance, "foo", new Integer(20));
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq(functionName),
-                                         (Object[]) aryEq(new Object[] { "foo" , new Integer(20)}));
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Object[] {"foo", new Integer(20) });
+
+        verify(handler).handleInvocation(invocation);
 
     }
 
@@ -284,10 +312,13 @@ public class EyePatchClassBuilderTest {
         Method method = barWrapped.getDeclaredMethod(functionName, int.class);
         method.invoke(instance, 20);
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq(functionName),
-                                         (Object[]) aryEq(new Integer[] { 20 }));
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Integer[] {20});
+
+        verify(handler).handleInvocation(invocation);
 
     }
 
@@ -310,10 +341,13 @@ public class EyePatchClassBuilderTest {
         Method method = barWrapped.getDeclaredMethod(functionName, String.class, int.class);
         method.invoke(instance, "foo", 20);
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq(functionName),
-                                         (Object[]) aryEq(new Object[] { "foo" , new Integer(20)}));
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                functionName,
+                new Object[] {"foo", new Integer(20)});
+
+        verify(handler).handleInvocation(invocation);
 
     }
 
@@ -331,10 +365,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo.class, classLoader);
         Object instance = barWrapped.newInstance();
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq("__construct__"),
-                                         (Object[]) aryEq(new Object[] {}));
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                "__construct__",
+                new Object[] {});
+
+        verify(handler).handleInvocation(invocation);
     }
 
     public static class Foo {
@@ -349,10 +386,13 @@ public class EyePatchClassBuilderTest {
         Constructor constructor = barWrapped.getConstructor(int.class);
         Object instance = constructor.newInstance(20);
 
-        verify(handler).handleInvocation(any(Class.class),
-                                         same(instance),
-                                         eq("__construct__"),
-                                         (Object[]) aryEq(new Object[] {20}));
+        Invocation invocation = new Invocation(
+                barWrapped,
+                instance,
+                "__construct__",
+                new Object[] {20});
+
+        verify(handler).handleInvocation(invocation);
     }
 
     public static class FooWithArg {
