@@ -8,6 +8,6 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
 
     @Override
     public Object handleInvocation(Invocation invocation) {
-        return "foo2";
+        return null;
     }
 }

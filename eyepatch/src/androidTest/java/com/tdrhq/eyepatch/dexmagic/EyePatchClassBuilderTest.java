@@ -35,6 +35,17 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testWrapping() throws Exception {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.setHandler(handler);
+        Invocation expectedInvocation = new Invocation(
+                Bar.class,
+                null,
+                "foo",
+                new Object[] {});
+
+        when(handler.handleInvocation(expectedInvocation))
+                .thenReturn("foo2");
+
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Method method = barWrapped.getMethod("foo");
         assertEquals("foo2", method.invoke(null));
