@@ -6,12 +6,17 @@ import android.util.Log;
 
 public abstract class StaticInvocationHandler {
 
-    public static StaticInvocationHandler sHandler = new StaticInvocationHandler() {
+    private static StaticInvocationHandler DEFAULT_HANDLER = new StaticInvocationHandler() {
             @Override
             public Object handleInvocation(Class klass, Object instance, String method, Object[] args) {
                 return "foo2";
             }
         };
+
+    public static StaticInvocationHandler sHandler = DEFAULT_HANDLER;
+    public static void setDefaultHandler() {
+        sHandler = DEFAULT_HANDLER;
+    }
 
     public StaticInvocationHandler() {
     }

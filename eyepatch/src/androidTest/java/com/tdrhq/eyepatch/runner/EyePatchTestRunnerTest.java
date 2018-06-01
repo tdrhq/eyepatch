@@ -2,15 +2,24 @@ package com.tdrhq.eyepatch.runner;
 
 import com.android.dx.Code;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
+import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
 import dalvik.system.PathClassLoader;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.junit.Assert.*;
+import org.mockito.Mockito;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 @EyePatchMockable( { EyePatchTestRunnerTest.Mockable.class })
 @RunWith(EyePatchTestRunner.class)
 public class EyePatchTestRunnerTest {
+    @After
+    public void after() throws Throwable {
+        StaticInvocationHandler.setDefaultHandler();
+    }
+
     @Test
     public void testPreconditions() throws Throwable {
         assertEquals(4, 2 + 2);
@@ -27,6 +36,9 @@ public class EyePatchTestRunnerTest {
     }
 
     public static class Mockable {
+        public String foo() {
+            return "car";
+        }
     }
 
     @Test
@@ -65,5 +77,18 @@ public class EyePatchTestRunnerTest {
         assertThat(
                 getTestClassLoader().getMockables(),
                 containsInAnyOrder(Mockable.class.getName()));
+    }
+
+    @Test
+    public void testCallsToStaticHandler() throws Throwable {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        Mockito.when(handler.handleInvocation(
+                     Mockito.any(Class.class),
+                     Mockito.any(Object.class),
+                     Mockito.anyString(),
+                     Mockito.any(Object[].class))).thenReturn("blah");
+        StaticInvocationHandler.sHandler = handler;
+
+        assertEquals("blah", new Mockable().foo());
     }
 }

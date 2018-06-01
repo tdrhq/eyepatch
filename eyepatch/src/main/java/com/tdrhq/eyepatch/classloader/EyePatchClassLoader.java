@@ -20,6 +20,7 @@ import java.util.Set;
  */
 public class EyePatchClassLoader extends ClassLoader {
     private PathClassLoader parent;
+    private EyePatchClassBuilder classBuilder;
 
     List<DexFile> dexFiles = new ArrayList<>();
     Set<String> mockables = new HashSet<>();
@@ -27,6 +28,7 @@ public class EyePatchClassLoader extends ClassLoader {
     public EyePatchClassLoader(ClassLoader realClassLoader, EyePatchClassBuilder mockClassBuilder) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
+        classBuilder = mockClassBuilder;
     }
 
     public void addMockable(String className) {
@@ -38,6 +40,12 @@ public class EyePatchClassLoader extends ClassLoader {
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        if (isMockable(name)) {
+            return classBuilder.wrapClass(
+                    getClass().getClassLoader().loadClass(name),
+                    this);
+        }
+
         if (isBlacklisted(name)) {
             return parent.loadClass(name);
         }
@@ -51,6 +59,10 @@ public class EyePatchClassLoader extends ClassLoader {
         }
     }
 
+    private boolean isMockable(String name) {
+        return mockables.contains(name);
+    }
+
     /**
      * If anything is blacklisted, all its dependencies *must* be
      * blacklisted too, otherwise bad things can happen.
@@ -61,6 +73,10 @@ public class EyePatchClassLoader extends ClassLoader {
         }
 
         if (name.startsWith("org.hamcrest")) {
+            return true;
+        }
+
+        if (name.startsWith("org.mockito")) {
             return true;
         }
 
