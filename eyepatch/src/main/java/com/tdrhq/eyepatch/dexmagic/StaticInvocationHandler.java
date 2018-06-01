@@ -7,12 +7,7 @@ import com.tdrhq.eyepatch.util.Checks;
 
 public abstract class StaticInvocationHandler {
 
-    private static StaticInvocationHandler DEFAULT_HANDLER = new StaticInvocationHandler() {
-            @Override
-            public Object handleInvocation(Invocation invocation) {
-                return "foo2";
-            }
-        };
+    private static StaticInvocationHandler DEFAULT_HANDLER = new DefaultInvocationHandler();
 
     private static StaticInvocationHandler sHandler = DEFAULT_HANDLER;
 
