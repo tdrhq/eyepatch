@@ -28,6 +28,15 @@ public class DefaultInvocationHandlerTest {
         assertNotNull(handler.getClassHandler(Foo.class));
     }
 
+
+    @Test
+    public void testMultipleClassesHandlers() throws Throwable {
+        ClassHandler handler1 = handler.getClassHandler(Foo.class);
+        ClassHandler handler2 = handler.getClassHandler(Bar.class);
+
+        assertNotSame(handler1, handler2);
+
+    }
     public static class Foo {
         public String bar() {
             return "zoidberg";
