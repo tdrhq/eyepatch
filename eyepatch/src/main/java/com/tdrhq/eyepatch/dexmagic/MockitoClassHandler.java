@@ -41,11 +41,13 @@ public class MockitoClassHandler implements ClassHandler {
     public Object handleInvocation(Invocation invocation) {
         MockDelegate mockDelegate = getMockDelegate(invocation.getMethod(), invocation.getInstance());
         Object[] args = invocation.getArgs();
-        if (args.length == 0) {
+        switch (args.length) {
+        case 0:
             return mockDelegate.invoke0();
-        } else if(args.length == 1) {
+        case 1:
             return mockDelegate.invoke1(args[0]);
         }
+
         throw new RuntimeException("unsupported number of arguments");
     }
 
