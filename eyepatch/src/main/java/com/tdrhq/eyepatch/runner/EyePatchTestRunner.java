@@ -2,10 +2,9 @@
 
 package com.tdrhq.eyepatch.runner;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
@@ -14,6 +13,26 @@ import org.junit.runners.model.InitializationError;
 
 public class EyePatchTestRunner extends Runner {
     private Runner delegate;
+
+    private static class ExposedTemporaryFolder extends TemporaryFolder {
+        @Override
+        public void before() {
+            try {
+                super.before();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void after() {
+            try {
+                super.after();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
