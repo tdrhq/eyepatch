@@ -11,6 +11,15 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
         return null;
     }
 
+    ClassHandler getClassHandler(Class klass) {
+        return new ClassHandler() {
+            @Override
+            public Object handleInvocation(Invocation invocation) {
+                return null;
+            }
+        };
+    }
+
     public static DefaultInvocationHandler newInstance() {
         return new DefaultInvocationHandler();
     }

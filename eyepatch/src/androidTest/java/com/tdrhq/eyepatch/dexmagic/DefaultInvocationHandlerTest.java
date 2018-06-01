@@ -23,9 +23,17 @@ public class DefaultInvocationHandlerTest {
         assertEquals(null, handler.handleInvocation(invocation));
     }
 
+    @Test
+    public void testClassHandler() throws Throwable {
+        assertNotNull(handler.getClassHandler(Foo.class));
+    }
+
     public static class Foo {
         public String bar() {
             return "zoidberg";
         }
+    }
+
+    public static class Bar {
     }
 }

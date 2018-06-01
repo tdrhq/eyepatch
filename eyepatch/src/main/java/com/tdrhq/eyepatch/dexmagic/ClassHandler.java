@@ -3,5 +3,5 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 public interface ClassHandler {
-    public void handleInvocation(Invocation invocation);
+    public Object handleInvocation(Invocation invocation);
 }
