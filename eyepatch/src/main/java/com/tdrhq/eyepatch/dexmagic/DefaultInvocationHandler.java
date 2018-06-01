@@ -16,7 +16,8 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
 
     @Override
     public Object handleInvocation(Invocation invocation) {
-        return null;
+        return getClassHandler(invocation.getInstanceClass())
+                .handleInvocation(invocation);
     }
 
     ClassHandler getClassHandler(Class klass) {

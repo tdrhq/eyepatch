@@ -8,12 +8,7 @@ public class MockitoClassHandlerFactory implements ClassHandlerFactory {
 
     @Override
     public ClassHandler create(Class klass) {
-        return new ClassHandler() {
-            @Override
-            public Object handleInvocation(Invocation invocation) {
-                throw new RuntimeException("not called");
-            }
-        };
+        return new MockitoClassHandler(klass);
     }
 
 }
