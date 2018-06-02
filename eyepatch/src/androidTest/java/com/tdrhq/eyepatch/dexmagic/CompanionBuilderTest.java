@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,6 +28,13 @@ public class CompanionBuilderTest {
         Class klass = companionBuilder.build(Foo.class, getClass().getClassLoader());
         // TODO: make this an interface
         assertTrue(Modifier.isAbstract(klass.getModifiers()));
+    }
+
+    @Test
+    public void testHasMethodBar() throws Throwable {
+        Class klass = companionBuilder.build(Foo.class, getClass().getClassLoader());
+        Method method = klass.getMethod("bar");
+        assertNotNull(method);
     }
 
     public static class Foo {
