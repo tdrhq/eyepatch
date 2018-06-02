@@ -4,4 +4,5 @@ package com.tdrhq.eyepatch.dexmagic;
 
 public interface ClassHandler {
     public Object handleInvocation(Invocation invocation);
+    public boolean canHandle(Class klass);
 }

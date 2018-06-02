@@ -130,4 +130,8 @@ public class MockitoClassHandler implements ClassHandler {
             return object == otherRef.object;
         }
     }
+
+    public boolean canHandle(Class klass) {
+        return true;
+    }
 }
