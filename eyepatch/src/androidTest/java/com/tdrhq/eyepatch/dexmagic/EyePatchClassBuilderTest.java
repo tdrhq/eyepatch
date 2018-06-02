@@ -1,15 +1,16 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.rules.*;
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.*;
 import static org.mockito.Mockito.*;
-import org.hamcrest.Matchers;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder mEyePatchClassBuilder;
@@ -414,6 +415,13 @@ public class EyePatchClassBuilderTest {
         assertNotNull(barWrapped2);
         assertNotNull(barWrapped1);
         assertNotSame(barWrapped1, barWrapped2);
+    }
+
+    @Test
+    public void testDexFileIsCached() throws Throwable {
+        DexFile file1 = mEyePatchClassBuilder.generateDexFile(Foo.class);
+        DexFile file2 = mEyePatchClassBuilder.generateDexFile(Foo.class);
+        assertSame(file1, file2);
     }
 
     public static class FooWithArg {

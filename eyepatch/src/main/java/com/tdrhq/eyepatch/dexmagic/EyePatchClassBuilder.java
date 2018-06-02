@@ -9,10 +9,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EyePatchClassBuilder {
     private File mDataDir;
     private int counter = 0;
+    private Map<Class, DexFile> cache = new HashMap<>();
 
     public EyePatchClassBuilder(File dataDir) {
         mDataDir = dataDir;
@@ -34,7 +37,18 @@ public class EyePatchClassBuilder {
     }
 
     @NonNull
-    private DexFile generateDexFile(Class realClass) {
+    DexFile generateDexFile(Class realClass) {
+        if (cache.containsKey(realClass)) {
+            return cache.get(realClass);
+        } else {
+            DexFile ret = generateDexFileUncached(realClass);
+            cache.put(realClass, ret);
+            return ret;
+        }
+    }
+
+    @NonNull
+    DexFile generateDexFileUncached(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             byte[] dex = dexmaker.generate();
