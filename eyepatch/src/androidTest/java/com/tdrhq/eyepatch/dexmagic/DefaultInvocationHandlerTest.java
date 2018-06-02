@@ -15,7 +15,7 @@ public class DefaultInvocationHandlerTest {
         List<ClassHandler> handlers = new ArrayList<>();
         handlers.add(new MockitoClassHandler(Foo.class));
         handlers.add(new MockitoClassHandler(Bar.class));
-        handler = new DefaultInvocationHandler(null, handlers);
+        handler = new DefaultInvocationHandler(handlers);
     }
 
     @Test

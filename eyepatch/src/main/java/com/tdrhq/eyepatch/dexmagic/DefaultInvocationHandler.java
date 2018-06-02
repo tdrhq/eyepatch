@@ -10,14 +10,10 @@ import java.util.Map;
 
 public class DefaultInvocationHandler extends StaticInvocationHandler {
 
-    private ClassHandlerFactory classHandlerFactory;
-    private Map<Class, ClassHandler> classHandlerMap = new HashMap<>();
     private List<ClassHandler> prebuiltHandlers = new ArrayList<>();
 
     DefaultInvocationHandler(
-            ClassHandlerFactory classHandlerFactory,
             List<ClassHandler> prebuiltHandlers) {
-        this.classHandlerFactory = classHandlerFactory;
         this.prebuiltHandlers.addAll(Checks.notNull(prebuiltHandlers));
     }
 
@@ -34,17 +30,10 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
             }
         }
 
-        if (classHandlerMap.containsKey(klass)) {
-            return classHandlerMap.get(klass);
-        }
-
-        ClassHandler ret = classHandlerFactory.create(klass);
-
-        classHandlerMap.put(klass, ret);
-        return ret;
+        throw new RuntimeException("No class handler for class: " + klass.getName());
     }
 
     public static DefaultInvocationHandler newInstance(List<ClassHandler> handlers) {
-        return new DefaultInvocationHandler(new MockitoClassHandlerFactory(), handlers);
+        return new DefaultInvocationHandler(handlers);
     }
 }
