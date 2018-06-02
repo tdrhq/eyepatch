@@ -433,10 +433,6 @@ public class EyePatchClassBuilderTest {
                     klass[0] = invocation.getInstanceClass();
                     return "";
                 }
-
-                @Override
-                public void prepare(Class klass) {
-                }
             };
 
         StaticInvocationHandler.setHandler(handler);

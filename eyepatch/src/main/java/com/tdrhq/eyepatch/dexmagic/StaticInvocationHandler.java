@@ -19,14 +19,9 @@ public abstract class StaticInvocationHandler {
         sHandler = Checks.notNull(handler);
     }
 
-    public static void prepareClass(Class klass) {
-        sHandler.prepare(klass);
-    }
-
     public StaticInvocationHandler() {
     }
 
-    public abstract void prepare(Class klass);
     public abstract Object handleInvocation(Invocation invocation);
 
     public static Object invokeStatic(Class klass, Object instance, String method, Object[] args) {
