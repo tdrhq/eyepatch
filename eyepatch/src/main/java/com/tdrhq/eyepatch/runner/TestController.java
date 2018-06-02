@@ -8,19 +8,16 @@ import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
 import org.junit.runners.model.InitializationError;
 
 public class TestController {
-    private ExposedTemporaryFolder tmpdir = null;
+    private EyePatchClassBuilder classBuilder;
 
-    private TestController() {
+    private TestController(EyePatchClassBuilder classBuilder) {
+        this.classBuilder = classBuilder;
     }
 
     public Class<?> generateTestClass(Class<?> testClass, Class[] mockables, ClassLoader classLoader1) throws InitializationError {
-        if (tmpdir == null) {
-            tmpdir = new ExposedTemporaryFolder();
-            tmpdir.before();
-        }
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
                 classLoader1,
-                new EyePatchClassBuilder(tmpdir.getRoot()));
+                this.classBuilder);
 
         MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
         for (Class<?> mockable : mockables) {
@@ -42,7 +39,11 @@ public class TestController {
     volatile static TestController sTestController = null;
     public synchronized static TestController getInstance() {
         if (sTestController == null) {
-            sTestController = new TestController();
+            ExposedTemporaryFolder tmpdir = new ExposedTemporaryFolder();
+            tmpdir.before();
+            sTestController = new TestController(
+                    new EyePatchClassBuilder(
+                            tmpdir.getRoot()));
         }
 
         return sTestController;
