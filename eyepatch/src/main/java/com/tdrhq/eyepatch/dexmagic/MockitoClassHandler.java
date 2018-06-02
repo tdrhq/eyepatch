@@ -35,7 +35,7 @@ public class MockitoClassHandler implements ClassHandler {
     private MockDelegate nextMockDelegate;
     private Map<MockKey, MockDelegate> mockDelegates = new HashMap<>();
 
-    public MockitoClassHandler(Class klass) {
+    public MockitoClassHandler(Class klass, CompanionBuilder companionBuilder) {
         this.klass = klass;
     }
 

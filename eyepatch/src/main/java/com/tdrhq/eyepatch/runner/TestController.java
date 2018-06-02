@@ -1,6 +1,7 @@
 package com.tdrhq.eyepatch.runner;
 
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
+import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.MockDelegateFactory;
 import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
@@ -10,15 +11,19 @@ import org.junit.runners.model.InitializationError;
 
 public class TestController {
     private EyePatchClassBuilder classBuilder;
+    private CompanionBuilder companionBuilder;
 
-    private TestController(EyePatchClassBuilder classBuilder) {
+    private TestController(EyePatchClassBuilder classBuilder,
+                           CompanionBuilder companionBuilder) {
         this.classBuilder = classBuilder;
+        this.companionBuilder = companionBuilder;
     }
 
     public Class<?> generateTestClass(Class<?> testClass, Class[] mockables, ClassLoader classLoader1) throws InitializationError {
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
                 classLoader1,
-                this.classBuilder);
+                this.classBuilder,
+                this.companionBuilder);
 
         MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
         for (Class<?> mockable : mockables) {
@@ -46,7 +51,8 @@ public class TestController {
             tmpdir.before();
             sTestController = new TestController(
                     new EyePatchClassBuilder(
-                            tmpdir.getRoot()));
+                            tmpdir.getRoot()),
+                    new CompanionBuilder(tmpdir.getRoot()));
         }
 
         return sTestController;

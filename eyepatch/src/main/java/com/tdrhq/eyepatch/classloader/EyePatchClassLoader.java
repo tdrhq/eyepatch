@@ -4,6 +4,7 @@ package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
+import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
@@ -31,16 +32,19 @@ public class EyePatchClassLoader extends ClassLoader
     private PathClassLoader parent;
     private EyePatchClassBuilder classBuilder;
     private StaticInvocationHandler mStaticInvocationHandler;
+    private CompanionBuilder companionBuilder;
 
     List<DexFile> dexFiles = new ArrayList<>();
     Set<String> mockables = new HashSet<>();
     Map<String, Class> mockedClasses = new HashMap<>();
 
 
-    public EyePatchClassLoader(ClassLoader realClassLoader, EyePatchClassBuilder mockClassBuilder) {
+    public EyePatchClassLoader(ClassLoader realClassLoader, EyePatchClassBuilder mockClassBuilder,
+                               CompanionBuilder mCompanionBuilder) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
         classBuilder = mockClassBuilder;
+        companionBuilder = mCompanionBuilder;
     }
 
     public void setMockables(List<String> mockables) {
@@ -54,7 +58,7 @@ public class EyePatchClassLoader extends ClassLoader
                                 getClass().getClassLoader().loadClass(mockable),
                                 this));
                 mockedClasses.put(mockable, klass);
-                handlers.add(new MockitoClassHandler(klass));
+                handlers.add(new MockitoClassHandler(klass, companionBuilder));
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
