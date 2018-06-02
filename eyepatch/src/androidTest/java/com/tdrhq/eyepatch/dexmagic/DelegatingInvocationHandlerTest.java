@@ -1,5 +1,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import dalvik.system.PathClassLoader;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -29,6 +31,19 @@ public class DelegatingInvocationHandlerTest {
 
     @Test
     public void testClassLoaderWithDelegation() throws Throwable {
+        ClassLoader classLoader = new MyPathClassLoader();
+        Class barWrapped = classLoader.loadClass(Bar.class.getName());
+    }
+
+    public static class MyPathClassLoader extends PathClassLoader {
+        public MyPathClassLoader() {
+            super(
+                    ClassLoaderIntrospector.getOriginalDexPathAsStr(
+                            MyPathClassLoader.class.getClassLoader()),
+                    null,
+                    MyPathClassLoader.class.getClassLoader().getParent());
+        }
+
     }
 
 

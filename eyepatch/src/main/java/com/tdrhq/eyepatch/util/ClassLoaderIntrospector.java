@@ -33,6 +33,10 @@ public class ClassLoaderIntrospector {
         return ret;
     }
 
+    public static String getOriginalDexPathAsStr(ClassLoader parent) {
+        return TextUtils.join(":", getOriginalDexPath(parent));
+    }
+
     public static void addDexPaths(ClassLoader classLoader, List<String> dexPaths) {
         Object dexPathList = Whitebox.getField(classLoader, BaseDexClassLoader.class, "pathList");
         assert(dexPathList != null);
