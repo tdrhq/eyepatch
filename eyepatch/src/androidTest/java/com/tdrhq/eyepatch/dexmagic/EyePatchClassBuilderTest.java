@@ -406,6 +406,16 @@ public class EyePatchClassBuilderTest {
         verify(handler).handleInvocation(invocation);
     }
 
+    @Test
+    public void testWrappingTheSameClassTwiceIsFine() throws Throwable {
+        ClassLoader classLoader2 = new PathClassLoader("", null, getClass().getClassLoader());
+        Class barWrapped1 = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader);
+        Class barWrapped2 = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader2);
+        assertNotNull(barWrapped2);
+        assertNotNull(barWrapped1);
+        assertNotSame(barWrapped1, barWrapped2);
+    }
+
     public static class FooWithArg {
         public FooWithArg(int val) {
         }

@@ -35,8 +35,6 @@ public class EyePatchClassBuilder {
 
     @NonNull
     private DexFile generateDexFile(Class realClass) {
-        DexFile dexFile;
-
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             byte[] dex = dexmaker.generate();
@@ -46,11 +44,10 @@ public class EyePatchClassBuilder {
             os.write(dex);
             os.close();
 
-             dexFile = new DexFile(of);
+            return new DexFile(of);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return dexFile;
     }
 
     private DexMaker buildDexMaker(String name, Class original) {
