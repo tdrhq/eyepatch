@@ -36,7 +36,15 @@ public class DelegatingInvocationHandlerTest {
     public void testClassLoaderWithDelegation() throws Throwable {
         ClassLoader classLoader = new MyPathClassLoader();
         Class barWrapped = classLoader.loadClass(Bar.class.getName());
+        Invocation invocation = new Invocation(
+                barWrapped,
+                null,
+                "foo",
+                new Object[] {});
+        mHandler.handleInvocation(
+                invocation);
 
+        verify(staticHandler).handleInvocation(invocation);
     }
 
     public class MyPathClassLoader extends PathClassLoader implements HasStaticInvocationHandler {

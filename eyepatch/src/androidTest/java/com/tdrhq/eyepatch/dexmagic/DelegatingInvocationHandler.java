@@ -9,6 +9,15 @@ package com.tdrhq.eyepatch.dexmagic;
 public class DelegatingInvocationHandler extends StaticInvocationHandler {
     @Override
     public Object handleInvocation(Invocation invocation) {
-        throw new UnsupportedOperationException("");
+        ClassLoader classLoader = invocation.getInstanceClass().getClassLoader();
+        if (!(classLoader instanceof HasStaticInvocationHandler)) {
+            throw new UnsupportedOperationException("");
+        }
+
+        HasStaticInvocationHandler hasStaticInvocationHandler =
+                (HasStaticInvocationHandler) classLoader;
+
+        return hasStaticInvocationHandler.getStaticInvocationHandler()
+                .handleInvocation(invocation);
     }
 }
