@@ -52,6 +52,22 @@ public class OtherClassTest {
 }
 ```
 
+
+## Limitations
+
+Many of these limitations are temporary, and we can eventually work
+around them:
+
+1. You can't mock Android internal classes as of now. When we do build
+this, it's most likely going to have a slightly different API.
+
+2. You can't *spy* on classes. That means, you have to mock out all
+the methods on a class.
+
+3. There's support for mocking out final methods, but this isn't
+exposed as of yet. Hopefully I'll release this real quick.
+
+
 ## Author
 
 Arnold Noronha <arnold@tdrhq.com>
