@@ -3,8 +3,10 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
-import com.tdrhq.eyepatch.EyePatchMockito;
+import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
+import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
+import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
@@ -19,9 +21,11 @@ import java.util.Set;
  * A class-loader that's kind of like the build-in Android class
  * loader, with places to hook into it.
  */
-public class EyePatchClassLoader extends ClassLoader {
+public class EyePatchClassLoader extends ClassLoader
+      implements HasStaticInvocationHandler {
     private PathClassLoader parent;
     private EyePatchClassBuilder classBuilder;
+    private StaticInvocationHandler mStaticInvocationHandler = DefaultInvocationHandler.newInstance();
 
     List<DexFile> dexFiles = new ArrayList<>();
     Set<String> mockables = new HashSet<>();
@@ -130,5 +134,10 @@ public class EyePatchClassLoader extends ClassLoader {
         for (String file : path) {
             dexFiles.add(new DexFile(file));
         }
+    }
+
+    @Override
+    public StaticInvocationHandler getStaticInvocationHandler() {
+        return mStaticInvocationHandler;
     }
 }

@@ -7,7 +7,7 @@ import com.tdrhq.eyepatch.util.Checks;
 
 public abstract class StaticInvocationHandler {
 
-    private static StaticInvocationHandler DEFAULT_HANDLER = DefaultInvocationHandler.newInstance();
+    private static StaticInvocationHandler DEFAULT_HANDLER = new DelegatingInvocationHandler();
 
     private static StaticInvocationHandler sHandler = DEFAULT_HANDLER;
 
