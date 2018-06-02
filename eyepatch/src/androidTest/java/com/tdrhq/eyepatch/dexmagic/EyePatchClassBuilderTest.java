@@ -424,6 +424,29 @@ public class EyePatchClassBuilderTest {
         assertSame(file1, file2);
     }
 
+    @Test
+    public void testVerifyClassAndClassLoaderInInvocation() throws Throwable {
+        final Class[] klass = new Class[1];
+        StaticInvocationHandler handler = new StaticInvocationHandler() {
+                @Override
+                public Object handleInvocation(Invocation invocation) {
+                    klass[0] = invocation.getInstanceClass();
+                    return "";
+                }
+
+                @Override
+                public void prepare(Class klass) {
+                }
+            };
+
+        StaticInvocationHandler.setHandler(handler);
+
+        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Method method = barWrapped.getMethod("foo");
+        method.invoke(null);
+        assertEquals(barWrapped.getName(), klass[0].getName());
+    }
+
     public static class FooWithArg {
         public FooWithArg(int val) {
         }
