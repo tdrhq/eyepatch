@@ -4,7 +4,8 @@ import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.MockDelegateFactory;
 import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.runners.model.InitializationError;
 
 public class TestController {
@@ -24,9 +25,11 @@ public class TestController {
             mockDelegateFactory.init(mockable);
         }
 
-        for (Class<?> mockable : mockables) {
-            classLoader.addMockable(mockable.getName());
+        List<String> mockablesStr = new ArrayList<>();
+        for (Class klass : mockables) {
+            mockablesStr.add(klass.getName());
         }
+        classLoader.setMockables(mockablesStr);
 
         try {
             testClass = classLoader.loadClass(testClass.getName());

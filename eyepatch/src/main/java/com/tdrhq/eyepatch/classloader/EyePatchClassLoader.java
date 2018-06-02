@@ -36,8 +36,8 @@ public class EyePatchClassLoader extends ClassLoader
         classBuilder = mockClassBuilder;
     }
 
-    public void addMockable(String className) {
-        mockables.add(className);
+    public void setMockables(List<String> mockables) {
+        this.mockables = new HashSet<>(mockables);
     }
 
     public Set<String> getMockables() {
