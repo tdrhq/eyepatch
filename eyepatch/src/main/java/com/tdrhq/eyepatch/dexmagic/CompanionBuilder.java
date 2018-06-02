@@ -48,7 +48,9 @@ public class CompanionBuilder {
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC | Modifier.ABSTRACT, TypeId.OBJECT);
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
-            generateMethod(dexmaker, methodTemplate, typeId, original);
+            if (Modifier.isStatic(methodTemplate.getModifiers())) {
+                generateMethod(dexmaker, methodTemplate, typeId, original);
+            }
         }
 
         return dexmaker;

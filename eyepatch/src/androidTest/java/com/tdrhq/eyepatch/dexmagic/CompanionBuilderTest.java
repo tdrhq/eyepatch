@@ -38,8 +38,24 @@ public class CompanionBuilderTest {
         assertFalse(Modifier.isStatic(method.getModifiers()));
     }
 
+    @Test
+    public void testHasNoNonStatic() throws Throwable {
+        Class klass = companionBuilder.build(Foo.class, getClass().getClassLoader());
+        try {
+            klass.getMethod("barNonStat");
+            fail("expected exception");
+        } catch (NoSuchMethodException e) {
+            // expected
+        }
+    }
+
+
     public static class Foo {
         public static String bar() {
+            return "car";
+        }
+
+        public String barNonStat() {
             return "car";
         }
     }
