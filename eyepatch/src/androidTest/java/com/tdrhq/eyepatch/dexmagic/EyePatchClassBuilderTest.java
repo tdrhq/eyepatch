@@ -445,6 +445,7 @@ public class EyePatchClassBuilderTest {
         Method method = barWrapped.getMethod("foo");
         method.invoke(null);
         assertEquals(barWrapped.getName(), klass[0].getName());
+        assertSame(classLoader, klass[0].getClassLoader());
     }
 
     public static class FooWithArg {
