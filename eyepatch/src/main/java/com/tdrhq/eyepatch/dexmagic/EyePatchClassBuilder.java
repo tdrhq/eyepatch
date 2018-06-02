@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.android.dx.*;
 import dalvik.system.DexFile;
@@ -22,12 +23,19 @@ public class EyePatchClassBuilder {
      * into the ClassLoader.
      */
     public Class wrapClass(Class realClass, ClassLoader classLoader) {
-        DexFile dexFile;
         if (realClass.getClassLoader() == classLoader) {
             throw new IllegalArgumentException(
                     "The classLoader provided must be different from the one " +
                     "used to load realClass");
         }
+        DexFile dexFile = generateDexFile(realClass);
+        return dexFile.loadClass(realClass.getName(), classLoader);
+
+    }
+
+    @NonNull
+    private DexFile generateDexFile(Class realClass) {
+        DexFile dexFile;
 
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
@@ -42,8 +50,7 @@ public class EyePatchClassBuilder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return dexFile.loadClass(realClass.getName(), classLoader);
-
+        return dexFile;
     }
 
     private DexMaker buildDexMaker(String name, Class original) {
