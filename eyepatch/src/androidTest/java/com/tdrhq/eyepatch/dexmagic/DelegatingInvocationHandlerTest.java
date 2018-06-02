@@ -33,9 +33,10 @@ public class DelegatingInvocationHandlerTest {
     public void testClassLoaderWithDelegation() throws Throwable {
         ClassLoader classLoader = new MyPathClassLoader();
         Class barWrapped = classLoader.loadClass(Bar.class.getName());
+
     }
 
-    public static class MyPathClassLoader extends PathClassLoader {
+    public class MyPathClassLoader extends PathClassLoader {
         public MyPathClassLoader() {
             super(
                     ClassLoaderIntrospector.getOriginalDexPathAsStr(
