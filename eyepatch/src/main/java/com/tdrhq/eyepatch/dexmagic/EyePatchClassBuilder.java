@@ -67,7 +67,7 @@ public class EyePatchClassBuilder {
     private DexMaker buildDexMaker(String name, Class original) {
         DexMaker dexmaker = new DexMaker();
         TypeId<?> typeId = TypeId.get("L" + name.replace(".", "/") + ";");
-        dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
+        dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.get(original.getSuperclass()));
 
         for (Constructor constructor : original.getDeclaredConstructors()) {
             generateConstructor(dexmaker, constructor, typeId, original);

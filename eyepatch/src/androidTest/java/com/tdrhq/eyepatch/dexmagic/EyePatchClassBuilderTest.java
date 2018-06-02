@@ -458,4 +458,15 @@ public class EyePatchClassBuilderTest {
             assertThat(e.getMessage(), Matchers.containsString("different"));
         }
     }
+
+    @Test
+    public void testClassExtension() throws Throwable {
+        Class fooWrapped = mEyePatchClassBuilder.wrapClass(Foo2.class, classLoader);
+        assertNotNull(fooWrapped);
+
+        assertSame(Foo.class, fooWrapped.getSuperclass());
+    }
+
+    public static class Foo2 extends Foo {
+    }
 }
