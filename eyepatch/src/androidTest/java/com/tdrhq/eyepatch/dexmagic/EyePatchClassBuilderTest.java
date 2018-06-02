@@ -38,8 +38,9 @@ public class EyePatchClassBuilderTest {
     public void testWrapping() throws Exception {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         StaticInvocationHandler.setHandler(handler);
+        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Invocation expectedInvocation = new Invocation(
-                Bar.class,
+                barWrapped,
                 null,
                 "foo",
                 new Object[] {});
@@ -47,7 +48,6 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("foo2");
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Method method = barWrapped.getMethod("foo");
         assertEquals("foo2", method.invoke(null));
     }
@@ -57,8 +57,10 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         StaticInvocationHandler.setHandler(handler);
 
+
+        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Invocation expectedInvocation = new Invocation(
-                Bar.class,
+                barWrapped,
                 null,
                 "foo",
                 new Object[] {});
@@ -67,14 +69,12 @@ public class EyePatchClassBuilderTest {
                 .thenReturn("foo3");
 
         Invocation expectedCarInvocation = new Invocation(
-                Bar.class,
+                barWrapped,
                 null,
                 "car",
                 new Object[] {});
         when(handler.handleInvocation(expectedCarInvocation))
                 .thenReturn("car3");
-
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Method method = barWrapped.getMethod("foo");
         assertEquals("foo3", method.invoke(null));
 

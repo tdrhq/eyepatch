@@ -42,6 +42,7 @@ public class Invocation {
         if (!(other instanceof Invocation));
         Invocation otherInvocation = (Invocation) other;
         return mClass.getName().equals(otherInvocation.mClass.getName())
+                && mClass.getClassLoader() == otherInvocation.mClass.getClassLoader()
                 && mInstance == otherInvocation.mInstance
                 && mMethod.equals(otherInvocation.mMethod)
                 && Arrays.equals(mArgs, otherInvocation.mArgs);
