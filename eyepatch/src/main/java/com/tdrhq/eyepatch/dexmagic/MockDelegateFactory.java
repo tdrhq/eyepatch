@@ -16,6 +16,10 @@ public class MockDelegateFactory {
         }
     }
 
+    public void init(Class klass) {
+
+    }
+
     public MockDelegate create() {
         return queue.pop();
     }

@@ -44,7 +44,11 @@ public class EyePatchTestRunner extends Runner {
                 new EyePatchClassBuilder(tmpdir.getRoot()));
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
 
-        MockDelegateFactory.getInstance();
+        MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
+        for (Class<?> mockable : mockableAnnotation.value()) {
+            mockDelegateFactory.init(mockable);
+        }
+
         for (Class<?> mockable : mockableAnnotation.value()) {
             classLoader.addMockable(mockable.getName());
         }
