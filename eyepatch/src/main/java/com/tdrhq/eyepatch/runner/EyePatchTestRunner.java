@@ -13,13 +13,11 @@ import org.junit.runners.model.InitializationError;
 public class EyePatchTestRunner extends Runner {
     private Runner delegate;
 
-    private ExposedTemporaryFolder tmpdir = new ExposedTemporaryFolder();
-
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         Class[] mockables = mockableAnnotation.value();
 
-        testClass = tmpdir.generateTestClass(testClass, mockables, getClass().getClassLoader());
+        testClass = new TestController().generateTestClass(testClass, mockables, getClass().getClassLoader());
         delegate = new JUnit4(testClass);
     }
 
@@ -31,6 +29,5 @@ public class EyePatchTestRunner extends Runner {
     @Override
     public void run(RunNotifier runNotifier) {
         delegate.run(runNotifier);
-        tmpdir.after();
     }
 }
