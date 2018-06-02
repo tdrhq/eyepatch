@@ -54,7 +54,7 @@ public class DefaultInvocationHandlerTest {
 
     }
     public static class Foo {
-        public String bar() {
+        public static String bar() {
             return "zoidberg";
         }
     }
