@@ -40,7 +40,7 @@ public class CompanionBuilder {
     private DexMaker buildDexMaker(String name, Class original) {
         DexMaker dexmaker = new DexMaker();
         TypeId<?> typeId = TypeId.get("L" + name.replace(".", "/") + ";");
-        dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
+        dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC | Modifier.ABSTRACT, TypeId.OBJECT);
         return dexmaker;
 
     }
