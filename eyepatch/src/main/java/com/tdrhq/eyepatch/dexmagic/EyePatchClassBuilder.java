@@ -17,6 +17,10 @@ public class EyePatchClassBuilder {
         mDataDir = dataDir;
     }
 
+    /**
+     * Wraps realClass, to generate a patchable class and loads it
+     * into the ClassLoader.
+     */
     public Class wrapClass(Class realClass, ClassLoader classLoader) {
         if (realClass.getClassLoader() == classLoader) {
             throw new IllegalArgumentException(
