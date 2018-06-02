@@ -51,3 +51,11 @@ public class OtherClassTest {
   }
 }
 ```
+
+## Author
+
+Arnold Noronha <arnold@tdrhq.com>
+
+## License
+
+MIT license, see LICENSE file
