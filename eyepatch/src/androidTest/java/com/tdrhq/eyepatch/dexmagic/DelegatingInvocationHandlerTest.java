@@ -17,8 +17,8 @@ public class DelegatingInvocationHandlerTest {
         try {
             mHandler.handleInvocation(
                     new Invocation(
-                            getClass(),
-                            this,
+                            Bar.class,
+                            null,
                             "foo",
                             new Object[] {}));
             fail("expected exception");
@@ -27,4 +27,14 @@ public class DelegatingInvocationHandlerTest {
         }
     }
 
+    @Test
+    public void testClassLoaderWithDelegation() throws Throwable {
+    }
+
+
+    public static class Bar {
+        public String foo() {
+            return "car";
+        }
+    }
 }
