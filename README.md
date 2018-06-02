@@ -17,7 +17,7 @@ constructors, and just about anything, but that gets a little
 complication and we're still working on making that better.)
 
 So suppose you have a static class like so:
-```
+```java
 public class StaticClass {
   public String doExpensiveStuff(String input) {
     // .. does a lot of stuff, hits network and what not.
@@ -27,7 +27,7 @@ public class StaticClass {
 
 You have another class that uses this static method:
 
-```
+```java
 public class OtherClass {
   public String doOtherStuff() {
      return "output: " + StaticClass.doExpensiveStuff("foo")
@@ -41,7 +41,7 @@ you're working with some stubborn engineers who really like their
 static functions for "performance reasons". Uggh. But let's test
 `doOtherStuff` with EyePatch.
 
-```
+```java
 @EyePatchMockables({ OtherClass.class })
 @RunWith(EyePatchTestRunner.class)
 public class OtherClassTest {
