@@ -35,4 +35,13 @@ public class TestController {
         }
         return testClass;
     }
+
+    volatile TestController sTestController = null;
+    public synchronized TestController getInstance() {
+        if (sTestController == null) {
+            sTestController = new TestController();
+        }
+
+        return sTestController;
+    }
 }
