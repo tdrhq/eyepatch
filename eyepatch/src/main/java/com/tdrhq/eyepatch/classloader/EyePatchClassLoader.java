@@ -10,6 +10,7 @@ import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
+import com.tdrhq.eyepatch.dexmagic.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
@@ -28,13 +29,14 @@ import java.util.Set;
  * loader, with places to hook into it.
  */
 public class EyePatchClassLoader extends ClassLoader
-      implements HasStaticInvocationHandler {
+    implements HasStaticInvocationHandler, StaticVerificationHandler {
     private PathClassLoader parent;
     private EyePatchClassBuilder classBuilder;
     private StaticInvocationHandler mStaticInvocationHandler;
     private CompanionBuilder companionBuilder;
 
     List<DexFile> dexFiles = new ArrayList<>();
+    List<MockitoClassHandler> classHandlers;
     Set<String> mockables = new HashSet<>();
     Map<String, Class> mockedClasses = new HashMap<>();
 
@@ -50,7 +52,7 @@ public class EyePatchClassLoader extends ClassLoader
     public void setMockables(List<String> mockables) {
         this.mockables = new HashSet<>(mockables);
 
-        List<ClassHandler> handlers = new ArrayList<>();
+        classHandlers = new ArrayList<>();
         for (String mockable : mockables) {
             try {
                 Class klass = Checks.notNull(
@@ -58,13 +60,13 @@ public class EyePatchClassLoader extends ClassLoader
                                 getClass().getClassLoader().loadClass(mockable),
                                 this));
                 mockedClasses.put(mockable, klass);
-                handlers.add(new MockitoClassHandler(klass, companionBuilder));
+                classHandlers.add(new MockitoClassHandler(klass, companionBuilder));
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
         mStaticInvocationHandler = DefaultInvocationHandler
-                .newInstance(handlers);
+                .newInstance(classHandlers);
     }
 
     public Set<String> getMockables() {
@@ -164,5 +166,14 @@ public class EyePatchClassLoader extends ClassLoader
     @Override
     public StaticInvocationHandler getStaticInvocationHandler() {
         return Checks.notNull(mStaticInvocationHandler);
+    }
+
+    @Override
+    public void verifyStatic(Class klass) {
+        for (MockitoClassHandler handler : classHandlers) {
+            if (handler.canHandle(klass)) {
+                handler.verifyStatic();
+            }
+        }
     }
 }

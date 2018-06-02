@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class MockitoClassHandler implements ClassHandler {
-    public static Class verifyStaticClass = null;
     private Class klass;
     private MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
 
@@ -53,11 +52,6 @@ public class MockitoClassHandler implements ClassHandler {
     @Override
     public Object handleInvocation(Invocation invocation) {
         MockDelegate mockDelegate = getMockDelegate(invocation.getMethod(), invocation.getInstance());
-
-        if (klass == verifyStaticClass) {
-            mockDelegate = verify(mockDelegate);
-            verifyStaticClass = null;
-        }
 
         Object[] args = invocation.getArgs();
         Method method = getCompanionMethod(invocation);
@@ -116,5 +110,9 @@ public class MockitoClassHandler implements ClassHandler {
 
     public boolean canHandle(Class klass) {
         return this.klass == klass;
+    }
+
+    public void verifyStatic() {
+        verify(companionMock);
     }
 }

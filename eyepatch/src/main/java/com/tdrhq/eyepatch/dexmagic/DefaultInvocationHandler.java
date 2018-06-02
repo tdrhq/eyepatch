@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class DefaultInvocationHandler extends StaticInvocationHandler {
 
-    private List<ClassHandler> prebuiltHandlers = new ArrayList<>();
+    private List<? extends ClassHandler> prebuiltHandlers;
 
     DefaultInvocationHandler(
-            List<ClassHandler> prebuiltHandlers) {
-        this.prebuiltHandlers.addAll(Checks.notNull(prebuiltHandlers));
+            List<? extends ClassHandler> prebuiltHandlers) {
+        this.prebuiltHandlers = prebuiltHandlers;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
         throw new RuntimeException("No class handler for class: " + klass.getName());
     }
 
-    public static DefaultInvocationHandler newInstance(List<ClassHandler> handlers) {
+    public static DefaultInvocationHandler newInstance(List<? extends ClassHandler> handlers) {
         return new DefaultInvocationHandler(handlers);
     }
 }

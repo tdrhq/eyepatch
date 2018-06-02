@@ -39,8 +39,7 @@ public class ExampleIntegrationTest {
         EyePatchMockito.verifyStatic(Foo.class);
         Foo.voidMethod(captor.capture());
 
-        // TODO: broken
-        // assertEquals("blah", captor.getValue());
+        assertEquals("blah", captor.getValue());
     }
 
 
