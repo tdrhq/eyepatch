@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class EyePatchClassBuilder {
     private File mDataDir;
-    private int counter = 0;
+    private static int counter = 0;
 
     public EyePatchClassBuilder(File dataDir) {
         mDataDir = dataDir;

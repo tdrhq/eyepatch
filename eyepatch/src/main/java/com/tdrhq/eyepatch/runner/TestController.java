@@ -10,6 +10,9 @@ import org.junit.runners.model.InitializationError;
 public class TestController {
     private ExposedTemporaryFolder tmpdir = null;
 
+    private TestController() {
+    }
+
     public Class<?> generateTestClass(Class<?> testClass, Class[] mockables, ClassLoader classLoader1) throws InitializationError {
         if (tmpdir == null) {
             tmpdir = new ExposedTemporaryFolder();
@@ -36,8 +39,8 @@ public class TestController {
         return testClass;
     }
 
-    volatile TestController sTestController = null;
-    public synchronized TestController getInstance() {
+    volatile static TestController sTestController = null;
+    public synchronized static TestController getInstance() {
         if (sTestController == null) {
             sTestController = new TestController();
         }

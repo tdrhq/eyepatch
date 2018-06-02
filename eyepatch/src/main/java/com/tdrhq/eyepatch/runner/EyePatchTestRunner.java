@@ -17,7 +17,8 @@ public class EyePatchTestRunner extends Runner {
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         Class[] mockables = mockableAnnotation.value();
 
-        testClass = new TestController().generateTestClass(testClass, mockables, getClass().getClassLoader());
+        testClass = TestController.getInstance()
+                .generateTestClass(testClass, mockables, getClass().getClassLoader());
         delegate = new JUnit4(testClass);
     }
 
