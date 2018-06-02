@@ -38,18 +38,20 @@ public class EyePatchTestRunner extends Runner {
     private ExposedTemporaryFolder tmpdir = new ExposedTemporaryFolder();
 
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
+        EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
+        Class[] mockables = mockableAnnotation.value();
+
         tmpdir.before();
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
                 getClass().getClassLoader(),
                 new EyePatchClassBuilder(tmpdir.getRoot()));
-        EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
 
         MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
-        for (Class<?> mockable : mockableAnnotation.value()) {
+        for (Class<?> mockable : mockables) {
             mockDelegateFactory.init(mockable);
         }
 
-        for (Class<?> mockable : mockableAnnotation.value()) {
+        for (Class<?> mockable : mockables) {
             classLoader.addMockable(mockable.getName());
         }
 
