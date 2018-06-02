@@ -22,6 +22,7 @@ public class EyePatchClassBuilder {
      * into the ClassLoader.
      */
     public Class wrapClass(Class realClass, ClassLoader classLoader) {
+        DexFile dexFile;
         if (realClass.getClassLoader() == classLoader) {
             throw new IllegalArgumentException(
                     "The classLoader provided must be different from the one " +
@@ -37,11 +38,12 @@ public class EyePatchClassBuilder {
             os.write(dex);
             os.close();
 
-            DexFile dexFile = new DexFile(of);
-            return dexFile.loadClass(realClass.getName(), classLoader);
+             dexFile = new DexFile(of);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return dexFile.loadClass(realClass.getName(), classLoader);
+
     }
 
     private DexMaker buildDexMaker(String name, Class original) {
