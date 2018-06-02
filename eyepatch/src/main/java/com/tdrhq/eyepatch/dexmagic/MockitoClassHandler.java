@@ -132,6 +132,6 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     public boolean canHandle(Class klass) {
-        return true;
+        return this.klass == klass;
     }
 }

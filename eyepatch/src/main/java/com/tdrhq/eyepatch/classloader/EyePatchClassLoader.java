@@ -3,18 +3,23 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
+import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
+import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -25,10 +30,12 @@ public class EyePatchClassLoader extends ClassLoader
       implements HasStaticInvocationHandler {
     private PathClassLoader parent;
     private EyePatchClassBuilder classBuilder;
-    private StaticInvocationHandler mStaticInvocationHandler = DefaultInvocationHandler.newInstance();
+    private StaticInvocationHandler mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
     Set<String> mockables = new HashSet<>();
+    Map<String, Class> mockedClasses = new HashMap<>();
+
 
     public EyePatchClassLoader(ClassLoader realClassLoader, EyePatchClassBuilder mockClassBuilder) {
         super(realClassLoader);
@@ -38,6 +45,22 @@ public class EyePatchClassLoader extends ClassLoader
 
     public void setMockables(List<String> mockables) {
         this.mockables = new HashSet<>(mockables);
+
+        List<ClassHandler> handlers = new ArrayList<>();
+        for (String mockable : mockables) {
+            try {
+                Class klass = Checks.notNull(
+                        classBuilder.wrapClass(
+                                getClass().getClassLoader().loadClass(mockable),
+                                this));
+                mockedClasses.put(mockable, klass);
+                handlers.add(new MockitoClassHandler(klass));
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        mStaticInvocationHandler = DefaultInvocationHandler
+                .newInstance(handlers);
     }
 
     public Set<String> getMockables() {
@@ -45,10 +68,8 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (isMockable(name)) {
-            return classBuilder.wrapClass(
-                    getClass().getClassLoader().loadClass(name),
-                    this);
+        if (mockedClasses.containsKey(name)) {
+            return mockedClasses.get(name);
         }
 
         if (isBlacklisted(name)) {
@@ -138,6 +159,6 @@ public class EyePatchClassLoader extends ClassLoader
 
     @Override
     public StaticInvocationHandler getStaticInvocationHandler() {
-        return mStaticInvocationHandler;
+        return Checks.notNull(mStaticInvocationHandler);
     }
 }

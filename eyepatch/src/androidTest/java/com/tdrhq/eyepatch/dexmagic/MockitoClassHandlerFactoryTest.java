@@ -2,6 +2,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.*;
 public class MockitoClassHandlerFactoryTest {
     @Before
     public void before() throws Throwable {
-        StaticInvocationHandler.setHandler(new DefaultInvocationHandler(new MockitoClassHandlerFactory()));
+        StaticInvocationHandler.setHandler(new DefaultInvocationHandler(new MockitoClassHandlerFactory(), new ArrayList<ClassHandler>()));
     }
 
     @After

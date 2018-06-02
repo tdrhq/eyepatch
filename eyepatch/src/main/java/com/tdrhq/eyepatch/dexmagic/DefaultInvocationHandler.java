@@ -2,16 +2,23 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.util.Checks;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultInvocationHandler extends StaticInvocationHandler {
 
     private ClassHandlerFactory classHandlerFactory;
     private Map<Class, ClassHandler> classHandlerMap = new HashMap<>();
+    private List<ClassHandler> prebuiltHandlers = new ArrayList<>();
 
-    DefaultInvocationHandler(ClassHandlerFactory classHandlerFactory) {
+    DefaultInvocationHandler(
+            ClassHandlerFactory classHandlerFactory,
+            List<ClassHandler> prebuiltHandlers) {
         this.classHandlerFactory = classHandlerFactory;
+        this.prebuiltHandlers.addAll(Checks.notNull(prebuiltHandlers));
     }
 
     @Override
@@ -21,6 +28,11 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
     }
 
     ClassHandler getClassHandler(Class klass) {
+        for (ClassHandler handler : prebuiltHandlers) {
+            if (handler.canHandle(klass)) {
+                return handler;
+            }
+        }
 
         if (classHandlerMap.containsKey(klass)) {
             return classHandlerMap.get(klass);
@@ -32,7 +44,7 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
         return ret;
     }
 
-    public static DefaultInvocationHandler newInstance() {
-        return new DefaultInvocationHandler(new MockitoClassHandlerFactory());
+    public static DefaultInvocationHandler newInstance(List<ClassHandler> handlers) {
+        return new DefaultInvocationHandler(new MockitoClassHandlerFactory(), handlers);
     }
 }
