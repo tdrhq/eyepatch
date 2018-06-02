@@ -3,7 +3,6 @@ package com.tdrhq.eyepatch.runner;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
-import com.tdrhq.eyepatch.dexmagic.MockDelegateFactory;
 import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +23,6 @@ public class TestController {
                 classLoader1,
                 this.classBuilder,
                 this.companionBuilder);
-
-        MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
-        for (Class<?> mockable : mockables) {
-            mockDelegateFactory.init(mockable);
-        }
 
         List<String> mockablesStr = new ArrayList<>();
         for (Class klass : mockables) {

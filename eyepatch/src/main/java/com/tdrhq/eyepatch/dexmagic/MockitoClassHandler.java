@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 
 public class MockitoClassHandler implements ClassHandler {
     private Class klass;
-    private MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
 
     private Class companionClass;
     private Object companionMock;
@@ -37,8 +36,6 @@ public class MockitoClassHandler implements ClassHandler {
             return methodName.hashCode();
         }
     }
-    private MockDelegate nextMockDelegate;
-    private Map<MockKey, MockDelegate> mockDelegates = new HashMap<>();
     private CompanionBuilder companionBuilder;
 
     public MockitoClassHandler(Class klass, CompanionBuilder companionBuilder) {
@@ -51,8 +48,6 @@ public class MockitoClassHandler implements ClassHandler {
 
     @Override
     public Object handleInvocation(Invocation invocation) {
-        MockDelegate mockDelegate = getMockDelegate(invocation.getMethod(), invocation.getInstance());
-
         Object[] args = invocation.getArgs();
         Method method = getCompanionMethod(invocation);
         try {
@@ -74,21 +69,6 @@ public class MockitoClassHandler implements ClassHandler {
         }
 
         throw new RuntimeException("can't find method: " + invocation.getMethod());
-    }
-
-    private MockDelegate getMockDelegate(String methodName, Object instance) {
-        MockKey key = new MockKey();
-        key.methodName = methodName;
-        key.instance = instance;
-
-        if (mockDelegates.containsKey(key)) {
-            return mockDelegates.get(key);
-        }
-
-        MockDelegate ret = mockDelegateFactory.create();
-        mockDelegates.put(key, ret);
-
-        return ret;
     }
 
     public static class Reference {
