@@ -41,9 +41,14 @@ public class EyePatchTestRunner extends Runner {
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         Class[] mockables = mockableAnnotation.value();
 
+        testClass = generateTestClass(tmpdir, testClass, mockables, getClass().getClassLoader());
+        delegate = new JUnit4(testClass);
+    }
+
+    private static Class<?> generateTestClass(ExposedTemporaryFolder tmpdir, Class<?> testClass, Class[] mockables, ClassLoader classLoader1) throws InitializationError {
         tmpdir.before();
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
-                getClass().getClassLoader(),
+                classLoader1,
                 new EyePatchClassBuilder(tmpdir.getRoot()));
 
         MockDelegateFactory mockDelegateFactory = MockDelegateFactory.getInstance();
@@ -60,7 +65,7 @@ public class EyePatchTestRunner extends Runner {
         } catch (ClassNotFoundException e) {
             throw new InitializationError(e);
         }
-        delegate = new JUnit4(testClass);
+        return testClass;
     }
 
     @Override
