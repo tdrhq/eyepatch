@@ -35,6 +35,7 @@ public class CompanionBuilderTest {
         Class klass = companionBuilder.build(Foo.class, getClass().getClassLoader());
         Method method = klass.getMethod("bar");
         assertNotNull(method);
+        assertFalse(Modifier.isStatic(method.getModifiers()));
     }
 
     public static class Foo {
