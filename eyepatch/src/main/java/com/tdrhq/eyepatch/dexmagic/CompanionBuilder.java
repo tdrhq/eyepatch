@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.util.Log;
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
 import com.android.dx.Local;
@@ -49,6 +50,7 @@ public class CompanionBuilder {
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
             if (Modifier.isStatic(methodTemplate.getModifiers())) {
+                Log.i("CompanionBuilder", "static method: " + methodTemplate.getName());
                 generateMethod(dexmaker, methodTemplate, typeId, original);
             }
         }
