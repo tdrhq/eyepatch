@@ -25,6 +25,13 @@ public class CompanionBuilder {
         mDataDir = dataDir;
     }
 
+    /**
+     * Generate a companion class for the given class.
+     *
+     * The ClassLoader needs to be the *real* classloader. Note that
+     * we don't need to cache the result, because we use a static
+     * counter to generate a new name everytime.
+     */
     public Class build(Class realClass, ClassLoader classLoader) {
         String name = generateName();
         DexMaker dexmaker = buildDexMaker(name, realClass);
@@ -81,6 +88,8 @@ public class CompanionBuilder {
     }
 
     private String generateName() {
-        return "com.tdrhq.eyepatch.dexmagic.Companion" + (++counter);
+        synchronized (CompanionBuilder.class) {
+            return "com.tdrhq.eyepatch.dexmagic.Companion" + (++counter);
+        }
     }
 }
