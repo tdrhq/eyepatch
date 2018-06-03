@@ -67,6 +67,11 @@ the methods on a class.
 3. There's support for mocking out final methods, but this isn't
 exposed as of yet. Hopefully I'll release this real quick.
 
+## API level support
+
+Currently only API level >= 23 is supported, we're working on bringing
+this all the way back to 14.
+
 
 ## Author
 
