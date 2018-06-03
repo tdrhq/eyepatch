@@ -8,8 +8,8 @@ import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import static com.tdrhq.eyepatch.util.Whitebox.arg;
 
 public class ClassLoaderIntrospector {
     private ClassLoaderIntrospector() {
@@ -42,7 +42,14 @@ public class ClassLoaderIntrospector {
         Object dexPathList = Whitebox.getField(parent, BaseDexClassLoader.class, "pathList");
         assert(dexPathList != null);
 
-        List<File> files = (List<File>) Whitebox.getField(dexPathList, "nativeLibraryDirectories");
+        Object filesVal = Whitebox.getField(dexPathList, "nativeLibraryDirectories");
+        List<File> files;
+
+        if (filesVal instanceof List) {
+            files = (List<File>) filesVal;
+        } else {
+            files = Arrays.asList((File[]) filesVal);
+        }
         List<String> ret = new ArrayList<>();
         for (File file : files) {
             ret.add(file.getAbsolutePath());
