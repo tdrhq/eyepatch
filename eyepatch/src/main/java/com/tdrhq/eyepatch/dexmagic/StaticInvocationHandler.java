@@ -24,8 +24,13 @@ public abstract class StaticInvocationHandler {
 
     public abstract Object handleInvocation(Invocation invocation);
 
-    public static Object invokeStatic(Class klass, Object instance, String method, Object[] args) {
-        Invocation invocation = new Invocation(klass, instance, method, args);
+    public static Object invokeStatic(
+            Class klass,
+            Object instance,
+            String method,
+            Class[] argTypes,
+            Object[] args) {
+        Invocation invocation = new Invocation(klass, instance, method, argTypes, args);
         if (sHandler != null) {
             return sHandler.handleInvocation(invocation);
         }

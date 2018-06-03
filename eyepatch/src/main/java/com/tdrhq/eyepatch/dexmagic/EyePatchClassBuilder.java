@@ -139,6 +139,7 @@ public class EyePatchClassBuilder {
         TypeId instance = TypeId.OBJECT;
         TypeId objectType = TypeId.get(Object.class);
         TypeId stringType = TypeId.get(String.class);
+        TypeId argArType = TypeId.get(Class[].class);
         TypeId objectArType = TypeId.get(Object[].class);
 
         MethodId invokeStaticMethod = staticInvoker.getMethod(
@@ -147,6 +148,7 @@ public class EyePatchClassBuilder {
                 classType,
                 objectType,
                 stringType,
+                argArType,
                 objectArType);
 
         Local<Object> returnValue = null;
@@ -158,6 +160,7 @@ public class EyePatchClassBuilder {
         Local<Class> callerClass = code.newLocal(TypeId.get(Class.class));
         Local instanceArg = code.newLocal(TypeId.OBJECT);
         Local<String> callerMethod = code.newLocal(TypeId.STRING);
+        Local<Class[]> argTypes = code.newLocal(TypeId.get(Class[].class));
         Local<Object[]> callerArgs = code.newLocal(TypeId.get(Object[].class));
         Local castedReturnValue = code.newLocal(returnType);
         Local<Integer> parameterLength = code.newLocal(TypeId.INT);
@@ -171,8 +174,11 @@ public class EyePatchClassBuilder {
 
         afterLocals.run();
         code.loadConstant(parameterLength, parameterTypes.length);
+        code.loadConstant(argTypes, null);
 
         buildCallerArray(callerArgs, parameterLength, tmp, parameterTypes, code);
+        code.loadConstant(parameterLength, parameterTypes.length);
+        buildArgArray(argTypes, parameterLength, parameterTypes, tmp, code);
 
         code.loadConstant(callerClass, original);
         if (Modifier.isStatic(modifiers)) {
@@ -187,6 +193,7 @@ public class EyePatchClassBuilder {
                 callerClass,
                 instanceArg,
                 callerMethod,
+                argTypes,
                 callerArgs);
 
         if (Primitives.isPrimitive(returnType)) {
@@ -208,6 +215,20 @@ public class EyePatchClassBuilder {
             code.returnVoid();
         } else {
             code.returnValue(castedReturnValue);
+        }
+    }
+
+    private void buildArgArray(
+            Local<Class[]> output,
+            Local<Integer> parameterLength,
+            Class[] parameterTypes,
+            Local<Object> tmp,
+            Code code) {
+        code.newArray(output, parameterLength);
+        for (int i = 0; i < parameterTypes.length; i++) {
+            code.loadConstant(parameterLength, i);
+            code.loadConstant(tmp, parameterTypes[i]);
+            code.aput(output, parameterLength, tmp);
         }
     }
 

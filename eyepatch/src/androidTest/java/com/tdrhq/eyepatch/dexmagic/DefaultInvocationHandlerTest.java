@@ -32,6 +32,7 @@ public class DefaultInvocationHandlerTest {
                 Foo.class,
                 new Foo(),
                 "bar",
+                new Class[] {},
                 new Object[] {});
 
         assertEquals(null, handler.handleInvocation(invocation));

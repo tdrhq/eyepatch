@@ -25,6 +25,7 @@ public class DelegatingInvocationHandlerTest {
                             Bar.class,
                             null,
                             "foo",
+                            new Class[] {},
                             new Object[] {}));
             fail("expected exception");
         } catch (UnsupportedOperationException e) {
@@ -40,6 +41,7 @@ public class DelegatingInvocationHandlerTest {
                 barWrapped,
                 null,
                 "foo",
+                new Class[] {},
                 new Object[] {});
         mHandler.handleInvocation(
                 invocation);

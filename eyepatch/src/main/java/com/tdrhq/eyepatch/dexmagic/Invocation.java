@@ -8,6 +8,7 @@ public class Invocation {
     private final Class mClass;
     private Object mInstance;
     private final String mMethod;
+    private Class[] argTypes;
     private Object[] mArgs;
 
     public Object[] getArgs() {
@@ -30,10 +31,12 @@ public class Invocation {
     public Invocation(Class klass,
                       Object instance,
                       String method,
+                      Class[] argTypes,
                       Object[] args) {
         mClass = klass;
         mMethod = method;
         mInstance = instance;
+        this.argTypes = argTypes;
         mArgs = args;
     }
 
@@ -45,6 +48,7 @@ public class Invocation {
                 && mClass.getClassLoader() == otherInvocation.mClass.getClassLoader()
                 && mInstance == otherInvocation.mInstance
                 && mMethod.equals(otherInvocation.mMethod)
+                && Arrays.equals(argTypes, otherInvocation.argTypes)
                 && Arrays.equals(mArgs, otherInvocation.mArgs);
 
     }

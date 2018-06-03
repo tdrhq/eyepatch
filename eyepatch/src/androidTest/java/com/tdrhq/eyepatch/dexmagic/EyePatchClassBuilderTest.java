@@ -43,6 +43,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 null,
                 "foo",
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(expectedInvocation))
@@ -63,6 +64,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 null,
                 "foo",
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(expectedInvocation))
@@ -72,6 +74,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 null,
                 "car",
+                new Class[] {},
                 new Object[] {});
         when(handler.handleInvocation(expectedCarInvocation))
                 .thenReturn("car3");
@@ -94,6 +97,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 "nonStatic",
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(invocation))
@@ -115,6 +119,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 "finalMethod",
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(invocation))
@@ -136,6 +141,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 "otherReturnType",
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(invocation))
@@ -158,6 +164,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(invocation))
@@ -180,6 +187,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] {},
                 new Object[] {});
 
         when(handler.handleInvocation(invocation))
@@ -205,6 +213,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] {},
                 new Object[] {});
 
         verify(handler).handleInvocation(invocation);
@@ -269,6 +278,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] { String.class },
                 new Object[] {"foo"});
 
         verify(handler).handleInvocation(invocation);
@@ -298,6 +308,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] { String.class, Integer.class },
                 new Object[] {"foo", new Integer(20) });
 
         verify(handler).handleInvocation(invocation);
@@ -328,6 +339,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] { int.class },
                 new Integer[] {20});
 
         verify(handler).handleInvocation(invocation);
@@ -357,6 +369,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 functionName,
+                new Class[] { String.class, int.class },
                 new Object[] {"foo", new Integer(20)});
 
         verify(handler).handleInvocation(invocation);
@@ -381,6 +394,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 "__construct__",
+                new Class[] {},
                 new Object[] {});
 
         verify(handler).handleInvocation(invocation);
@@ -402,6 +416,7 @@ public class EyePatchClassBuilderTest {
                 barWrapped,
                 instance,
                 "__construct__",
+                new Class[] { int.class },
                 new Object[] {20});
 
         verify(handler).handleInvocation(invocation);
