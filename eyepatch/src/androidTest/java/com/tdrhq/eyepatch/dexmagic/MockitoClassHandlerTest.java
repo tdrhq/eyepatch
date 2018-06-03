@@ -45,6 +45,7 @@ public class MockitoClassHandlerTest {
         mMockitoClassHandler.handleInvocation(invocation);
 
         assertEquals("car", captor.getValue());
+        mMockitoClassHandler.resetStatic();
     }
 
     @Test
