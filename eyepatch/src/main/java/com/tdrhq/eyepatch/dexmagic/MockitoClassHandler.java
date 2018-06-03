@@ -104,7 +104,7 @@ public class MockitoClassHandler implements ClassHandler {
 
     public void resetStatic() {
         Log.i("MockitoClassHandler", "Resetting: " + klass.toString());
-        reset(companionMock);
+        companionMock = mock(companionClass);
     }
 
 }
