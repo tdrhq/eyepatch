@@ -484,4 +484,46 @@ public class EyePatchClassBuilderTest {
 
     public static class Foo2 extends Foo {
     }
+
+    @Test
+    public void testMethodPolymorph() throws Throwable {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.setHandler(handler);
+        Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo3.class, classLoader);
+        Invocation expectedInvocation = new Invocation(
+                barWrapped,
+                null,
+                "bar",
+                new Class[] { int.class },
+                new Object[] { new Integer(2)});
+
+        when(handler.handleInvocation(expectedInvocation))
+                .thenReturn("int1");
+
+        Invocation expectedInvocation2 = new Invocation(
+                barWrapped,
+                null,
+                "bar",
+                new Class[] { String.class },
+                new Object[] { "two" });
+
+        when(handler.handleInvocation(expectedInvocation2))
+                .thenReturn("String1");
+
+
+        Method method = barWrapped.getMethod("bar", int.class);
+        assertEquals("int1", method.invoke(null, 2));
+
+        Method method2 = barWrapped.getMethod("bar", String.class);
+        assertEquals("String1", method2.invoke(null, "two"));
+    }
+
+    public static class Foo3 {
+        public static String bar(String arg) {
+            return "String";
+        }
+        public static String bar(int arg) {
+            return "int";
+        }
+    }
 }

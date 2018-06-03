@@ -62,13 +62,13 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     private Method getCompanionMethod(Invocation invocation) {
-        for (Method method : companionClass.getDeclaredMethods()) {
-            if (method.getName().equals(invocation.getMethod())) {
-                return method;
-            }
+        try {
+            return companionClass.getDeclaredMethod(
+                    invocation.getMethod(),
+                    invocation.getArgTypes());
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
-
-        throw new RuntimeException("can't find method: " + invocation.getMethod());
     }
 
     public static class Reference {

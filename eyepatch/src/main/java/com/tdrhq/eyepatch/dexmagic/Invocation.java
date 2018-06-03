@@ -15,6 +15,10 @@ public class Invocation {
         return mArgs;
     }
 
+    public Class[] getArgTypes() {
+        return argTypes;
+    }
+
 
     public Object getInstance() {
         return mInstance;
@@ -62,5 +66,10 @@ public class Invocation {
                 mInstance.toString(),
                 mMethod,
                 Arrays.toString(mArgs));
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
     }
 }
