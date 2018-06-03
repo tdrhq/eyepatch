@@ -69,9 +69,10 @@ exposed as of yet. Hopefully I'll release this real quick.
 
 ## API level support
 
-Currently only API level >= 23 is supported, we're working on bringing
+Currently only API level >= 22 is supported, we're working on bringing
 this all the way back to 14.
 
+You need to have `android:vmSafeMode="true"` for this to work.
 
 ## Author
 
