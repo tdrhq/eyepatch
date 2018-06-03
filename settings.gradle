@@ -1,1 +1,1 @@
-include ':app', ':eyepatch'
+include ':eyepatch'
