@@ -57,7 +57,6 @@ public class ClassLoaderIntrospector {
             }
 
             Class dexPathList = Class.forName("dalvik.system.DexPathList");
-            String zipSeparator = (String) Whitebox.getStaticField(dexPathList, "zipSeparator");
             List<String> dexPath = getOriginalDexPath(classLoader);
             String dexPathAsStr = TextUtils.join(":", dexPath);
 
