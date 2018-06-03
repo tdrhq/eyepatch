@@ -2,13 +2,13 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.util.Log;
 import com.tdrhq.eyepatch.util.Checks;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.reset;
 
 public class MockitoClassHandler implements ClassHandler {
     private Class klass;
@@ -50,6 +50,7 @@ public class MockitoClassHandler implements ClassHandler {
     public Object handleInvocation(Invocation invocation) {
         Object[] args = invocation.getArgs();
         Method method = getCompanionMethod(invocation);
+
         try {
             return method.invoke(
                     companionMock,
@@ -93,6 +94,17 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     public void verifyStatic() {
-        verify(companionMock);
+        Log.i("MockitoClassHandler", "Verifying: " + klass.toString());
+        Object result = verify(companionMock);
+        if (result != companionMock) {
+            throw new UnsupportedOperationException(
+                    "uh oh, mockito returned another object on verify");
+        }
     }
+
+    public void resetStatic() {
+        Log.i("MockitoClassHandler", "Resetting: " + klass.toString());
+        reset(companionMock);
+    }
+
 }

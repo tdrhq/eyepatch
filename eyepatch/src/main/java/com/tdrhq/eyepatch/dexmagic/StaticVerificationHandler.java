@@ -4,4 +4,5 @@ package com.tdrhq.eyepatch.dexmagic;
 
 public interface StaticVerificationHandler {
     void verifyStatic(Class klass);
+    void resetStatic(Class klass);
 }

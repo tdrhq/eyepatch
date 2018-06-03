@@ -3,6 +3,7 @@ package com.tdrhq.eyepatch.dexmagic;
 import com.tdrhq.eyepatch.EyePatchMockito;
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -12,6 +13,12 @@ import static org.mockito.Mockito.*;
 @EyePatchMockable( { ExampleIntegrationTest.Foo.class } )
 @RunWith(EyePatchTestRunner.class)
 public class ExampleIntegrationTest {
+
+    @After
+    public void after() throws Throwable {
+        EyePatchMockito.resetStatic(Foo.class);
+    }
+
     @Test
     public void testDifferentArgs() throws Throwable {
         when(Foo.bar("zoid")).thenReturn("berg");

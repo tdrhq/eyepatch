@@ -61,6 +61,7 @@ public class CompanionBuilder {
         String methodName = methodTemplate.getName();
         int modifiers = methodTemplate.getModifiers();
         modifiers &= (~(Modifier.STATIC | Modifier.FINAL| Modifier.NATIVE));
+        modifiers |= Modifier.PUBLIC;
         TypeId returnType = TypeId.get(methodTemplate.getReturnType());
         Class[] parameterTypes = methodTemplate.getParameterTypes();
 

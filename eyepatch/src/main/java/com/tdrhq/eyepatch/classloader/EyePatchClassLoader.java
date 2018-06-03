@@ -180,4 +180,17 @@ public class EyePatchClassLoader extends ClassLoader
         throw new IllegalStateException("Could not find handler for: " +
                                         klass.getName());
     }
+
+    @Override
+    public void resetStatic(Class klass) {
+        for (MockitoClassHandler handler : classHandlers) {
+            if (handler.canHandle(klass)) {
+                handler.resetStatic();
+                return;
+            }
+        }
+
+        throw new IllegalStateException("Could not find handler for: " +
+                                        klass.getName());
+    }
 }
