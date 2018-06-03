@@ -22,8 +22,12 @@ public class MockitoClassHandlerTest {
 
     @Test
     public void testVerify() throws Throwable {
+        testVerifyOn(Foo.class);
+    }
+
+    private void testVerifyOn(Class fooClass) {
         Invocation invocation = new Invocation(
-                Foo.class,
+                fooClass,
                 null,
                 "bar",
                 new Class[] { String.class },
@@ -36,7 +40,7 @@ public class MockitoClassHandlerTest {
         mMockitoClassHandler.verifyStatic();
 
         invocation = new Invocation(
-                Foo.class,
+                fooClass,
                 null,
                 "bar",
                 new Class[] { String.class },
