@@ -173,7 +173,11 @@ public class EyePatchClassLoader extends ClassLoader
         for (MockitoClassHandler handler : classHandlers) {
             if (handler.canHandle(klass)) {
                 handler.verifyStatic();
+                return;
             }
         }
+
+        throw new IllegalStateException("Could not find handler for: " +
+                                        klass.getName());
     }
 }
