@@ -37,16 +37,6 @@ public class ClassLoaderIntrospector {
         return TextUtils.join(":", getOriginalDexPath(parent));
     }
 
-    public static void addDexPaths(ClassLoader classLoader, List<String> dexPaths) {
-        Object dexPathList = Whitebox.getField(classLoader, BaseDexClassLoader.class, "pathList");
-        assert(dexPathList != null);
-
-        String dexPath = TextUtils.join(":", dexPaths);
-        Whitebox.invoke(dexPathList,
-                        "addDexPath",
-                        arg(String.class, dexPath),
-                        arg(File.class, null));
-    }
 
     public static List<String> getOriginalNativeLibPath(ClassLoader parent) {
         Object dexPathList = Whitebox.getField(parent, BaseDexClassLoader.class, "pathList");

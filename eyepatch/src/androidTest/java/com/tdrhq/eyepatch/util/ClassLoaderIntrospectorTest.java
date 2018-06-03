@@ -16,24 +16,6 @@ public class ClassLoaderIntrospectorTest {
     }
 
     @Test
-    public void testAddDexPath() throws Throwable {
-        ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader().getParent());
-        assertThat(ClassLoaderIntrospector.getOriginalDexPath(classLoader),
-                   is(empty()));
-
-        List<String> dexPaths = new ArrayList<>();
-        String sampleDex = ClassLoaderIntrospector.getOriginalDexPath(getClass().getClassLoader())
-                .get(0);
-        dexPaths.add(sampleDex);
-        ClassLoaderIntrospector.addDexPaths(
-                classLoader,
-                dexPaths);
-
-        assertThat(ClassLoaderIntrospector.getOriginalDexPath(classLoader),
-                   contains(sampleDex));
-    }
-
-    @Test
     public void testClone() throws Throwable {
         ClassLoader clone = ClassLoaderIntrospector.clone(
                 getClass().getClassLoader());
