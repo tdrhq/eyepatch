@@ -39,8 +39,7 @@ public class ExampleIntegrationTest {
         assertEquals("toyota", Foo.bar("car"));
     }
 
-    // TODO: broken on API level 22
-    //@Test
+    @Test
     public void testCaptureOnVoidMethod() throws Throwable {
         Foo.voidMethod("blah");
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
