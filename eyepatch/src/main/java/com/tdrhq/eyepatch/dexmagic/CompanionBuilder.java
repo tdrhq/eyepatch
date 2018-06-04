@@ -36,14 +36,8 @@ public class CompanionBuilder {
         String name = generateName();
         DexMaker dexmaker = buildDexMaker(name, realClass);
         try {
-            byte[] dex = dexmaker.generate();
-
             File of = new File(mDataDir, name +  ".dex");
-            FileOutputStream os = new FileOutputStream(of);
-            os.write(dex);
-            os.close();
-
-            DexFile dexFile = DexFile.loadDex(of.getAbsolutePath(), null, 0);
+            DexFile dexFile = Util.createDexFile(dexmaker, of);
             return dexFile.loadClass(name, classLoader);
         } catch (IOException e) {
             throw new RuntimeException(e);
