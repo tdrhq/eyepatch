@@ -68,7 +68,10 @@ this, it's most likely going to have a slightly different API.
 the methods on a class.
 
 3. There's support for mocking out final methods, but this isn't
-exposed as of yet. Hopefully I'll release this real quick.
+exposed as of yet. Hopefully I'll release this real quick. However,
+apparently the latest Mockito version does already support this on
+Android P. I haven't tried this myself. (See
+https://github.com/linkedin/dexmaker/issues/77)
 
 ## API level support
 
