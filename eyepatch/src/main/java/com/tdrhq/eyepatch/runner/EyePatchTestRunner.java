@@ -14,6 +14,7 @@ public class EyePatchTestRunner extends Runner {
     private Runner delegate;
 
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
+        DeviceValidator.assertDeviceIsAcceptable();
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         Class[] mockables = mockableAnnotation.value();
 
