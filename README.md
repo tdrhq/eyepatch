@@ -1,9 +1,12 @@
 # EyePatch
 
-EyePatch is PowerMocking for Android tests (a.k.a instrumentation
-tests, tests that run on an actual emulator.). This is highly alpha
-quality at the moment, there may be edge cases like specific API
-levels, or class configurations where this doesn't work.
+EyePatch let's you mock static and final methods in Android tests
+(a.k.a instrumentation tests, tests that run on an actual
+emulator.). This is highly alpha quality at the moment, there may be
+edge cases like specific API levels, or class configurations where
+this doesn't work.
+
+Essentially this is PowerMock for Android.
 
 ## Examples
 
