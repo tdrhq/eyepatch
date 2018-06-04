@@ -10,6 +10,11 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.JUnit4;
 import org.junit.runners.model.InitializationError;
 
+/**
+ * The main JUnit test runner used for all EyePatch tests.
+ *
+ * @see {@code EyePatchMockables}
+ */
 public class EyePatchTestRunner extends Runner {
     private Runner delegate;
 

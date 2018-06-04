@@ -5,6 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation used on EyePatch tests to indicate which classes
+ * need to be mockable in the test.
+ *
+ * Currently, all mocked classes are *completely* mocked, i.e you
+ * can't partially mock classes.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface EyePatchMockable {
