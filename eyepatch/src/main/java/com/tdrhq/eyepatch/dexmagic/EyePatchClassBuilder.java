@@ -16,31 +16,6 @@ import java.util.Map;
 public class EyePatchClassBuilder {
     private File mDataDir;
     private int counter = 0;
-    public static class Key {
-        Class klass;
-        ClassLoader classLoader;
-
-        public Key(Class klass, ClassLoader classLoader) {
-            this.klass = Checks.notNull(klass);
-            this.classLoader = Checks.notNull(classLoader);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (!(other instanceof Key)) {
-                return false;
-            }
-
-            Key otherKey = (Key) other;
-            return klass == otherKey.klass &&
-                    classLoader == otherKey.classLoader;
-        }
-
-        @Override
-        public int hashCode() {
-            return klass.hashCode();
-        }
-    }
     private Map<Key, DexFile> cache = new HashMap<>();
 
     public EyePatchClassBuilder(File dataDir) {
@@ -275,5 +250,31 @@ public class EyePatchClassBuilder {
     }
 
     public static void invokeHelper(Class klass, String name) {
+    }
+
+    public static class Key {
+        Class klass;
+        ClassLoader classLoader;
+
+        public Key(Class klass, ClassLoader classLoader) {
+            this.klass = Checks.notNull(klass);
+            this.classLoader = Checks.notNull(classLoader);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof Key)) {
+                return false;
+            }
+
+            Key otherKey = (Key) other;
+            return klass == otherKey.klass &&
+                    classLoader == otherKey.classLoader;
+        }
+
+        @Override
+        public int hashCode() {
+            return klass.hashCode();
+        }
     }
 }
