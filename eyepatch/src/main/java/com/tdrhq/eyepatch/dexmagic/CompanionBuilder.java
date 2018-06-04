@@ -36,7 +36,7 @@ public class CompanionBuilder {
         String name = generateName();
         DexMaker dexmaker = buildDexMaker(name, realClass);
         try {
-            File of = new File(mDataDir, name +  ".jar");
+            File of = new File(mDataDir, generateJarName() +  ".jar");
             DexFile dexFile = Util.createDexFile(dexmaker, of);
             return dexFile.loadClass(name, classLoader);
         } catch (IOException e) {
@@ -84,6 +84,12 @@ public class CompanionBuilder {
     private String generateName() {
         synchronized (CompanionBuilder.class) {
             return "com.tdrhq.eyepatch.dexmagic.Companion" + (++counter);
+        }
+    }
+
+    private String generateJarName() {
+        synchronized (CompanionBuilder.class) {
+            return "CB" + (++counter);
         }
     }
 }
