@@ -85,23 +85,12 @@ public class EyePatchClassBuilder {
             arguments[i] = TypeId.get(parameterTypes[i]);
         }
         MethodId cons = typeId.getConstructor(arguments);
-        final TypeId parent = TypeId.get(original.getSuperclass());
-        final Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
-        eyePatchClassBuilder.generateMethodContents(
-                code,
-                typeId,
-                returnType,
-                parameterTypes,
-                original,
-                modifiers,
-                methodName,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        code.invokeDirect(parent.getConstructor(), null, code.getThis(typeId));
+        TypeId parent = TypeId.get(original.getSuperclass());
+        Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
+        Locals locals = new Locals(code, returnType);
+        code.invokeDirect(parent.getConstructor(), null, code.getThis(typeId));
 
-                    }
-                });
+        eyePatchClassBuilder.generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
@@ -115,24 +104,12 @@ public class EyePatchClassBuilder {
         }
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
         Code code = dexmaker.declare(foo, modifiers);
-        generateMethodContents(code, typeId, returnType, parameterTypes, original, modifiers,
-                               methodName, new Runnable() {
-                                       @Override
-                                       public void run() {
-                                       }
-                                   });
+        Locals locals = new Locals(code, returnType);
+
+        generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }
 
-    private void generateMethodContents(
-            Code code,
-            TypeId typeId,
-            TypeId returnType, Class[] parameterTypes, Class original,
-            int modifiers,
-            String methodName,
-            Runnable afterLocals) {
-        Locals locals = new Locals(code, returnType);
-        afterLocals.run();
-
+    private void generateMethodContentsInternal(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
