@@ -130,6 +130,9 @@ public class EyePatchClassBuilder {
             int modifiers,
             String methodName,
             Runnable afterLocals) {
+        Locals locals = new Locals(code, returnType);
+        afterLocals.run();
+
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
@@ -137,9 +140,6 @@ public class EyePatchClassBuilder {
         TypeId stringType = TypeId.get(String.class);
         TypeId argArType = TypeId.get(Class[].class);
         TypeId objectArType = TypeId.get(Object[].class);
-
-        Locals locals = new Locals(code, returnType);
-        afterLocals.run();
 
         MethodId invokeStaticMethod = staticInvoker.getMethod(
                 objectType,
