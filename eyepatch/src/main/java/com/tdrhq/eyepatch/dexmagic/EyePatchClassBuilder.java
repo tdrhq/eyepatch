@@ -109,7 +109,7 @@ public class EyePatchClassBuilder {
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }
 
-    private void generateMethodContentsInternal(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
+    private static void generateMethodContentsInternal(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
@@ -210,7 +210,7 @@ public class EyePatchClassBuilder {
         }
     }
 
-    private void buildArgArray(
+    private static void buildArgArray(
             Local<Class[]> output,
             Local<Integer> parameterLength,
             Class[] parameterTypes,
@@ -224,7 +224,7 @@ public class EyePatchClassBuilder {
         }
     }
 
-    private void buildCallerArray(
+    private static void buildCallerArray(
             Local<Object[]> callerArgs, Local<Integer> parameterLength,
             Local<Object> tmp,
             Class[] parameterTypes, Code code) {
