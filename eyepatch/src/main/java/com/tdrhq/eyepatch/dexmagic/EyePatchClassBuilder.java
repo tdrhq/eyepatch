@@ -66,7 +66,7 @@ public class EyePatchClassBuilder {
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.get(original.getSuperclass()));
 
         for (Constructor constructor : original.getDeclaredConstructors()) {
-            generateConstructor(dexmaker, constructor, typeId, original);
+            generateConstructor(this, dexmaker, constructor, typeId, original);
         }
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
@@ -75,7 +75,7 @@ public class EyePatchClassBuilder {
         return dexmaker;
     }
 
-    private void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+    private static void generateConstructor(EyePatchClassBuilder eyePatchClassBuilder, DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
         String methodName = "__construct__";
         int modifiers = constructor.getModifiers();
         TypeId returnType = TypeId.VOID;
@@ -87,7 +87,7 @@ public class EyePatchClassBuilder {
         MethodId cons = typeId.getConstructor(arguments);
         final TypeId parent = TypeId.get(original.getSuperclass());
         final Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
-        generateMethodContents(
+        eyePatchClassBuilder.generateMethodContents(
                 code,
                 typeId,
                 returnType,
@@ -138,6 +138,9 @@ public class EyePatchClassBuilder {
         TypeId argArType = TypeId.get(Class[].class);
         TypeId objectArType = TypeId.get(Object[].class);
 
+        Locals locals = new Locals(code, returnType);
+        afterLocals.run();
+
         MethodId invokeStaticMethod = staticInvoker.getMethod(
                 objectType,
                 "invokeStatic",
@@ -147,70 +150,86 @@ public class EyePatchClassBuilder {
                 argArType,
                 objectArType);
 
-        Local<Object> returnValue = null;
 
-        if (returnType != TypeId.VOID) {
-            returnValue = code.newLocal(TypeId.OBJECT);
-        }
+        code.loadConstant(locals.parameterLength, parameterTypes.length);
+        code.loadConstant(locals.argTypes, null);
 
-        Local<Class> callerClass = code.newLocal(TypeId.get(Class.class));
-        Local instanceArg = code.newLocal(TypeId.OBJECT);
-        Local<String> callerMethod = code.newLocal(TypeId.STRING);
-        Local<Class[]> argTypes = code.newLocal(TypeId.get(Class[].class));
-        Local<Object[]> callerArgs = code.newLocal(TypeId.get(Object[].class));
-        Local castedReturnValue = code.newLocal(returnType);
-        Local<Integer> parameterLength = code.newLocal(TypeId.INT);
-        Local<Object> tmp = code.newLocal(TypeId.OBJECT);
+        buildCallerArray(locals.callerArgs, locals.parameterLength, locals.tmp, parameterTypes, code);
+        code.loadConstant(locals.parameterLength, parameterTypes.length);
+        buildArgArray(locals.argTypes, locals.parameterLength, parameterTypes, locals.tmp, code);
 
-        Local boxedReturnValue = null;
-
-        if (Primitives.isPrimitive(returnType) && returnType != TypeId.VOID) {
-            boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
-        }
-
-        afterLocals.run();
-        code.loadConstant(parameterLength, parameterTypes.length);
-        code.loadConstant(argTypes, null);
-
-        buildCallerArray(callerArgs, parameterLength, tmp, parameterTypes, code);
-        code.loadConstant(parameterLength, parameterTypes.length);
-        buildArgArray(argTypes, parameterLength, parameterTypes, tmp, code);
-
-        code.loadConstant(callerClass, original);
+        code.loadConstant(locals.callerClass, original);
         if (Modifier.isStatic(modifiers)) {
-            code.loadConstant(instanceArg, null);
+            code.loadConstant(locals.instanceArg, null);
         } else {
-            instanceArg = code.getThis(typeId);
+            locals.instanceArg = code.getThis(typeId);
         }
-        code.loadConstant(callerMethod, methodName);
+        code.loadConstant(locals.callerMethod, methodName);
         code.invokeStatic(
                 invokeStaticMethod,
-                returnValue,
-                callerClass,
-                instanceArg,
-                callerMethod,
-                argTypes,
-                callerArgs);
+                locals.returnValue,
+                locals.callerClass,
+                locals.instanceArg,
+                locals.callerMethod,
+                locals.argTypes,
+                locals.callerArgs);
 
         if (Primitives.isPrimitive(returnType)) {
             MethodId intValue = Primitives.getBoxedType(returnType)
                     .getMethod(
                             returnType,
                             Primitives.getUnboxFunction(returnType));
-            code.cast(boxedReturnValue, returnValue);
+            code.cast(locals.boxedReturnValue, locals.returnValue);
             code.invokeVirtual(
                     intValue,
-                    castedReturnValue,
-                    boxedReturnValue);
+                    locals.castedReturnValue,
+                    locals.boxedReturnValue);
 
         } else if (returnType != TypeId.VOID) {
-            code.cast(castedReturnValue, returnValue);
+            code.cast(locals.castedReturnValue, locals.returnValue);
         }
 
         if (returnType == TypeId.VOID) {
             code.returnVoid();
         } else {
-            code.returnValue(castedReturnValue);
+            code.returnValue(locals.castedReturnValue);
+        }
+    }
+
+    private static class Locals {
+        Local<Object> returnValue;
+        Local<Class> callerClass;
+        Local instanceArg;
+        Local<String> callerMethod;
+        Local<Class[]> argTypes;
+        Local<Object[]> callerArgs;
+        Local castedReturnValue;
+        Local<Integer> parameterLength;
+        Local<Object> tmp;
+        Local boxedReturnValue;
+
+        public Locals(Code code, TypeId returnType) {
+            returnValue = null;
+
+            if (returnType != TypeId.VOID) {
+                returnValue = code.newLocal(TypeId.OBJECT);
+            }
+
+            callerClass = code.newLocal(TypeId.get(Class.class));
+            instanceArg = code.newLocal(TypeId.OBJECT);
+            callerMethod = code.newLocal(TypeId.STRING);
+            argTypes = code.newLocal(TypeId.get(Class[].class));
+            callerArgs = code.newLocal(TypeId.get(Object[].class));
+            castedReturnValue = code.newLocal(returnType);
+            parameterLength = code.newLocal(TypeId.INT);
+            tmp = code.newLocal(TypeId.OBJECT);
+
+            boxedReturnValue = null;
+
+            if (Primitives.isPrimitive(returnType) && returnType != TypeId.VOID) {
+                boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
+            }
+
         }
     }
 
