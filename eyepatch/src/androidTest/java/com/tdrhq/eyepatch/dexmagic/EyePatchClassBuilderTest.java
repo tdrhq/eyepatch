@@ -1,6 +1,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.util.Checks;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
@@ -524,6 +525,35 @@ public class EyePatchClassBuilderTest {
         }
         public static String bar(int arg) {
             return "int";
+        }
+    }
+
+
+    @Test
+    public void testCheckSuperWithConstructor() throws Throwable {
+        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandler.setHandler(handler);
+        Class fooChildWrapped = mEyePatchClassBuilder.wrapClass(FooChild.class, classLoader);
+        Object instance = fooChildWrapped.newInstance();
+
+        FooParent fooParent = (FooParent) instance;
+        assertEquals(null, fooParent.blah);
+    }
+
+    public static class FooParent {
+        String blah = "car";
+        public FooParent() {
+            throw new RuntimeException("dfdfdf");
+        }
+
+        public FooParent(String blah) {
+            this.blah = Checks.notNull(blah);
+        }
+    }
+
+    public static class FooChild extends FooParent {
+        public FooChild() {
+            super("notseen");
         }
     }
 }
