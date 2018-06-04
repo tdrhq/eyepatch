@@ -6,7 +6,7 @@ emulator.). This is highly alpha quality at the moment, there may be
 edge cases like specific API levels, or class configurations where
 this doesn't work.
 
-Essentially this is PowerMock for Android.
+Essentially this is (a subset of) PowerMock for Android.
 
 ## Examples
 
