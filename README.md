@@ -22,7 +22,7 @@ complication and we're still working on making that better.)
 So suppose you have a static class like so:
 ```java
 public class StaticClass {
-  public String doExpensiveStuff(String input) {
+  public static String doExpensiveStuff(String input) {
     // .. does a lot of stuff, hits network and what not.
   }
 }
