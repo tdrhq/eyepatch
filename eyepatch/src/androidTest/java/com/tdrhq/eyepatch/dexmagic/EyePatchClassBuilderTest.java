@@ -542,10 +542,6 @@ public class EyePatchClassBuilderTest {
 
     public static class FooParent {
         String blah = "car";
-        public FooParent() {
-            throw new RuntimeException("dfdfdf");
-        }
-
         public FooParent(String blah) {
             this.blah = Checks.notNull(blah);
         }
