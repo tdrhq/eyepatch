@@ -434,8 +434,8 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testDexFileIsCached() throws Throwable {
-        DexFile file1 = mEyePatchClassBuilder.generateDexFile(Foo.class);
-        DexFile file2 = mEyePatchClassBuilder.generateDexFile(Foo.class);
+        DexFile file1 = mEyePatchClassBuilder.generateDexFile(Foo.class, getClass().getClassLoader());
+        DexFile file2 = mEyePatchClassBuilder.generateDexFile(Foo.class, getClass().getClassLoader());
         assertSame(file1, file2);
     }
 

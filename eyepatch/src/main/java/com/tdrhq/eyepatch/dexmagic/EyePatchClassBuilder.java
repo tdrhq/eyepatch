@@ -3,6 +3,7 @@ package com.tdrhq.eyepatch.dexmagic;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.android.dx.*;
+import com.tdrhq.eyepatch.util.Checks;
 import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -15,7 +16,32 @@ import java.util.Map;
 public class EyePatchClassBuilder {
     private File mDataDir;
     private int counter = 0;
-    private Map<Class, DexFile> cache = new HashMap<>();
+    public static class Key {
+        Class klass;
+        ClassLoader classLoader;
+
+        public Key(Class klass, ClassLoader classLoader) {
+            this.klass = Checks.notNull(klass);
+            this.classLoader = Checks.notNull(classLoader);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof Key)) {
+                return false;
+            }
+
+            Key otherKey = (Key) other;
+            return klass == otherKey.klass &&
+                    classLoader == otherKey.classLoader;
+        }
+
+        @Override
+        public int hashCode() {
+            return klass.hashCode();
+        }
+    }
+    private Map<Key, DexFile> cache = new HashMap<>();
 
     public EyePatchClassBuilder(File dataDir) {
         mDataDir = dataDir;
@@ -31,18 +57,19 @@ public class EyePatchClassBuilder {
                     "The classLoader provided must be different from the one " +
                     "used to load realClass");
         }
-        DexFile dexFile = generateDexFile(realClass);
+        DexFile dexFile = generateDexFile(realClass, classLoader);
         return dexFile.loadClass(realClass.getName(), classLoader);
 
     }
 
     @NonNull
-    DexFile generateDexFile(Class realClass) {
-        if (cache.containsKey(realClass)) {
-            return cache.get(realClass);
+    DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
+        Key key = new Key(realClass, classLoader);
+        if (cache.containsKey(key)) {
+            return cache.get(key);
         } else {
             DexFile ret = generateDexFileUncached(realClass);
-            cache.put(realClass, ret);
+            cache.put(key, ret);
             return ret;
         }
     }
