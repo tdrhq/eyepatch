@@ -7,7 +7,7 @@ edge cases like specific API levels, or class configurations where
 this doesn't work.
 
 Essentially this is (a subset of) PowerMock for Android. (To be clear,
-PowerMock doesn't work on Android tests because it release on JVM
+PowerMock doesn't work on Android because it relies on JVM
 specific hacks that don't work on Dalvik/ART).
 
 ## Examples
