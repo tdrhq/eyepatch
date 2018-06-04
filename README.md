@@ -78,7 +78,9 @@ https://github.com/linkedin/dexmaker/issues/77)
 Currently only API level >= 21 is supported, we're working on bringing
 this all the way back to 14.
 
-You need to have `android:vmSafeMode="true"` for this to work.
+You need to have `android:vmSafeMode="true"` in your `<application>`
+tag in your `AndroidManifest.xml`. Otherwise your tests will fail in
+mysterious ways (In particular I've seen it failing on API level 22).
 
 ## Author
 
