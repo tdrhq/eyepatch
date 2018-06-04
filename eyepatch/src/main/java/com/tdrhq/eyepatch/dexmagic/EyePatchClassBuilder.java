@@ -66,7 +66,7 @@ public class EyePatchClassBuilder {
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.get(original.getSuperclass()));
 
         for (Constructor constructor : original.getDeclaredConstructors()) {
-            generateConstructor(this, dexmaker, constructor, typeId, original);
+            generateConstructor(dexmaker, constructor, typeId, original);
         }
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
@@ -75,7 +75,7 @@ public class EyePatchClassBuilder {
         return dexmaker;
     }
 
-    private static void generateConstructor(EyePatchClassBuilder eyePatchClassBuilder, DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+    private static void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
         String methodName = "__construct__";
         int modifiers = constructor.getModifiers();
         TypeId returnType = TypeId.VOID;
@@ -90,7 +90,7 @@ public class EyePatchClassBuilder {
         Locals locals = new Locals(code, returnType);
         code.invokeDirect(parent.getConstructor(), null, code.getThis(typeId));
 
-        eyePatchClassBuilder.generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
+        generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
