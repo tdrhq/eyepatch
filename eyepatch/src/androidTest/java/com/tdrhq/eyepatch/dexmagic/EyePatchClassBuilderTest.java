@@ -544,10 +544,12 @@ public class EyePatchClassBuilderTest {
         // crashed by Dalvik is all fine with it, and we'll abuse this
         // to keep our API simple.
         assertEquals(null, fooParent.blah);
+        assertEquals(0, fooParent.num);
     }
 
     public static class FooParent {
         String blah = "car";
+        int num = 10;
         public FooParent(String blah) {
             this.blah = Checks.notNull(blah);
         }
