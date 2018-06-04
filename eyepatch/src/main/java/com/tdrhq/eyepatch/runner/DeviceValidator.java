@@ -5,6 +5,7 @@ package com.tdrhq.eyepatch.runner;
 import android.os.Build;
 
 public class DeviceValidator {
+    public static boolean disableValidation = false;
     private static final String SDK_INT_MESSAGE =
             "EyePatch is only supported on Lollipop or higher devices.\n";
 
@@ -27,6 +28,6 @@ public class DeviceValidator {
      * checks.
      */
     private static boolean isEyePatchTest() {
-        return false;
+        return disableValidation;
     }
 }
