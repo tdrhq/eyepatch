@@ -43,7 +43,7 @@ public class CompanionBuilder {
             os.write(dex);
             os.close();
 
-            DexFile dexFile = new DexFile(of);
+            DexFile dexFile = DexFile.loadDex(of.getAbsolutePath(), null, 0);
             return dexFile.loadClass(name, classLoader);
         } catch (IOException e) {
             throw new RuntimeException(e);

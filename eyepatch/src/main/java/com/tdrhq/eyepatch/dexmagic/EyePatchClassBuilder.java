@@ -51,14 +51,8 @@ public class EyePatchClassBuilder {
     DexFile generateDexFileUncached(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
-            byte[] dex = dexmaker.generate();
-
             File of = new File(mDataDir, "EyePatch_Generated" + (++counter) + ".dex");
-            FileOutputStream os = new FileOutputStream(of);
-            os.write(dex);
-            os.close();
-
-            return new DexFile(of);
+            return Util.createDexFile(dexmaker, of);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
