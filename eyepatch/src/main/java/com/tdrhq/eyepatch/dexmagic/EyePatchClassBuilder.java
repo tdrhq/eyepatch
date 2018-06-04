@@ -51,7 +51,7 @@ public class EyePatchClassBuilder {
     DexFile generateDexFileUncached(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
-            File of = new File(mDataDir, "EyePatch_Generated" + (++counter) + ".dex");
+            File of = new File(mDataDir, "EyePatch_Generated" + (++counter) + ".jar");
             return Util.createDexFile(dexmaker, of);
         } catch (IOException e) {
             throw new RuntimeException(e);
