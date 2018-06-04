@@ -4,6 +4,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dex.DexFormat;
 import com.android.dx.DexMaker;
+import com.android.dx.TypeId;
 import dalvik.system.DexFile;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,4 +30,7 @@ public class Util {
         return new DexFile(outputFile);
     }
 
+    public static TypeId<?>  createTypeIdForName(String name) {
+        return TypeId.get("L" + name.replace(".", "/") + ";");
+    }
 }

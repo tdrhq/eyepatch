@@ -46,7 +46,7 @@ public class CompanionBuilder {
 
     private DexMaker buildDexMaker(String name, Class original) {
         DexMaker dexmaker = new DexMaker();
-        TypeId<?> typeId = TypeId.get("L" + name.replace(".", "/") + ";");
+        TypeId<?> typeId = Util.createTypeIdForName(name);
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC | Modifier.ABSTRACT, TypeId.OBJECT);
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
