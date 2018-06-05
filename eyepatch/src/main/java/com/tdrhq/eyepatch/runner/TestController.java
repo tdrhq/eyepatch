@@ -1,7 +1,6 @@
 package com.tdrhq.eyepatch.runner;
 
 import android.support.annotation.NonNull;
-
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
@@ -9,6 +8,8 @@ import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.runners.model.InitializationError;
@@ -62,7 +63,16 @@ public class TestController {
 
     @NonNull
     private ClassHandler createClassHandler(Class klass) {
-        return new MockitoClassHandler(klass, companionBuilder);
+        try {
+            Method method = originalTestClass.getMethod("createClassHandler", Class.class);
+            return (ClassHandler) method.invoke(null, klass);
+        } catch (NoSuchMethodException e) {
+            return new MockitoClassHandler(klass, companionBuilder);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Class buildPatchableClass(EyePatchClassLoader classLoader, String className) throws ClassNotFoundException {
