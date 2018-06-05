@@ -6,9 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
-@EyePatchMockable( { CustomClassHolderTest.Foo.class })
+@EyePatchMockable( { CustomClassHandlerTest.Foo.class })
 @RunWith(EyePatchTestRunner.class)
-public class CustomClassHolderTest {
+public class CustomClassHandlerTest {
 
     public static ClassHandler createClassHandler(final Class klass) {
         return new ClassHandler() {
