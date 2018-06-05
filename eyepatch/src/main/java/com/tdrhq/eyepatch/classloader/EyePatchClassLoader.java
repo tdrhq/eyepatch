@@ -171,7 +171,7 @@ public class EyePatchClassLoader extends ClassLoader
     @Override
     public void verifyStatic(Class klass) {
         for (MockitoClassHandler handler : classHandlers) {
-            if (handler.canHandle(klass)) {
+            if (handler.getResponsibility() == klass) {
                 handler.verifyStatic();
                 return;
             }
@@ -184,7 +184,7 @@ public class EyePatchClassLoader extends ClassLoader
     @Override
     public void resetStatic(Class klass) {
         for (MockitoClassHandler handler : classHandlers) {
-            if (handler.canHandle(klass)) {
+            if (handler.getResponsibility() == klass) {
                 handler.resetStatic();
                 return;
             }

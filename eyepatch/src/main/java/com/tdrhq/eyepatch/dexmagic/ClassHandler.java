@@ -4,5 +4,10 @@ package com.tdrhq.eyepatch.dexmagic;
 
 public interface ClassHandler {
     public Object handleInvocation(Invocation invocation);
-    public boolean canHandle(Class klass);
+
+    /**
+     * Get the class this handler is responsible for. A ClassHandler
+     * can only be responsible for one single class.
+     */
+    public Class getResponsibility();
 }

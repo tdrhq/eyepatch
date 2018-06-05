@@ -72,8 +72,8 @@ public class MockitoClassHandler implements ClassHandler {
         }
     }
 
-    public boolean canHandle(Class klass) {
-        return this.klass == klass;
+    public Class getResponsibility() {
+        return this.klass;
     }
 
     public void verifyStatic() {

@@ -25,7 +25,7 @@ public class DefaultInvocationHandler extends StaticInvocationHandler {
 
     ClassHandler getClassHandler(Class klass) {
         for (ClassHandler handler : prebuiltHandlers) {
-            if (handler.canHandle(klass)) {
+            if (handler.getResponsibility() == klass) {
                 return handler;
             }
         }
