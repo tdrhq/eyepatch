@@ -7,6 +7,7 @@ import com.tdrhq.eyepatch.util.Checks;
 import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -65,6 +66,10 @@ public class EyePatchClassBuilder {
         TypeId<?> typeId = Util.createTypeIdForName(name);
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.get(original.getSuperclass()));
 
+        for (Field field : original.getDeclaredFields()) {
+            generateField(dexmaker, field, typeId);
+        }
+
         for (Constructor constructor : original.getDeclaredConstructors()) {
             generateConstructor(dexmaker, constructor, typeId, original);
         }
@@ -73,6 +78,14 @@ public class EyePatchClassBuilder {
             generateMethod(dexmaker, methodTemplate, typeId, original);
         }
         return dexmaker;
+    }
+
+    private static void generateField(DexMaker dexmaker, Field field, TypeId<?> typeId) {
+        FieldId<?, ?> fieldId = typeId.getField(
+                TypeId.get(field.getType()),
+                field.getName());
+        int modifiers = field.getModifiers();
+        dexmaker.declare(fieldId, modifiers, null);
     }
 
     private static void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {

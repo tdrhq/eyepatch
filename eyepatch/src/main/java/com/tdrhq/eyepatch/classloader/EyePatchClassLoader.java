@@ -106,6 +106,8 @@ public class EyePatchClassLoader extends ClassLoader
             // But.. we need to make sure test classes don't get blacklisted
             if (name.endsWith("Test") ||
                 name.contains("Test$") ||
+                name.endsWith("Tests") ||
+                name.contains("Tests$") ||
                 name.contains("Blacklisted")) {
                 Log.i("EyePatchClassLoader", "Whitelisting: " + name);
                 return false;
