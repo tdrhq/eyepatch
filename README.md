@@ -64,6 +64,13 @@ public class OtherClassTest {
 }
 ```
 
+## Shadowing entire classes
+
+It's possible to replace an entire class (along with constructors,
+final methods, fields, parent classes and what now) at runtime during
+the test. The API is surprisingly straightforward, but needs the
+static `createClassHandlers` in order to work. For an example see:
+https://github.com/tdrhq/eyepatch/blob/master/eyepatch/src/androidTest/java/com/tdrhq/eyepatch/dexmagic/ShadowClassHandlerTest.java
 
 ## Limitations
 
@@ -80,7 +87,8 @@ the methods on a class.
 exposed as of yet. Hopefully I'll release this real quick. However,
 apparently the latest Mockito version does already support this on
 Android P. I haven't tried this myself. (See
-https://github.com/linkedin/dexmaker/issues/77)
+https://github.com/linkedin/dexmaker/issues/77) However, you can use
+shadows, to do much more than just final method mocking.
 
 ## API level support
 
