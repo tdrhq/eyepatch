@@ -39,6 +39,9 @@ public class ShadowClassHandlerTest {
 
       public static class FooShadow {
           int arg;
+
+          // __construct__ is the shadow function called when the
+          // constructor is invoked.
           public void __construct__(int arg) {
               this.arg = arg;
           }
