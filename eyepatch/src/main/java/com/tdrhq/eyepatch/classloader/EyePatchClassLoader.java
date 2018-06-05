@@ -36,7 +36,7 @@ public class EyePatchClassLoader extends ClassLoader
     private CompanionBuilder companionBuilder;
 
     List<DexFile> dexFiles = new ArrayList<>();
-    List<MockitoClassHandler> classHandlers;
+    List<ClassHandler> classHandlers;
     Set<String> mockables = new HashSet<>();
     Map<String, Class> mockedClasses = new HashMap<>();
 
@@ -50,9 +50,7 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     public void setMockables(List<String> mockables) {
-        this.mockables = new HashSet<>(mockables);
-
-        classHandlers = new ArrayList<>();
+        List<ClassHandler> classHandlers = new ArrayList<>();
         for (String mockable : mockables) {
             try {
                 Class klass = Checks.notNull(
@@ -64,6 +62,15 @@ public class EyePatchClassLoader extends ClassLoader
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
+        }
+        setClassHandlers(classHandlers);
+    }
+
+    public void setClassHandlers(List<ClassHandler> classHandlers) {
+        this.classHandlers = Checks.notNull(classHandlers);
+        this.mockables = new HashSet<>(mockables);
+        for (ClassHandler classHandler : classHandlers) {
+            this.mockables.add(classHandler.getResponsibility().getName());
         }
         mStaticInvocationHandler = DefaultInvocationHandler
                 .newInstance(classHandlers);
@@ -170,9 +177,12 @@ public class EyePatchClassLoader extends ClassLoader
 
     @Override
     public void verifyStatic(Class klass) {
-        for (MockitoClassHandler handler : classHandlers) {
+        for (ClassHandler handler : classHandlers) {
             if (handler.getResponsibility() == klass) {
-                handler.verifyStatic();
+                if (!(handler instanceof MockitoClassHandler)) {
+                    throw new RuntimeException("can't verify against this class");
+                }
+                ((MockitoClassHandler) handler).verifyStatic();
                 return;
             }
         }
@@ -183,9 +193,12 @@ public class EyePatchClassLoader extends ClassLoader
 
     @Override
     public void resetStatic(Class klass) {
-        for (MockitoClassHandler handler : classHandlers) {
+        for (ClassHandler handler : classHandlers) {
             if (handler.getResponsibility() == klass) {
-                handler.resetStatic();
+                if (!(handler instanceof MockitoClassHandler)) {
+                    throw new RuntimeException("can't verify against this class");
+                }
+                ((MockitoClassHandler) handler).resetStatic();
                 return;
             }
         }
