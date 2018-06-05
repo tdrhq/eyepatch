@@ -101,10 +101,15 @@ public class EyePatchClassBuilder {
         TypeId parent = TypeId.get(original.getSuperclass());
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
-        code.invokeDirect(Checks.notNull(parent.getConstructor()),
-                          null, code.getThis(typeId));
+
+        invokeEasiestSuper(typeId, parent, code);
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
+    }
+
+    private static void invokeEasiestSuper(TypeId<?> typeId, TypeId parent, Code code) {
+        code.invokeDirect(Checks.notNull(parent.getConstructor()),
+                          null, code.getThis(typeId));
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
