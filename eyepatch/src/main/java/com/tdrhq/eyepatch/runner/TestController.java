@@ -50,12 +50,17 @@ public class TestController {
             try {
                 Class klass = Checks.notNull(
                         buildPatchableClass(classLoader, mockable));
-                classHandlers.add(new MockitoClassHandler(klass, companionBuilder));
+                classHandlers.add(createClassHandler(klass));
             } catch (ClassNotFoundException e1) {
                 throw new RuntimeException(e1);
             }
         }
         return classHandlers;
+    }
+
+    @NonNull
+    private ClassHandler createClassHandler(Class klass) {
+        return new MockitoClassHandler(klass, companionBuilder);
     }
 
     private Class buildPatchableClass(EyePatchClassLoader classLoader, String className) throws ClassNotFoundException {
