@@ -47,6 +47,13 @@ static functions for "performance reasons". Uggh. But let's test
 `doOtherStuff` with EyePatch.
 
 ```java
+
+import com.tdrhq.eyepatch.runner.EyePatchMockable;
+import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
+
+// Note that we're using Mockito's DSL
+import org.mockito.Mockito.when;
+
 @EyePatchMockables({ OtherClass.class })
 @RunWith(EyePatchTestRunner.class)
 public class OtherClassTest {
