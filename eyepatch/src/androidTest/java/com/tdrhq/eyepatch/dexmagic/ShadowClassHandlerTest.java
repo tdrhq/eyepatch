@@ -12,6 +12,9 @@ import static org.junit.Assert.*;
 @RunWith(EyePatchTestRunner.class)
 public class ShadowClassHandlerTest {
 
+      // This static method is invoked by EyePatchTestRunner when
+      // present. If not present it would default to Mockito class
+      // handlers.
       public static ClassHandler createClassHandler(final Class klass) {
           // klass == Foo.class will not work here, because they will
           // be different classes loaded by different class loaders!
