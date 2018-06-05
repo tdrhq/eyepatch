@@ -17,6 +17,10 @@ public class Util {
     }
 
     public static DexFile createDexFile(DexMaker dexmaker, File outputFile) throws IOException {
+        return createDexFile(dexmaker, outputFile, null);
+    }
+
+    public static DexFile createDexFile(DexMaker dexmaker, File outputFile, File cacheDir) throws IOException {
         byte[] dex = dexmaker.generate();
 
         JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(outputFile));
@@ -27,7 +31,9 @@ public class Util {
         jarOut.closeEntry();
         jarOut.close();
 
-        return new DexFile(outputFile);
+        return DexFile.loadDex(outputFile.getAbsolutePath(),
+                               cacheDir != null ? cacheDir.getAbsolutePath() : null,
+                               0);
     }
 
     public static TypeId<?>  createTypeIdForName(String name) {
