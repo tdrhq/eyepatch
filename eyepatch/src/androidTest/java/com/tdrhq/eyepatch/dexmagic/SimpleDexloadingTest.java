@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.support.test.InstrumentationRegistry;
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;
 import dalvik.system.DexFile;
@@ -18,7 +19,7 @@ public class SimpleDexloadingTest {
     static int counter = 0; // almost never used, but just in case
 
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder();
+    public TemporaryFolder tmpdir = new TemporaryFolder(InstrumentationRegistry.getTargetContext().getDataDir());
 
     @Test
     public void testHappyPath() throws Throwable {
