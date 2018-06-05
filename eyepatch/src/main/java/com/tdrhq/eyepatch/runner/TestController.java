@@ -16,6 +16,7 @@ import org.junit.runners.model.InitializationError;
 public class TestController {
     private EyePatchClassBuilder classBuilder;
     private CompanionBuilder companionBuilder;
+    private Class<?> originalTestClass;
 
     private TestController(EyePatchClassBuilder classBuilder,
                            CompanionBuilder companionBuilder) {
@@ -24,6 +25,7 @@ public class TestController {
     }
 
     public Class<?> generateTestClass(Class<?> testClass, Class[] mockables, ClassLoader classLoader1) throws InitializationError {
+        this.originalTestClass = Checks.notNull(testClass);
         EyePatchClassLoader classLoader = new EyePatchClassLoader(
                 classLoader1
         );
