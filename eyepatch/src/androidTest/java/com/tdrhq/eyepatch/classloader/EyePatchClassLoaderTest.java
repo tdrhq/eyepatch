@@ -7,24 +7,21 @@ import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.util.Whitebox;
 import org.junit.Before;
 import org.junit.Test;
-import static org.hamcrest.Matchers.*;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class EyePatchClassLoaderTest {
     private EyePatchClassLoader classLoader;
-    private EyePatchClassBuilder classBuilder;
     private CompanionBuilder companionBuilder;
 
     @Before
     public void before() throws Throwable {
-        classBuilder = mock(EyePatchClassBuilder.class);
         companionBuilder = mock(CompanionBuilder.class);
 
         classLoader = new EyePatchClassLoader(
-                getClass().getClassLoader(),
-                classBuilder,
-                companionBuilder);
+                getClass().getClassLoader()
+        );
     }
 
     @Test

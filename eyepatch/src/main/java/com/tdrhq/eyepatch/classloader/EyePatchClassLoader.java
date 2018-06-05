@@ -4,7 +4,6 @@ package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
-import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
@@ -15,7 +14,7 @@ import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
-import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +30,7 @@ import java.util.Set;
 public class EyePatchClassLoader extends ClassLoader
     implements HasStaticInvocationHandler, StaticVerificationHandler {
     private PathClassLoader parent;
-    private EyePatchClassBuilder classBuilder;
     private StaticInvocationHandler mStaticInvocationHandler;
-    private CompanionBuilder companionBuilder;
 
     List<DexFile> dexFiles = new ArrayList<>();
     List<ClassHandler> classHandlers;
@@ -41,28 +38,9 @@ public class EyePatchClassLoader extends ClassLoader
     Map<String, Class> mockedClasses = new HashMap<>();
 
 
-    public EyePatchClassLoader(ClassLoader realClassLoader, EyePatchClassBuilder mockClassBuilder,
-                               CompanionBuilder mCompanionBuilder) {
+    public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
-        classBuilder = mockClassBuilder;
-        companionBuilder = mCompanionBuilder;
-    }
-
-    public void setMockables(List<String> mockables) {
-        List<ClassHandler> classHandlers = new ArrayList<>();
-        for (String mockable : mockables) {
-            try {
-                Class klass = Checks.notNull(
-                        classBuilder.wrapClass(
-                                getClass().getClassLoader().loadClass(mockable),
-                                this));
-                classHandlers.add(new MockitoClassHandler(klass, companionBuilder));
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        setClassHandlers(classHandlers);
     }
 
     public void setClassHandlers(List<ClassHandler> classHandlers) {
