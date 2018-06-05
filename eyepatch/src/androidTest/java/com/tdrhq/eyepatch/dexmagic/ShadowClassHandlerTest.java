@@ -13,6 +13,8 @@ import static org.junit.Assert.*;
 public class ShadowClassHandlerTest {
 
       public static ClassHandler createClassHandler(final Class klass) {
+          // klass == Foo.class will not work here, because they will
+          // be different classes loaded by different class loaders!
           if (klass.getName().equals(Foo.class.getName())) {
               return new ShadowClassHandler(klass, FooShadow.class);
           }
