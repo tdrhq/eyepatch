@@ -17,10 +17,11 @@ public class Util {
     }
 
     public static DexFile createDexFile(DexMaker dexmaker, File outputFile) throws IOException {
-        return createDexFile(dexmaker, outputFile, null);
+        File optFile = new File(outputFile.getAbsolutePath() + ".opt.jar");
+        return createDexFile(dexmaker, outputFile, optFile);
     }
 
-    public static DexFile createDexFile(DexMaker dexmaker, File outputFile, File cacheDir) throws IOException {
+    private static DexFile createDexFile(DexMaker dexmaker, File outputFile, File cacheDir) throws IOException {
         byte[] dex = dexmaker.generate();
 
         JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(outputFile));
