@@ -57,7 +57,6 @@ public class EyePatchClassLoader extends ClassLoader
                         classBuilder.wrapClass(
                                 getClass().getClassLoader().loadClass(mockable),
                                 this));
-                mockedClasses.put(mockable, klass);
                 classHandlers.add(new MockitoClassHandler(klass, companionBuilder));
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
@@ -70,7 +69,9 @@ public class EyePatchClassLoader extends ClassLoader
         this.classHandlers = Checks.notNull(classHandlers);
         this.mockables = new HashSet<>(mockables);
         for (ClassHandler classHandler : classHandlers) {
-            this.mockables.add(classHandler.getResponsibility().getName());
+            String className = classHandler.getResponsibility().getName();
+            this.mockables.add(className);
+            mockedClasses.put(className, classHandler.getResponsibility());
         }
         mStaticInvocationHandler = DefaultInvocationHandler
                 .newInstance(classHandlers);
