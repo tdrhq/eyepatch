@@ -21,7 +21,9 @@ public class EyePatchTestRunner extends Runner {
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
         DeviceValidator.assertDeviceIsAcceptable();
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
-        Class[] mockables = mockableAnnotation.value();
+        Class[] mockables = mockableAnnotation != null ?
+                mockableAnnotation.value() :
+                new Class[] {};
 
         testClass = TestController.getInstance()
                 .generateTestClass(testClass, mockables, getClass().getClassLoader());
