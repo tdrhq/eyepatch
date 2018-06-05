@@ -29,7 +29,7 @@ public class SimpleDexloadingTest {
         dexmaker.declare(typeId, className + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
 
         File of = new File(tmpdir.getRoot(), "blah" + (++counter) + ".jar");
-        DexFile dexFile = Util.createDexFile(dexmaker, of);
+        DexFile dexFile = Util.createDexFile(dexmaker, of, tmpdir.newFolder());
         dexFile.loadClass(className, getClass().getClassLoader());
     }
 }
