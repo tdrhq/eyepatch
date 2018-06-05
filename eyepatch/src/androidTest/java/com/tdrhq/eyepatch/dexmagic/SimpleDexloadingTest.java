@@ -19,7 +19,7 @@ public class SimpleDexloadingTest {
     static int counter = 0; // almost never used, but just in case
 
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder(InstrumentationRegistry.getTargetContext().getDataDir("foo"));
+    public TemporaryFolder tmpdir = new TemporaryFolder(InstrumentationRegistry.getTargetContext().getDir("foo", 0));
 
     @Test
     public void testHappyPath() throws Throwable {
