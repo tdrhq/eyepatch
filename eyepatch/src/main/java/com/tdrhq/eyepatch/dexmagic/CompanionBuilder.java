@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ClassLoader;
 import java.lang.UnsupportedOperationException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -49,6 +50,10 @@ public class CompanionBuilder {
         TypeId<?> typeId = Util.createTypeIdForName(name);
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC | Modifier.ABSTRACT, TypeId.OBJECT);
 
+        for (Constructor constructor : original.getDeclaredConstructors()) {
+            generateConstructor(dexmaker, constructor, typeId, original);
+        }
+
         for (Method methodTemplate : original.getDeclaredMethods()) {
             if (Modifier.isStatic(methodTemplate.getModifiers())) {
                 Log.i("CompanionBuilder", "static method: " + methodTemplate.getName());
@@ -60,14 +65,27 @@ public class CompanionBuilder {
 
     }
 
+    private void generateConstructor(DexMaker dexmaker, Constructor constructor, TypeId<?> typeId, Class original) {
+        generateMethodInternal(dexmaker, typeId,
+                "__construct__",
+                Modifier.PUBLIC,
+                constructor.getParameterTypes(),
+                void.class);
+    }
+
     public void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
         String methodName = methodTemplate.getName();
         int modifiers = methodTemplate.getModifiers();
         modifiers &= (~(Modifier.STATIC | Modifier.FINAL| Modifier.NATIVE));
         modifiers |= Modifier.PUBLIC;
-        TypeId returnType = TypeId.get(methodTemplate.getReturnType());
         Class[] parameterTypes = methodTemplate.getParameterTypes();
 
+        Class<?> returnType1 = methodTemplate.getReturnType();
+        generateMethodInternal(dexmaker, typeId, methodName, modifiers, parameterTypes, returnType1);
+    }
+
+    private void generateMethodInternal(DexMaker dexmaker, TypeId<?> typeId, String methodName, int modifiers, Class[] parameterTypes, Class<?> returnType1) {
+        TypeId returnType = TypeId.get(returnType1);
         TypeId[] arguments = new TypeId[parameterTypes.length];
         for (int i = 0 ;i < parameterTypes.length; i++) {
             arguments[i] = TypeId.get(parameterTypes[i]);

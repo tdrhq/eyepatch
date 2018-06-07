@@ -49,6 +49,12 @@ public class CompanionBuilderTest {
         }
     }
 
+    @Test
+    public void testHasConstructMethod() throws Throwable {
+        Class klass = companionBuilder.build(Foo.class, getClass().getClassLoader());
+        assertNotNull(klass.getMethod("__construct__"));
+    }
+
 
     public static class Foo {
         public static String bar() {
