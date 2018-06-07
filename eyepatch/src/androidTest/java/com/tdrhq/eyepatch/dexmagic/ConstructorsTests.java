@@ -2,9 +2,11 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
 import com.tdrhq.eyepatch.util.Checks;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
@@ -16,8 +18,19 @@ import static org.junit.Assert.*;
 })
 @RunWith(EyePatchTestRunner.class)
 public class ConstructorsTests {
+    @ClassRule
+    public static EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
     public static ClassHandler createClassHandler(final Class klass) {
+
+        if (klass == FooChild.class) {
+            // in one case, we'll use a MockitoClassHandler to
+            // integration test that path.
+            return new MockitoClassHandler(
+                    klass,
+                    new CompanionBuilder(tmpdir.getRoot()));
+        }
+
         return new ClassHandler() {
             @Override
             public Class getResponsibility() {
