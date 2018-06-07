@@ -1,11 +1,11 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -13,7 +13,7 @@ public class DefaultInvocationHandlerTest {
     private DefaultInvocationHandler handler;
 
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder();
+    public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
     @Before
     public void before() throws Throwable {

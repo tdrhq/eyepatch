@@ -1,9 +1,9 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.*;
 import static org.junit.Assert.*;
 
@@ -11,7 +11,7 @@ public class MockitoClassHandlerTest {
     private MockitoClassHandler mMockitoClassHandler;
 
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder();
+    public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
     @Before
     public void before() throws Throwable {

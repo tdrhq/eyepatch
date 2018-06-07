@@ -1,17 +1,17 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
 public class CompanionBuilderTest {
     private CompanionBuilder companionBuilder;
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder();
+    public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
     @Before
     public void before() throws Throwable {

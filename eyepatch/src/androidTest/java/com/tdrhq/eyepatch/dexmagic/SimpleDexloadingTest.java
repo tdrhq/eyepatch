@@ -3,12 +3,12 @@ package com.tdrhq.eyepatch.dexmagic;
 import android.support.test.InstrumentationRegistry;
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;
+import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import dalvik.system.DexFile;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
 /**
@@ -19,7 +19,7 @@ public class SimpleDexloadingTest {
     static int counter = 0; // almost never used, but just in case
 
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder(InstrumentationRegistry.getTargetContext().getDir("foo", 0));
+    public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
     @Test
     public void testHappyPath() throws Throwable {

@@ -1,6 +1,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.Checks;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
@@ -19,7 +20,7 @@ public class EyePatchClassBuilderTest {
     private ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader());
 
     @Rule
-    public TemporaryFolder tmpdir = new TemporaryFolder();
+    public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
     @Before
     public void before() throws Exception {
