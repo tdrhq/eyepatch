@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 @EyePatchMockable({
   ConstructorsTests.FooChild.class,
   ConstructorsTests.FooChildWithPrimitive.class,
+  ConstructorsTests.FooChildWithBoth.class
 })
 @RunWith(EyePatchTestRunner.class)
 public class ConstructorsTests {
@@ -25,12 +26,6 @@ public class ConstructorsTests {
 
             @Override
             public Object handleInvocation(Invocation invocation) {
-                if (invocation.getMethod().equals("getNumber")) {
-                    return 20;
-                }
-                if (invocation.getMethod().equals("getOtherNumber")) {
-                    return 40;
-                }
                 return null;
             }
         };
@@ -52,6 +47,18 @@ public class ConstructorsTests {
                      20, child.num);
         assertEquals("a default 0 should be passed",
                      0, child.mBlah);
+    }
+
+    @Test
+    public void superWithBoth() throws Throwable {
+        FooChildWithBoth child = new FooChildWithBoth();
+        assertEquals("parent constructor should be called",
+                     20, child.num);
+        assertEquals("a default 0 should be passed",
+                     0, child.mBlah);
+
+        assertEquals("a default empty should also be passed",
+                     "", child.mCar);
     }
 
     public static class FooParent {
@@ -81,6 +88,24 @@ public class ConstructorsTests {
     public static class FooChildWithPrimitive extends FooParentWithPrimitive {
         public FooChildWithPrimitive() {
             super(19);
+        }
+    }
+
+
+    public static class FooParentWithBoth {
+        int mBlah;
+        String mCar;
+        int num = 10;
+        public FooParentWithBoth(int blah, String car) {
+            mBlah = blah;
+            mCar = car;
+            num = 20;
+        }
+    }
+
+    public static class FooChildWithBoth extends FooParentWithBoth {
+        public FooChildWithBoth() {
+            super(19, "notseenever");
         }
     }
 
