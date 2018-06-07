@@ -22,6 +22,14 @@ public class ConstructorsTests {
                      20, child.num);
     }
 
+
+    @Test
+    public void superWithPrimitive() throws Throwable {
+        FooChildWithPrimitive child = new FooChildWithPrimitive();
+        assertEquals("parent constructor should be called",
+                     20, child.num);
+    }
+
     public static class FooParent {
         String blah = "car";
         int num = 10;
@@ -34,6 +42,21 @@ public class ConstructorsTests {
     public static class FooChild extends FooParent {
         public FooChild() {
             super("notseen");
+        }
+    }
+
+    public static class FooParentWithPrimitive {
+        int mBlah;
+        int num = 10;
+        public FooParentWithPrimitive(int blah) {
+            mBlah = blah;
+            num = 20;
+        }
+    }
+
+    public static class FooChildWithPrimitive extends FooParentWithPrimitive {
+        public FooChildWithPrimitive() {
+            super(19);
         }
     }
 
