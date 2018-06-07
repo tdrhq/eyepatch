@@ -2,10 +2,11 @@
 
 package com.tdrhq.eyepatch;
 
+import android.support.test.InstrumentationRegistry;
 import org.junit.rules.TemporaryFolder;
 
 public class EyePatchTemporaryFolder extends TemporaryFolder {
     public EyePatchTemporaryFolder() {
-        super();
+        super(InstrumentationRegistry.getTargetContext().getDir("fortest", 0));
     }
 }
