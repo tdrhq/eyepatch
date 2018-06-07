@@ -10,10 +10,32 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 @EyePatchMockable({
-  FieldsTests.Foo.class,
+  ConstructorsTests.FooChild.class,
+  ConstructorsTests.FooChildWithPrimitive.class,
 })
 @RunWith(EyePatchTestRunner.class)
 public class ConstructorsTests {
+
+    public static ClassHandler createClassHandler(final Class klass) {
+        return new ClassHandler() {
+            @Override
+            public Class getResponsibility() {
+                return klass;
+            }
+
+            @Override
+            public Object handleInvocation(Invocation invocation) {
+                if (invocation.getMethod().equals("getNumber")) {
+                    return 20;
+                }
+                if (invocation.getMethod().equals("getOtherNumber")) {
+                    return 40;
+                }
+                return null;
+            }
+        };
+
+    }
 
     @Test
     public void testCheckSuperWithConstructor() throws Throwable {
@@ -28,6 +50,8 @@ public class ConstructorsTests {
         FooChildWithPrimitive child = new FooChildWithPrimitive();
         assertEquals("parent constructor should be called",
                      20, child.num);
+        assertEquals("a default 0 should be passed",
+                     0, child.mBlah);
     }
 
     public static class FooParent {
