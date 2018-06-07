@@ -119,7 +119,11 @@ public class EyePatchClassBuilder {
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            code.loadConstant(parentArgs[i], null);
+            if (parameterTypes[i] == String.class) {
+                code.loadConstant(parentArgs[i], "");
+            } else {
+                code.loadConstant(parentArgs[i], null);
+            }
         }
 
         code.invokeDirect(Checks.notNull(parent.getConstructor(argTypes)),

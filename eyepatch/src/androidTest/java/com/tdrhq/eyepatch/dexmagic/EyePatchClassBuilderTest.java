@@ -538,7 +538,7 @@ public class EyePatchClassBuilderTest {
 
         FooParent fooParent = (FooParent) instance;
 
-        assertEquals(null, fooParent.blah);
+        assertEquals("", fooParent.blah);
         assertEquals(20, fooParent.num);
     }
 
@@ -546,7 +546,7 @@ public class EyePatchClassBuilderTest {
         String blah = "car";
         int num = 10;
         public FooParent(String blah) {
-            this.blah = blah;
+            this.blah = Checks.notNull(blah);
             num = 20;
         }
     }
