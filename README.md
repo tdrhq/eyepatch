@@ -92,8 +92,9 @@ shadows, to do much more than just final method mocking.
 
 ## API level support
 
-Currently only API level >= 16 is supported, we're working on bringing
-this down to 14 in the near future.
+Currently only API level >= 16 is supported. This is verified by our
+Jenkins servers by running tests on all emulators from 16 to 26
+inclusive.
 
 You need to have `android:vmSafeMode="true"` in your `<application>`
 tag in your `AndroidManifest.xml`. Otherwise your tests will fail in
