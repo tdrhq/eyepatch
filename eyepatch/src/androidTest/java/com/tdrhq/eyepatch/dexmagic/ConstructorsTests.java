@@ -23,7 +23,7 @@ public class ConstructorsTests {
 
     public static ClassHandler createClassHandler(final Class klass) {
 
-        if (klass == FooChild.class) {
+        if (klass.getName().equals(FooChild.class)) {
             // in one case, we'll use a MockitoClassHandler to
             // integration test that path.
             return new MockitoClassHandler(
