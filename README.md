@@ -92,12 +92,19 @@ shadows, to do much more than just final method mocking.
 
 ## API level support
 
-Currently only API level >= 21 is supported, we're working on bringing
-this all the way back to 14.
+Currently only API level >= 16 is supported, we're working on bringing
+this down to 14 in the near future.
 
 You need to have `android:vmSafeMode="true"` in your `<application>`
 tag in your `AndroidManifest.xml`. Otherwise your tests will fail in
 mysterious ways (In particular I've seen it failing on API level 22).
+
+On API level < 21, you also need to disable dexopt before running the
+tests:
+
+```shell
+$ adb shell setprop dalvik.vm.dexopt-flags v=n,o=n
+```
 
 ## Author
 
