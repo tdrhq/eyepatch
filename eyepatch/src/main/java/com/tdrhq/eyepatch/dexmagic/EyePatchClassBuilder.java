@@ -113,20 +113,31 @@ public class EyePatchClassBuilder {
         Class[] parameterTypes = parentConstructor.getParameterTypes();
         TypeId[] argTypes = new TypeId[parameterTypes.length];
         Local[] parentArgs = new Local[parameterTypes.length];
+        Local<Class> currentClass = code.newLocal(TypeId.get(Class.class));
+        Local<Object> getDefaultReturnVal = code.newLocal(TypeId.OBJECT);
+
         for (int i = 0; i < parameterTypes.length; i++) {
             argTypes[i] = TypeId.get(parameterTypes[i]);
             parentArgs[i] = code.newLocal(argTypes[i]);
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (parameterTypes[i] == String.class) {
-                code.loadConstant(parentArgs[i], "");
+            if (!Primitives.isPrimitive(parameterTypes[i])) {
+                TypeId<?> staticInvoker = TypeId.get(StaticInvocationHandler.class);
+                code.loadConstant(currentClass, parameterTypes[i]);
+                MethodId getDefaultConstructorArg =
+                        staticInvoker.getMethod(
+                                TypeId.OBJECT,
+                                "getDefaultConstructorArg",
+                                TypeId.get(Class.class));
+                code.invokeStatic(getDefaultConstructorArg, getDefaultReturnVal, currentClass);
+                code.cast(parentArgs[i], getDefaultReturnVal);
             } else {
                 code.loadConstant(parentArgs[i], null);
             }
         }
 
-        code.invokeDirect(Checks.notNull(parent.getConstructor(argTypes)),
+        code.invokeDirect(parent.getConstructor(argTypes),
                           null, code.getThis(typeId), parentArgs);
     }
 
