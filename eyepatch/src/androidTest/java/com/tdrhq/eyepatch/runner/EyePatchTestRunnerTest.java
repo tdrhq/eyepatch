@@ -2,6 +2,7 @@ package com.tdrhq.eyepatch.runner;
 
 import com.android.dx.Code;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
+import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.Invocation;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
 import dalvik.system.PathClassLoader;
@@ -13,9 +14,28 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-@EyePatchMockable( { EyePatchTestRunnerTest.Mockable.class })
+@EyePatchMockable( {
+    EyePatchTestRunnerTest.Mockable.class,
+    EyePatchTestRunnerTest.AnotherMockable.class
+})
 @RunWith(EyePatchTestRunner.class)
 public class EyePatchTestRunnerTest {
+
+    @ClassHandlerProvider(AnotherMockable.class)
+    static ClassHandler createAnotherMockableHandler(final Class klass) {
+        return new ClassHandler() {
+            @Override
+            public Object handleInvocation(Invocation invocation) {
+                return "car";
+            }
+
+            @Override
+            public Class getResponsibility() {
+                return klass;
+            }
+        };
+    }
+
     @After
     public void after() throws Throwable {
         StaticInvocationHandler.setDefaultHandler();
@@ -77,7 +97,8 @@ public class EyePatchTestRunnerTest {
     public void testGetMockables() throws Throwable {
         assertThat(
                 getTestClassLoader().getMockables(),
-                containsInAnyOrder(Mockable.class.getName()));
+                containsInAnyOrder(Mockable.class.getName(),
+                                   AnotherMockable.class.getName()));
     }
 
     @Test
@@ -88,5 +109,11 @@ public class EyePatchTestRunnerTest {
         StaticInvocationHandler.setHandler(handler);
 
         assertEquals("blah", new Mockable().foo());
+    }
+
+    public static class AnotherMockable {
+        public String foo() {
+            return "noteverseen";
+        }
     }
 }
