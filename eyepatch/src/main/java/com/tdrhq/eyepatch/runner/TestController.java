@@ -63,16 +63,22 @@ public class TestController {
 
     @NonNull
     private ClassHandler createClassHandler(Class klass) {
+        ClassHandler ret;
         try {
             Method method = originalTestClass.getMethod("createClassHandler", Class.class);
-            return (ClassHandler) method.invoke(null, klass);
+            ret = (ClassHandler) method.invoke(null, klass);
         } catch (NoSuchMethodException e) {
-            return new MockitoClassHandler(klass, companionBuilder);
+            ret = null;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+
+        if (ret == null) {
+            return new MockitoClassHandler(klass, companionBuilder);
+        }
+        return ret;
     }
 
     private Class buildPatchableClass(EyePatchClassLoader classLoader, String className) throws ClassNotFoundException {
