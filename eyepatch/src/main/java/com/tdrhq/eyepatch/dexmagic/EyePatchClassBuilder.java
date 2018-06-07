@@ -102,14 +102,43 @@ public class EyePatchClassBuilder {
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
 
-        invokeEasiestSuper(typeId, parent, code);
+        invokeEasiestSuper(typeId, parent, original, code);
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }
 
-    private static void invokeEasiestSuper(TypeId<?> typeId, TypeId parent, Code code) {
-        code.invokeDirect(Checks.notNull(parent.getConstructor()),
-                          null, code.getThis(typeId));
+    private static void invokeEasiestSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
+        // Since this is the first method, we can still create locals
+        Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
+        Class[] parameterTypes = parentConstructor.getParameterTypes();
+        TypeId[] argTypes = new TypeId[parameterTypes.length];
+        Local[] parentArgs = new Local[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            argTypes[i] = TypeId.get(parameterTypes[i]);
+            parentArgs[i] = code.newLocal(argTypes[i]);
+        }
+
+        for (int i = 0; i < parameterTypes.length; i++) {
+            code.loadConstant(parentArgs[i], null);
+        }
+
+        code.invokeDirect(Checks.notNull(parent.getConstructor(argTypes)),
+                          null, code.getThis(typeId), parentArgs);
+    }
+
+    private static Constructor getEasiestConstructor(Class klass) {
+        Constructor best = null;
+        int bestCost = Integer.MAX_VALUE;
+        for (Constructor cons : klass.getDeclaredConstructors()) {
+            if (getConstructorCost(cons) < bestCost) {
+                best = cons;
+            }
+        }
+        return best;
+    }
+
+    private static int getConstructorCost(Constructor cons) {
+        return cons.getParameterTypes().length;
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
