@@ -55,6 +55,13 @@ public class CompanionBuilderTest {
         assertNotNull(klass.getMethod("__construct__"));
     }
 
+    @Test
+    public void testHasMultipleConsMethods() throws Throwable {
+        Class klass = companionBuilder.build(FooWithMultipleCons.class, getClass().getClassLoader());
+        assertNotNull(klass.getMethod("__construct__"));
+        assertNotNull(klass.getMethod("__construct__", String.class));
+        assertNotNull(klass.getMethod("__construct__", String.class, int.class));
+    }
 
     public static class Foo {
         public static String bar() {
@@ -63,6 +70,17 @@ public class CompanionBuilderTest {
 
         public String barNonStat() {
             return "car";
+        }
+    }
+
+    public static class FooWithMultipleCons {
+        public FooWithMultipleCons() {
+        }
+
+        public FooWithMultipleCons(String foo) {
+        }
+
+        public FooWithMultipleCons(String foo, int bar) {
         }
     }
 }
