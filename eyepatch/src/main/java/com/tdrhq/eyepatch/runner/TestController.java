@@ -1,6 +1,7 @@
 package com.tdrhq.eyepatch.runner;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
@@ -76,9 +77,39 @@ public class TestController {
         }
 
         if (ret == null) {
+            ret = createFromProviderAnnotation(klass);
+        }
+
+        if (ret == null) {
             return new MockitoClassHandler(klass, companionBuilder);
         }
         return ret;
+    }
+
+    private ClassHandler createFromProviderAnnotation(Class klass) {
+        Method[] methods = originalTestClass.getDeclaredMethods();
+        Method finalMethod = null;
+        for (Method method : methods) {
+            ClassHandlerProvider provider =
+                    method.getAnnotation(ClassHandlerProvider.class);
+            if (provider != null && provider.value().getName().equals(klass.getName())) {
+                if (finalMethod != null) {
+                    throw new RuntimeException("multiple providers for " + klass.getName());
+                }
+                finalMethod = method;
+            }
+        }
+
+        if (finalMethod != null) {
+            try {
+                return (ClassHandler) Checks.notNull(finalMethod.invoke(null, klass));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(finalMethod.getName() + " must be public static", e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
 
     private Class buildPatchableClass(EyePatchClassLoader classLoader, String className) throws ClassNotFoundException {

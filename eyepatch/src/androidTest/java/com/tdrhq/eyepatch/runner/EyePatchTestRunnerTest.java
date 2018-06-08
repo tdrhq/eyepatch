@@ -102,6 +102,11 @@ public class EyePatchTestRunnerTest {
     }
 
     @Test
+    public void testHandlerWithAnnotation() throws Throwable {
+        assertEquals("car", AnotherMockable.foo());
+    }
+
+    @Test
     public void testCallsToStaticHandler() throws Throwable {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Mockito.when(handler.handleInvocation(
@@ -112,7 +117,7 @@ public class EyePatchTestRunnerTest {
     }
 
     public static class AnotherMockable {
-        public String foo() {
+        public static String foo() {
             return "noteverseen";
         }
     }

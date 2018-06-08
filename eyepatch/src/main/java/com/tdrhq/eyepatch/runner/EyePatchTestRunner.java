@@ -2,8 +2,9 @@
 
 package com.tdrhq.eyepatch.runner;
 
-import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
@@ -21,12 +22,17 @@ public class EyePatchTestRunner extends Runner {
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
         DeviceValidator.assertDeviceIsAcceptable();
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
-        Class[] mockables = mockableAnnotation != null ?
-                mockableAnnotation.value() :
-                new Class[] {};
+        List<Class> mockables = new ArrayList<>();
+
+        mockables.addAll(Arrays.asList(
+                                 mockableAnnotation != null ?
+                                 mockableAnnotation.value() :
+                                 new Class[] {}));
 
         testClass = TestController.getInstance()
-                .generateTestClass(testClass, mockables, getClass().getClassLoader());
+                .generateTestClass(testClass,
+                                   mockables.toArray(new Class[] {}),
+                                   getClass().getClassLoader());
         delegate = new JUnit4(testClass);
     }
 
