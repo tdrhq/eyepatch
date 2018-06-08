@@ -26,7 +26,7 @@ public class EyePatchClassBuilderTest {
 
     @Before
     public void before() throws Exception {
-        mEyePatchClassBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorBuilder());
+        mEyePatchClassBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorBuilderFactory());
     }
 
     public static class SimpleConstructorBuilder extends ConstructorBuilder {
@@ -35,6 +35,13 @@ public class EyePatchClassBuilderTest {
             code.invokeDirect(parent.getConstructor(),
                               null, code.getThis(typeId));
 
+        }
+    }
+
+    public static class SimpleConstructorBuilderFactory extends ConstructorBuilderFactory {
+        @Override
+        public ConstructorBuilder newInstance() {
+            return new SimpleConstructorBuilder();
         }
     }
 
