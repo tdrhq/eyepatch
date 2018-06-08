@@ -1,7 +1,6 @@
 package com.tdrhq.eyepatch.runner;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
@@ -12,7 +11,9 @@ import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.runners.model.InitializationError;
 
 public class TestController {
@@ -89,15 +90,23 @@ public class TestController {
     private ClassHandler createFromProviderAnnotation(Class klass) {
         Method[] methods = originalTestClass.getDeclaredMethods();
         Method finalMethod = null;
-        for (Method method : methods) {
+        Map<Method, ClassHandlerProvider> providers = new HashMap<>();
+        for (Method method: methods) {
             ClassHandlerProvider provider =
                     method.getAnnotation(ClassHandlerProvider.class);
-            if (provider != null && provider.value().getName().equals(klass.getName())) {
+            if (provider != null) {
+                providers.put(method, provider);
+            }
+        }
+        for (Map.Entry<Method, ClassHandlerProvider> entry : providers.entrySet()) {
+
+            if (entry.getValue().value().getName().equals(klass.getName())) {
                 if (finalMethod != null) {
                     throw new RuntimeException("multiple providers for " + klass.getName());
                 }
-                finalMethod = method;
+                finalMethod = entry.getKey();
             }
+
         }
 
         if (finalMethod != null) {

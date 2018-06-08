@@ -4,6 +4,7 @@ package com.tdrhq.eyepatch.runner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -29,11 +30,18 @@ public class EyePatchTestRunner extends Runner {
                                  mockableAnnotation.value() :
                                  new Class[] {}));
 
+        mockables.addAll(findMockablesFromMethodAnnotations(testClass));
+
         testClass = TestController.getInstance()
                 .generateTestClass(testClass,
                                    mockables.toArray(new Class[] {}),
                                    getClass().getClassLoader());
         delegate = new JUnit4(testClass);
+    }
+
+    private Collection<? extends Class> findMockablesFromMethodAnnotations(Class<?> testClass) {
+        List<Class> ret = new ArrayList<>();
+        return ret;
     }
 
     @Override
