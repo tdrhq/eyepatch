@@ -48,9 +48,6 @@ static functions for "performance reasons". Uggh. But let's test
 
 ```java
 
-import com.tdrhq.eyepatch.runner.EyePatchMockable;
-import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
-
 // Note that we're using Mockito's DSL
 import org.mockito.Mockito.when;
 
@@ -68,8 +65,7 @@ public class OtherClassTest {
 
 It's possible to replace an entire class (along with constructors,
 final methods, fields, parent classes and what not) at runtime during
-the test. The API is surprisingly straightforward, but needs the
-static `createClassHandlers` in order to work. For an example see:
+the test. The API is surprisingly straightforward. For an example see:
 https://github.com/tdrhq/eyepatch/blob/master/eyepatch/src/androidTest/java/com/tdrhq/eyepatch/dexmagic/ShadowClassHandlerTest.java
 
 ## Limitations
