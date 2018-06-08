@@ -104,7 +104,7 @@ public class EyePatchClassBuilder {
         Locals locals = new Locals(code, returnType);
 
         ConstructorGenerator constructorGenerator = constructorGeneratorFactory
-                .newInstance(typeId, original, code);
+                .newInstance(typeId, original.getSuperclass(), code);
         constructorGenerator.declareLocals();
         constructorGenerator.invokeSuper();
 

@@ -34,20 +34,20 @@ public class ConstructorGenerator {
     private Local<Object> getDefaultReturnVal = null;
 
     private TypeId<?> mTypeId;
-    private Class mOriginal;
+    private Class mParent;
     private Code mCode;
 
     public ConstructorGenerator(TypeId<?> typeId,
-                                Class original,
+                                Class parent,
                                 Code code) {
         mTypeId = typeId;
-        mOriginal = original;
+        mParent = parent;
         mCode = code;
     }
 
     public void declareLocals() {
-        TypeId parent = TypeId.get(mOriginal.getSuperclass());
-        Constructor parentConstructor = getEasiestConstructor(mOriginal.getSuperclass());
+        TypeId parent = TypeId.get(mParent);
+        Constructor parentConstructor = getEasiestConstructor(mParent);
         Class[] parameterTypes = parentConstructor.getParameterTypes();
         parentArgs = new Local[parameterTypes.length];
         currentClass = mCode.newLocal(TypeId.get(Class.class));
@@ -55,8 +55,8 @@ public class ConstructorGenerator {
     }
 
     public void invokeSuper() {
-        TypeId parent = TypeId.get(mOriginal.getSuperclass());
-        Constructor parentConstructor = getEasiestConstructor(mOriginal.getSuperclass());
+        TypeId parent = TypeId.get(mParent);
+        Constructor parentConstructor = getEasiestConstructor(mParent);
         Class[] parameterTypes = parentConstructor.getParameterTypes();
         TypeId[] argTypes = new TypeId[parameterTypes.length];
 

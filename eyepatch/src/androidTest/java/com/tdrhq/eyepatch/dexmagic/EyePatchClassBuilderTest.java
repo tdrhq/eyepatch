@@ -31,7 +31,7 @@ public class EyePatchClassBuilderTest {
     public static class SimpleConstructorGeneratorFactory extends ConstructorGeneratorFactory {
         @Override
         public ConstructorGenerator newInstance(final TypeId<?> typeId,
-                                                final Class original,
+                                                final Class parent,
                                                 final Code code) {
             return new ConstructorGenerator(null, null, null) {
                 @Override
@@ -40,8 +40,8 @@ public class EyePatchClassBuilderTest {
 
                 @Override
                 public void invokeSuper() {
-                    TypeId parent = TypeId.get(original.getSuperclass());
-                    code.invokeDirect(parent.getConstructor(),
+                    TypeId parentId = TypeId.get(parent);
+                    code.invokeDirect(parentId.getConstructor(),
                                       null, code.getThis(typeId));
 
                 }
