@@ -11,9 +11,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import org.hamcrest.Matchers;
 import org.junit.*;
-import org.junit.rules.*;
+
 import static org.junit.Assert.*;
-import static org.mockito.AdditionalMatchers.*;
 import static org.mockito.Mockito.*;
 
 public class EyePatchClassBuilderTest {
@@ -26,10 +25,10 @@ public class EyePatchClassBuilderTest {
 
     @Before
     public void before() throws Exception {
-        mEyePatchClassBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorBuilderFactory());
+        mEyePatchClassBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
     }
 
-    public static class SimpleConstructorBuilder extends ConstructorBuilder {
+    public static class SimpleConstructorGenerator extends ConstructorGenerator {
         @Override
         public void invokeSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
             code.invokeDirect(parent.getConstructor(),
@@ -38,10 +37,10 @@ public class EyePatchClassBuilderTest {
         }
     }
 
-    public static class SimpleConstructorBuilderFactory extends ConstructorBuilderFactory {
+    public static class SimpleConstructorGeneratorFactory extends ConstructorGeneratorFactory {
         @Override
-        public ConstructorBuilder newInstance() {
-            return new SimpleConstructorBuilder();
+        public ConstructorGenerator newInstance() {
+            return new SimpleConstructorGenerator();
         }
     }
 

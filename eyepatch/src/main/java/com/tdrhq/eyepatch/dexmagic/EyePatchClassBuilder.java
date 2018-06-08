@@ -15,14 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EyePatchClassBuilder {
-    private ConstructorBuilderFactory constructorBuilderFactory;
+    private ConstructorGeneratorFactory constructorGeneratorFactory;
     private File mDataDir;
     private int counter = 0;
     private Map<Key, DexFile> cache = new HashMap<>();
 
-    public EyePatchClassBuilder(File dataDir, ConstructorBuilderFactory constructorBuilderFactory) {
+    public EyePatchClassBuilder(File dataDir, ConstructorGeneratorFactory constructorGeneratorFactory) {
         mDataDir = dataDir;
-        this.constructorBuilderFactory = Checks.notNull(constructorBuilderFactory);
+        this.constructorGeneratorFactory = Checks.notNull(constructorGeneratorFactory);
     }
 
     /**
@@ -104,8 +104,8 @@ public class EyePatchClassBuilder {
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
 
-        ConstructorBuilder constructorBuilder = constructorBuilderFactory.newInstance();
-        constructorBuilder.invokeSuper(typeId, parent, original, code);
+        ConstructorGenerator constructorGenerator = constructorGeneratorFactory.newInstance();
+        constructorGenerator.invokeSuper(typeId, parent, original, code);
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }

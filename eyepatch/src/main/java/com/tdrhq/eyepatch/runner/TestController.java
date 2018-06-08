@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
-import com.tdrhq.eyepatch.dexmagic.ConstructorBuilderFactory;
+import com.tdrhq.eyepatch.dexmagic.ConstructorGeneratorFactory;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
 import com.tdrhq.eyepatch.util.Checks;
@@ -142,7 +142,7 @@ public class TestController {
             sTestController = new TestController(
                     new EyePatchClassBuilder(
                             tmpdir.getRoot(),
-                            new ConstructorBuilderFactory()),
+                            new ConstructorGeneratorFactory()),
                     new CompanionBuilder(tmpdir.getRoot()));
         }
 

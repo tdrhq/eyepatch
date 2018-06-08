@@ -7,7 +7,7 @@ import com.android.dx.TypeId;
 
 import java.lang.reflect.Constructor;
 
-public class ConstructorBuilder {
+public class ConstructorGenerator {
 
     private static Constructor getEasiestConstructor(Class klass) {
         Constructor best = null;
