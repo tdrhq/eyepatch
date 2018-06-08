@@ -9,10 +9,6 @@ public class DeviceValidator {
             "EyePatch is only supported on Jellybean or higher devices.\n";
 
     public static void assertDeviceIsAcceptable() {
-        if (isEyePatchTest()) {
-            return;
-        }
-
         if (Build.VERSION.SDK_INT < 16) {
             throw new UnsupportedOperationException(
                     SDK_INT_MESSAGE);
