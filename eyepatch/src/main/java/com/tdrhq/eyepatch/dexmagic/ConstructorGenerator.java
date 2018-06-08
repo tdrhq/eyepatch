@@ -7,6 +7,11 @@ import com.android.dx.TypeId;
 
 import java.lang.reflect.Constructor;
 
+/**
+ * Generates the contents of a constructor for an EyePatch class.
+ *
+ * In particular this is only upto the super() call.
+ */
 public class ConstructorGenerator {
 
     private static Constructor getEasiestConstructor(Class klass) {
