@@ -29,15 +29,25 @@ public class ConstructorGenerator {
         return cons.getParameterTypes().length;
     }
 
+    private Local[] parentArgs = null;
+    private Local<Class> currentClass = null;
+    private Local<Object> getDefaultReturnVal = null;
+
+    public void declareLocals(TypeId<?> typeId, Class original, Code code) {
+        TypeId parent = TypeId.get(original.getSuperclass());
+        Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
+        Class[] parameterTypes = parentConstructor.getParameterTypes();
+        parentArgs = new Local[parameterTypes.length];
+        currentClass = code.newLocal(TypeId.get(Class.class));
+        getDefaultReturnVal = code.newLocal(TypeId.OBJECT);
+    }
+
     public void invokeSuper(TypeId<?> typeId, Class original, Code code) {
         TypeId parent = TypeId.get(original.getSuperclass());
-        // Since this is the first method, we can still create locals
+        declareLocals(typeId, original, code);
         Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
         Class[] parameterTypes = parentConstructor.getParameterTypes();
         TypeId[] argTypes = new TypeId[parameterTypes.length];
-        Local[] parentArgs = new Local[parameterTypes.length];
-        Local<Class> currentClass = code.newLocal(TypeId.get(Class.class));
-        Local<Object> getDefaultReturnVal = code.newLocal(TypeId.OBJECT);
 
         for (int i = 0; i < parameterTypes.length; i++) {
             argTypes[i] = TypeId.get(parameterTypes[i]);
