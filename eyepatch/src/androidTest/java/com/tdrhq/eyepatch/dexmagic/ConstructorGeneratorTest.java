@@ -44,14 +44,18 @@ public class ConstructorGeneratorTest {
     @Test
     public void testPreconditions() throws Throwable {
         declareClass(SuperClassSimpleConstructor.class);
+        declareConstructor();
+
+        Class klass = generateClass();
+        klass.newInstance();
+    }
+
+    private void declareConstructor() {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
         ConstructorGenerator generator = createGenerator(code);
         generator.declareLocals();
         generator.invokeSuper();
         code.returnVoid();
-
-        Class klass = generateClass();
-        klass.newInstance();
     }
 
     private ConstructorGenerator createGenerator(Code code) {
