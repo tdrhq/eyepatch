@@ -33,44 +33,55 @@ public class ConstructorGenerator {
     private Local<Class> currentClass = null;
     private Local<Object> getDefaultReturnVal = null;
 
-    public void declareLocals(TypeId<?> typeId, Class original, Code code) {
-        TypeId parent = TypeId.get(original.getSuperclass());
-        Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
-        Class[] parameterTypes = parentConstructor.getParameterTypes();
-        parentArgs = new Local[parameterTypes.length];
-        currentClass = code.newLocal(TypeId.get(Class.class));
-        getDefaultReturnVal = code.newLocal(TypeId.OBJECT);
+    private TypeId<?> mTypeId;
+    private Class mOriginal;
+    private Code mCode;
+
+    public ConstructorGenerator(TypeId<?> typeId,
+                                Class original,
+                                Code code) {
+        mTypeId = typeId;
+        mOriginal = original;
+        mCode = code;
     }
 
-    public void invokeSuper(TypeId<?> typeId, Class original, Code code) {
-        TypeId parent = TypeId.get(original.getSuperclass());
-        declareLocals(typeId, original, code);
-        Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
+    public void declareLocals() {
+        TypeId parent = TypeId.get(mOriginal.getSuperclass());
+        Constructor parentConstructor = getEasiestConstructor(mOriginal.getSuperclass());
+        Class[] parameterTypes = parentConstructor.getParameterTypes();
+        parentArgs = new Local[parameterTypes.length];
+        currentClass = mCode.newLocal(TypeId.get(Class.class));
+        getDefaultReturnVal = mCode.newLocal(TypeId.OBJECT);
+    }
+
+    public void invokeSuper() {
+        TypeId parent = TypeId.get(mOriginal.getSuperclass());
+        Constructor parentConstructor = getEasiestConstructor(mOriginal.getSuperclass());
         Class[] parameterTypes = parentConstructor.getParameterTypes();
         TypeId[] argTypes = new TypeId[parameterTypes.length];
 
         for (int i = 0; i < parameterTypes.length; i++) {
             argTypes[i] = TypeId.get(parameterTypes[i]);
-            parentArgs[i] = code.newLocal(argTypes[i]);
+            parentArgs[i] = mCode.newLocal(argTypes[i]);
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {
             if (!Primitives.isPrimitive(parameterTypes[i])) {
                 TypeId<?> staticInvoker = TypeId.get(StaticInvocationHandler.class);
-                code.loadConstant(currentClass, parameterTypes[i]);
+                mCode.loadConstant(currentClass, parameterTypes[i]);
                 MethodId getDefaultConstructorArg =
                         staticInvoker.getMethod(
                                 TypeId.OBJECT,
                                 "getDefaultConstructorArg",
                                 TypeId.get(Class.class));
-                code.invokeStatic(getDefaultConstructorArg, getDefaultReturnVal, currentClass);
-                code.cast(parentArgs[i], getDefaultReturnVal);
+                mCode.invokeStatic(getDefaultConstructorArg, getDefaultReturnVal, currentClass);
+                mCode.cast(parentArgs[i], getDefaultReturnVal);
             } else {
-                code.loadConstant(parentArgs[i], null);
+                mCode.loadConstant(parentArgs[i], null);
             }
         }
 
-        code.invokeDirect(parent.getConstructor(argTypes),
-                          null, code.getThis(typeId), parentArgs);
+        mCode.invokeDirect(parent.getConstructor(argTypes),
+                          null, mCode.getThis(mTypeId), parentArgs);
     }
 }

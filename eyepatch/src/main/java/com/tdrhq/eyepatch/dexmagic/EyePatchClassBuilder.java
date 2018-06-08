@@ -103,8 +103,10 @@ public class EyePatchClassBuilder {
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
 
-        ConstructorGenerator constructorGenerator = constructorGeneratorFactory.newInstance();
-        constructorGenerator.invokeSuper(typeId, original, code);
+        ConstructorGenerator constructorGenerator = constructorGeneratorFactory
+                .newInstance(typeId, original, code);
+        constructorGenerator.declareLocals();
+        constructorGenerator.invokeSuper();
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }

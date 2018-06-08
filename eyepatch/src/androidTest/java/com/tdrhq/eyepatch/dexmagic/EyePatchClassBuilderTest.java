@@ -28,20 +28,24 @@ public class EyePatchClassBuilderTest {
         mEyePatchClassBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
     }
 
-    public static class SimpleConstructorGenerator extends ConstructorGenerator {
-        @Override
-        public void invokeSuper(TypeId<?> typeId, Class original, Code code) {
-            TypeId parent = TypeId.get(original.getSuperclass());
-            code.invokeDirect(parent.getConstructor(),
-                              null, code.getThis(typeId));
-
-        }
-    }
-
     public static class SimpleConstructorGeneratorFactory extends ConstructorGeneratorFactory {
         @Override
-        public ConstructorGenerator newInstance() {
-            return new SimpleConstructorGenerator();
+        public ConstructorGenerator newInstance(final TypeId<?> typeId,
+                                                final Class original,
+                                                final Code code) {
+            return new ConstructorGenerator(null, null, null) {
+                @Override
+                public void declareLocals() {
+                }
+
+                @Override
+                public void invokeSuper() {
+                    TypeId parent = TypeId.get(original.getSuperclass());
+                    code.invokeDirect(parent.getConstructor(),
+                                      null, code.getThis(typeId));
+
+                }
+            };
         }
     }
 
