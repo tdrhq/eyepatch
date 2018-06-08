@@ -29,14 +29,15 @@ public class DeviceValidator {
             return;
         }
 
+
         if (!getDexOptFlag("v").equals("n") ||
             !getDexOptFlag("o").equals("n")) {
-            // throw new UnsupportedOperationException(DISABLE_DEXOPT_MESSAGE);
+            throw new UnsupportedOperationException(DISABLE_DEXOPT_MESSAGE);
         }
     }
 
     private static String getDexOptFlag(String flagName) {
-        String allFlags = System.getProperty(DEXOPT_FLAG);
+        String allFlags = SystemProperties.getSystemProperty(DEXOPT_FLAG);
         return parseDexOptFlags(allFlags, flagName);
     }
 
