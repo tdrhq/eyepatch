@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
+import com.tdrhq.eyepatch.dexmagic.ConstructorBuilder;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
 import com.tdrhq.eyepatch.util.Checks;
@@ -140,7 +141,8 @@ public class TestController {
             tmpdir.before();
             sTestController = new TestController(
                     new EyePatchClassBuilder(
-                            tmpdir.getRoot()),
+                            tmpdir.getRoot(),
+                            new ConstructorBuilder()),
                     new CompanionBuilder(tmpdir.getRoot()));
         }
 

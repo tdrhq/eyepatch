@@ -7,7 +7,7 @@ import com.android.dx.TypeId;
 
 import java.lang.reflect.Constructor;
 
-class ConstructorBuilder {
+public class ConstructorBuilder {
 
     private static Constructor getEasiestConstructor(Class klass) {
         Constructor best = null;
@@ -24,7 +24,7 @@ class ConstructorBuilder {
         return cons.getParameterTypes().length;
     }
 
-    void invokeSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
+    public void invokeSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
         // Since this is the first method, we can still create locals
         Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
         Class[] parameterTypes = parentConstructor.getParameterTypes();
