@@ -102,7 +102,7 @@ public class EyePatchClassBuilder {
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
 
-        ConstructorBuilder.invokeEasiestSuper(typeId, parent, original, code);
+        new ConstructorBuilder().invokeSuper(typeId, parent, original, code);
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
     }

@@ -8,7 +8,23 @@ import com.android.dx.TypeId;
 import java.lang.reflect.Constructor;
 
 class ConstructorBuilder {
-    static void invokeEasiestSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
+
+    private static Constructor getEasiestConstructor(Class klass) {
+        Constructor best = null;
+        int bestCost = Integer.MAX_VALUE;
+        for (Constructor cons : klass.getDeclaredConstructors()) {
+            if (getConstructorCost(cons) < bestCost) {
+                best = cons;
+            }
+        }
+        return best;
+    }
+
+    private static int getConstructorCost(Constructor cons) {
+        return cons.getParameterTypes().length;
+    }
+
+    void invokeSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
         // Since this is the first method, we can still create locals
         Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
         Class[] parameterTypes = parentConstructor.getParameterTypes();
@@ -40,20 +56,5 @@ class ConstructorBuilder {
 
         code.invokeDirect(parent.getConstructor(argTypes),
                           null, code.getThis(typeId), parentArgs);
-    }
-
-    private static Constructor getEasiestConstructor(Class klass) {
-        Constructor best = null;
-        int bestCost = Integer.MAX_VALUE;
-        for (Constructor cons : klass.getDeclaredConstructors()) {
-            if (getConstructorCost(cons) < bestCost) {
-                best = cons;
-            }
-        }
-        return best;
-    }
-
-    private static int getConstructorCost(Constructor cons) {
-        return cons.getParameterTypes().length;
     }
 }
