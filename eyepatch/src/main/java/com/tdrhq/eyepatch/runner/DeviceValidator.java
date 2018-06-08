@@ -8,6 +8,13 @@ public class DeviceValidator {
     private static final String SDK_INT_MESSAGE =
             "EyePatch is only supported on Jellybean or higher devices.\n";
 
+    private static final String DEXOPT_FLAG = "dalvik.vm.dexopt-flags";
+
+    private static final String DISABLE_DEXOPT_MESSAGE =
+            "DexOpt needs to be disabled when running on KitKat or lower. " +
+            "YOu can do this by running: \n" +
+            "  $ adb shell setprop " + DEXOPT_FLAG + " v=n,o=n";
+
     public static void assertDeviceIsAcceptable() {
         if (Build.VERSION.SDK_INT < 16) {
             throw new UnsupportedOperationException(
@@ -24,12 +31,12 @@ public class DeviceValidator {
 
         if (!getDexOptFlag("v").equals("n") ||
             !getDexOptFlag("o").equals("n")) {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException(DISABLE_DEXOPT_MESSAGE);
         }
     }
 
     private static String getDexOptFlag(String flagName) {
-        String allFlags = System.getProperty("dalvik.vm.dexopt-flags");
+        String allFlags = System.getProperty(DEXOPT_FLAG);
         return parseDexOptFlags(allFlags, flagName);
     }
 
