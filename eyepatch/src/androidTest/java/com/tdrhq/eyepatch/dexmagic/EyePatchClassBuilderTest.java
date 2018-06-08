@@ -30,7 +30,8 @@ public class EyePatchClassBuilderTest {
 
     public static class SimpleConstructorGenerator extends ConstructorGenerator {
         @Override
-        public void invokeSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
+        public void invokeSuper(TypeId<?> typeId, Class original, Code code) {
+            TypeId parent = TypeId.get(original.getSuperclass());
             code.invokeDirect(parent.getConstructor(),
                               null, code.getThis(typeId));
 

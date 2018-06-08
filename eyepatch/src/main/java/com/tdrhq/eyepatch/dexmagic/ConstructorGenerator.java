@@ -29,7 +29,8 @@ public class ConstructorGenerator {
         return cons.getParameterTypes().length;
     }
 
-    public void invokeSuper(TypeId<?> typeId, TypeId parent, Class original, Code code) {
+    public void invokeSuper(TypeId<?> typeId, Class original, Code code) {
+        TypeId parent = TypeId.get(original.getSuperclass());
         // Since this is the first method, we can still create locals
         Constructor parentConstructor = getEasiestConstructor(original.getSuperclass());
         Class[] parameterTypes = parentConstructor.getParameterTypes();
