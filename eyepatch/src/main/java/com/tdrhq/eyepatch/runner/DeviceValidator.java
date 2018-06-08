@@ -7,14 +7,14 @@ import android.os.Build;
 public class DeviceValidator {
     public static boolean disableValidation = false;
     private static final String SDK_INT_MESSAGE =
-            "EyePatch is only supported on Lollipop or higher devices.\n";
+            "EyePatch is only supported on Jellybean or higher devices.\n";
 
     public static void assertDeviceIsAcceptable() {
         if (isEyePatchTest()) {
             return;
         }
 
-        if (Build.VERSION.SDK_INT < 21) {
+        if (Build.VERSION.SDK_INT < 16) {
             throw new UnsupportedOperationException(
                     SDK_INT_MESSAGE);
         }
