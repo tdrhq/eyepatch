@@ -16,9 +16,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ConstructorGeneratorTest {
-    private ClassLoader classLoader = ClassLoaderIntrospector
-            .clone(getClass().getClassLoader());
-
+    private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
@@ -48,6 +46,16 @@ public class ConstructorGeneratorTest {
 
         Class klass = generateClass();
         klass.newInstance();
+    }
+
+    @Test
+    public void testVerifySuperIsCalled() throws Throwable {
+        declareClass(SuperClassSimpleConstructor.class);
+        declareConstructor();
+
+        Class klass = generateClass();
+        SuperClassSimpleConstructor instance = (SuperClassSimpleConstructor) klass.newInstance();
+        assertTrue(instance.invoked);
     }
 
     private void declareConstructor() {

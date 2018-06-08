@@ -5,20 +5,20 @@ import com.android.dx.Code;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.Checks;
+import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import org.hamcrest.Matchers;
 import org.junit.*;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder mEyePatchClassBuilder;
     private StaticInvocationHandler oldHandler;
-    private ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader());
+    private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
 
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();

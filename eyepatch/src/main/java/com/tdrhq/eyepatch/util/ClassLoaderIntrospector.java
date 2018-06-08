@@ -37,6 +37,11 @@ public class ClassLoaderIntrospector {
         return TextUtils.join(":", getOriginalDexPath(parent));
     }
 
+    // useful for tests.
+    public static ClassLoader newChildClassLoader() {
+        return new PathClassLoader("", null, ClassLoaderIntrospector.class.getClassLoader());
+    }
+
 
     public static List<String> getOriginalNativeLibPath(ClassLoader parent) {
         Object dexPathList = Whitebox.getField(parent, BaseDexClassLoader.class, "pathList");
