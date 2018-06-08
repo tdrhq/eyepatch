@@ -1,28 +1,17 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.runner.EyePatchMockable;
+import com.tdrhq.eyepatch.runner.ClassHandlerProvider;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
-@EyePatchMockable({
-  ShadowClassHandlerTest.Foo.class,
-})
 @RunWith(EyePatchTestRunner.class)
 public class ShadowClassHandlerTest {
 
-      // This static method is invoked by EyePatchTestRunner when
-      // present. If not present it would default to Mockito class
-      // handlers.
-      public static ClassHandler createClassHandler(final Class klass) {
-          // klass == Foo.class will not work here, because they will
-          // be different classes loaded by different class loaders!
-          if (klass.getName().equals(Foo.class.getName())) {
-              return new ShadowClassHandler(klass, FooShadow.class);
-          }
-
-          throw new RuntimeException("unexpected class");
+      @ClassHandlerProvider(Foo.class)
+      public static ClassHandler createFooClass(final Class klass) {
+          return new ShadowClassHandler(klass, FooShadow.class);
       }
 
       @Test

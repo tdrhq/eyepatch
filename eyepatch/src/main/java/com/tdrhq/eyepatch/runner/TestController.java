@@ -88,9 +88,8 @@ public class TestController {
     }
 
     private ClassHandler createFromProviderAnnotation(Class klass) {
-        Method[] methods = originalTestClass.getDeclaredMethods();
         Method finalMethod = null;
-        Map<Method, ClassHandlerProvider> providers = getClassHandlerProviderMap(methods);
+        Map<Method, ClassHandlerProvider> providers = getClassHandlerProviderMap(originalTestClass);
         for (Map.Entry<Method, ClassHandlerProvider> entry : providers.entrySet()) {
 
             if (entry.getValue().value().getName().equals(klass.getName())) {
@@ -115,7 +114,8 @@ public class TestController {
     }
 
     @NonNull
-    static Map<Method, ClassHandlerProvider> getClassHandlerProviderMap(Method[] methods) {
+    static Map<Method, ClassHandlerProvider> getClassHandlerProviderMap(Class originalTestClass) {
+        Method[] methods = originalTestClass.getDeclaredMethods();
         Map<Method, ClassHandlerProvider> providers = new HashMap<>();
         for (Method method: methods) {
             ClassHandlerProvider provider =

@@ -41,6 +41,10 @@ public class EyePatchTestRunner extends Runner {
 
     private Collection<? extends Class> findMockablesFromMethodAnnotations(Class<?> testClass) {
         List<Class> ret = new ArrayList<>();
+        for (ClassHandlerProvider provider :
+                     TestController.getClassHandlerProviderMap(testClass).values()) {
+            ret.add(provider.value());
+        }
         return ret;
     }
 
