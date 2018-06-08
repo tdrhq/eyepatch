@@ -90,14 +90,7 @@ public class TestController {
     private ClassHandler createFromProviderAnnotation(Class klass) {
         Method[] methods = originalTestClass.getDeclaredMethods();
         Method finalMethod = null;
-        Map<Method, ClassHandlerProvider> providers = new HashMap<>();
-        for (Method method: methods) {
-            ClassHandlerProvider provider =
-                    method.getAnnotation(ClassHandlerProvider.class);
-            if (provider != null) {
-                providers.put(method, provider);
-            }
-        }
+        Map<Method, ClassHandlerProvider> providers = getClassHandlerProviderMap(methods);
         for (Map.Entry<Method, ClassHandlerProvider> entry : providers.entrySet()) {
 
             if (entry.getValue().value().getName().equals(klass.getName())) {
@@ -119,6 +112,19 @@ public class TestController {
             }
         }
         return null;
+    }
+
+    @NonNull
+    static Map<Method, ClassHandlerProvider> getClassHandlerProviderMap(Method[] methods) {
+        Map<Method, ClassHandlerProvider> providers = new HashMap<>();
+        for (Method method: methods) {
+            ClassHandlerProvider provider =
+                    method.getAnnotation(ClassHandlerProvider.class);
+            if (provider != null) {
+                providers.put(method, provider);
+            }
+        }
+        return providers;
     }
 
     private Class buildPatchableClass(EyePatchClassLoader classLoader, String className) throws ClassNotFoundException {
