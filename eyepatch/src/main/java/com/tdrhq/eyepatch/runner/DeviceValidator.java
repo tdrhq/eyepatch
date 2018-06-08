@@ -31,7 +31,7 @@ public class DeviceValidator {
 
         if (!getDexOptFlag("v").equals("n") ||
             !getDexOptFlag("o").equals("n")) {
-            throw new UnsupportedOperationException(DISABLE_DEXOPT_MESSAGE);
+            // throw new UnsupportedOperationException(DISABLE_DEXOPT_MESSAGE);
         }
     }
 
