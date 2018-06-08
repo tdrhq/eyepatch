@@ -9,7 +9,6 @@ import com.tdrhq.eyepatch.runner.DeviceValidator;
 public class TestRunner extends AndroidJUnitRunner {
     @Override
     public void onCreate(Bundle args) {
-        DeviceValidator.disableValidation = true;
         super.onCreate(args);
     }
 }
