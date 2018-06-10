@@ -99,8 +99,10 @@ public class ConstructorGeneratorTest {
 
     public static class SuperClassSingleConstructor {
         public boolean invoked = false;
+        public String arg = null;
         public SuperClassSingleConstructor(String arg) {
             invoked = true;
+            this.arg = arg;
         }
     }
 }
