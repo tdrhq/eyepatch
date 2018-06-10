@@ -66,6 +66,7 @@ public class ConstructorGeneratorTest {
         Class klass = generateClass();
         SuperClassSingleConstructor instance = (SuperClassSingleConstructor) klass.newInstance();
         assertTrue(instance.invoked);
+        assertEquals("", instance.arg);
     }
 
     private void declareConstructor() {
