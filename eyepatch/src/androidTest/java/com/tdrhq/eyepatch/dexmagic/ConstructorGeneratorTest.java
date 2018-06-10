@@ -58,6 +58,16 @@ public class ConstructorGeneratorTest {
         assertTrue(instance.invoked);
     }
 
+    @Test
+    public void testSingleConstructor() throws Throwable {
+        declareClass(SuperClassSingleConstructor.class);
+        declareConstructor();
+
+        Class klass = generateClass();
+        SuperClassSingleConstructor instance = (SuperClassSingleConstructor) klass.newInstance();
+        assertTrue(instance.invoked);
+    }
+
     private void declareConstructor() {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
         ConstructorGenerator generator = createGenerator(code);
@@ -83,6 +93,13 @@ public class ConstructorGeneratorTest {
     public static class SuperClassSimpleConstructor {
         boolean invoked = false;
         public SuperClassSimpleConstructor() {
+            invoked = true;
+        }
+    }
+
+    public static class SuperClassSingleConstructor {
+        public boolean invoked = false;
+        public SuperClassSingleConstructor(String arg) {
             invoked = true;
         }
     }
