@@ -43,13 +43,4 @@ public abstract class StaticInvocationHandler {
 
         return null;
     }
-
-    public static Object getDefaultConstructorArg(
-            Class argType) {
-        if (argType == String.class) {
-            return "";
-        }
-
-        return null;
-    }
 }

@@ -67,10 +67,10 @@ public class ConstructorGenerator {
 
         for (int i = 0; i < parameterTypes.length; i++) {
             if (!Primitives.isPrimitive(parameterTypes[i])) {
-                TypeId<?> staticInvoker = TypeId.get(StaticInvocationHandler.class);
+                TypeId<?> constructorGenerator = TypeId.get(ConstructorGenerator.class);
                 mCode.loadConstant(currentClass, parameterTypes[i]);
                 MethodId getDefaultConstructorArg =
-                        staticInvoker.getMethod(
+                        constructorGenerator.getMethod(
                                 TypeId.OBJECT,
                                 "getDefaultConstructorArg",
                                 TypeId.get(Class.class));
@@ -83,5 +83,14 @@ public class ConstructorGenerator {
 
         mCode.invokeDirect(parent.getConstructor(argTypes),
                           null, mCode.getThis(mTypeId), parentArgs);
+    }
+
+    public static Object getDefaultConstructorArg(
+            Class argType) {
+        if (argType == String.class) {
+            return "";
+        }
+
+        return null;
     }
 }
