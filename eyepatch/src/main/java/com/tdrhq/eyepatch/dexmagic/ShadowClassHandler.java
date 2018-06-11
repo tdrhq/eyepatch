@@ -41,6 +41,10 @@ public class ShadowClassHandler implements ClassHandler {
                     shadow,
                     invocation.getArgs());
         } catch (NoSuchMethodException e) {
+            if (invocation.getMethod().equals(EyePatchClassBuilder.PRE_CONSTRUCT)) {
+                // it's okay to skip this
+                return null;
+            }
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);

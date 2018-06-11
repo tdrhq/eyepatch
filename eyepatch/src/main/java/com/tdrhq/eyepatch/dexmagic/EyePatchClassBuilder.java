@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EyePatchClassBuilder {
+    public static final String PRE_CONSTRUCT = "__pre_construct__";
+    public static final String CONSTRUCT = "__construct__";
     private ConstructorGeneratorFactory constructorGeneratorFactory;
     private File mDataDir;
     private int counter = 0;
@@ -91,7 +93,7 @@ public class EyePatchClassBuilder {
     }
 
     private void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
-        String methodName = "__construct__";
+        String methodName = CONSTRUCT;
         int modifiers = constructor.getModifiers();
         TypeId returnType = TypeId.VOID;
         Class[] parameterTypes = constructor.getParameterTypes();
@@ -102,10 +104,13 @@ public class EyePatchClassBuilder {
         MethodId cons = typeId.getConstructor(arguments);
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
+        Local<SuperInvocation> superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
 
         ConstructorGenerator constructorGenerator = constructorGeneratorFactory
                 .newInstance(typeId, original.getSuperclass(), code);
         constructorGenerator.declareLocals();
+
+        generateInvokeWithoutReturn(code, typeId, returnType, parameterTypes, original, modifiers | Modifier.STATIC, PRE_CONSTRUCT, locals);
         constructorGenerator.invokeSuper();
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
@@ -128,6 +133,16 @@ public class EyePatchClassBuilder {
     }
 
     private static void generateMethodContentsInternal(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
+        generateInvokeWithoutReturn(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
+
+        if (returnType == TypeId.VOID) {
+            code.returnVoid();
+        } else {
+            code.returnValue(locals.castedReturnValue);
+        }
+    }
+
+    private static void generateInvokeWithoutReturn(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
         TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
@@ -157,7 +172,8 @@ public class EyePatchClassBuilder {
         if (Modifier.isStatic(modifiers)) {
             code.loadConstant(locals.instanceArg, null);
         } else {
-            locals.instanceArg = code.getThis(typeId);
+            code.move(locals.instanceArg, code.getThis(typeId));
+            //locals.instanceArg = code.getThis(typeId);
         }
         code.loadConstant(locals.callerMethod, methodName);
         code.invokeStatic(
@@ -182,12 +198,6 @@ public class EyePatchClassBuilder {
 
         } else if (returnType != TypeId.VOID) {
             code.cast(locals.castedReturnValue, locals.returnValue);
-        }
-
-        if (returnType == TypeId.VOID) {
-            code.returnVoid();
-        } else {
-            code.returnValue(locals.castedReturnValue);
         }
     }
 

@@ -63,7 +63,7 @@ public class Invocation {
                 "%s(from %s); %s; %s; %s",
                 mClass.toString(),
                 mClass.getClassLoader().toString(),
-                mInstance.toString(),
+                String.valueOf(mInstance),
                 mMethod,
                 Arrays.toString(mArgs));
     }

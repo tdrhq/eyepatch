@@ -53,14 +53,18 @@ public class CompanionBuilderTest {
     public void testHasConstructMethod() throws Throwable {
         Class klass = companionBuilder.build(Foo.class, getClass().getClassLoader());
         assertNotNull(klass.getMethod("__construct__"));
+        assertNotNull(klass.getMethod("__pre_construct__"));
     }
 
     @Test
     public void testHasMultipleConsMethods() throws Throwable {
         Class klass = companionBuilder.build(FooWithMultipleCons.class, getClass().getClassLoader());
         assertNotNull(klass.getMethod("__construct__"));
+        assertNotNull(klass.getMethod("__pre_construct__"));
         assertNotNull(klass.getMethod("__construct__", String.class));
+        assertNotNull(klass.getMethod("__pre_construct__", String.class));
         assertNotNull(klass.getMethod("__construct__", String.class, int.class));
+        assertNotNull(klass.getMethod("__pre_construct__", String.class, int.class));
     }
 
     public static class Foo {

@@ -52,6 +52,10 @@ public class ConstructorGenerator {
         parentArgs = new Local[parameterTypes.length];
         currentClass = mCode.newLocal(TypeId.get(Class.class));
         getDefaultReturnVal = mCode.newLocal(TypeId.OBJECT);
+
+        for (int i = 0; i < parameterTypes.length; i++) {
+            parentArgs[i] = mCode.newLocal(TypeId.get(parameterTypes[i]));
+        }
     }
 
     public void invokeSuper() {
@@ -62,7 +66,6 @@ public class ConstructorGenerator {
 
         for (int i = 0; i < parameterTypes.length; i++) {
             argTypes[i] = TypeId.get(parameterTypes[i]);
-            parentArgs[i] = mCode.newLocal(argTypes[i]);
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {

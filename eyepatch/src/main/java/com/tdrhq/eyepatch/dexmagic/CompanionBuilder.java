@@ -71,6 +71,11 @@ public class CompanionBuilder {
                 Modifier.PUBLIC,
                 constructor.getParameterTypes(),
                 void.class);
+        generateMethodInternal(dexmaker, typeId,
+                "__pre_construct__",
+                Modifier.PUBLIC,
+                constructor.getParameterTypes(),
+                SuperInvocation.class);
     }
 
     public void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {

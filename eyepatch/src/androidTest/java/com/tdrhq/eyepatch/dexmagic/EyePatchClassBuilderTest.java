@@ -414,6 +414,13 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo.class, classLoader);
         Object instance = barWrapped.newInstance();
 
+        Invocation preInvocation = new Invocation(
+                barWrapped,
+                null,
+                "__pre_construct__",
+                new Class[] {},
+                new Object[] {});
+
         Invocation invocation = new Invocation(
                 barWrapped,
                 instance,
@@ -421,6 +428,7 @@ public class EyePatchClassBuilderTest {
                 new Class[] {},
                 new Object[] {});
 
+        verify(handler).handleInvocation(preInvocation);
         verify(handler).handleInvocation(invocation);
     }
 
