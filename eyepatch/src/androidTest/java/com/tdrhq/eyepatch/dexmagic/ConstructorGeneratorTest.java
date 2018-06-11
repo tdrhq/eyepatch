@@ -71,6 +71,17 @@ public class ConstructorGeneratorTest {
         assertEquals("", instance.arg);
     }
 
+    @Test
+    public void testMultipleConstructors() throws Throwable {
+        declareClass(SuperClassWithMultipleConstructors.class);
+        declareConstructor();
+
+        Class klass = generateClass();
+        SuperClassWithMultipleConstructors instance =
+                (SuperClassWithMultipleConstructors) klass.newInstance();
+        assertEquals(1, instance.invoked);
+    }
+
     private void declareConstructor() {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
         superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
@@ -108,6 +119,18 @@ public class ConstructorGeneratorTest {
         public SuperClassSingleConstructor(String arg) {
             invoked = true;
             this.arg = arg;
+        }
+    }
+
+    public static class SuperClassWithMultipleConstructors {
+        public int invoked = 0;
+
+        public SuperClassWithMultipleConstructors() {
+            invoked = 1;
+        }
+
+        public SuperClassWithMultipleConstructors(String arg) {
+            invoked = 2;
         }
     }
 }

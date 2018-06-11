@@ -20,6 +20,7 @@ public class ConstructorGenerator {
         for (Constructor cons : klass.getDeclaredConstructors()) {
             if (getConstructorCost(cons) < bestCost) {
                 best = cons;
+                bestCost = getConstructorCost(cons);
             }
         }
         return best;
