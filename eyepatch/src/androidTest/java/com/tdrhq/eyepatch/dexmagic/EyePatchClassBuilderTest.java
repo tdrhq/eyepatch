@@ -560,34 +560,4 @@ public class EyePatchClassBuilderTest {
             return "int";
         }
     }
-
-
-    @Test
-    @org.junit.Ignore("this doesn't belong here")
-    public void testCheckSuperWithConstructor() throws Throwable {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
-        StaticInvocationHandler.setHandler(handler);
-        Class fooChildWrapped = mEyePatchClassBuilder.wrapClass(FooChild.class, classLoader);
-        Object instance = fooChildWrapped.newInstance();
-
-        FooParent fooParent = (FooParent) instance;
-
-        assertEquals("", fooParent.blah);
-        assertEquals(20, fooParent.num);
-    }
-
-    public static class FooParent {
-        String blah = "car";
-        int num = 10;
-        public FooParent(String blah) {
-            this.blah = Checks.notNull(blah);
-            num = 20;
-        }
-    }
-
-    public static class FooChild extends FooParent {
-        public FooChild() {
-            super("notseen");
-        }
-    }
 }
