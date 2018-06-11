@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.runner.ClassHandlerProvider;
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
 import com.tdrhq.eyepatch.util.Checks;
@@ -13,20 +14,30 @@ import static org.junit.Assert.*;
 
 @EyePatchMockable({
   ConstructorsTests.FooChild.class,
-  ConstructorsTests.FooChildWithPrimitive.class,
-  ConstructorsTests.FooChildWithBoth.class
 })
 @RunWith(EyePatchTestRunner.class)
 public class ConstructorsTests {
     @ClassRule
     public static EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
 
-    public static ClassHandler createClassHandler(final Class klass) {
+    @ClassHandlerProvider(FooChildWithPrimitive.class)
+    public static ClassHandler createFooChildWithPrimitive(final Class klass) {
+        return new ClassHandler() {
+            @Override
+            public Class getResponsibility() {
+                return klass;
+            }
 
-        if (klass.getName().equals(FooChild.class.getName())) {
-            return null;
-        }
+            @Override
+            public Object handleInvocation(Invocation invocation) {
+                return null;
+            }
+        };
 
+    }
+
+    @ClassHandlerProvider(FooChildWithBoth.class)
+    public static ClassHandler createFooChildWithBoth(final Class klass) {
         return new ClassHandler() {
             @Override
             public Class getResponsibility() {
