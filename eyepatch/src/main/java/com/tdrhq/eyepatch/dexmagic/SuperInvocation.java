@@ -3,8 +3,8 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+import com.tdrhq.eyepatch.util.Checks;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,17 +29,11 @@ public class SuperInvocation {
 
     public SuperInvocation(Class[] argTypes,
                            Object[] args) {
-        for (int i = 0; i < argTypes.length; i ++) {
-            Class klass = argTypes[i];
-            if (klass == null) {
-                throw new NullPointerException("null types not allows, got: " +
-                                               argTypes.length + " args: " +
-                                               Arrays.toString(argTypes));
-            }
+        for (Class klass :argTypes) {
+            Checks.notNull(klass);
         }
-
-        mArgTypes = Arrays.copyOf(argTypes, argTypes.length);
-        mArgs = Arrays.copyOf(args, args.length);
+        mArgTypes = argTypes;
+        mArgs = args;
         mConsId = getConstructorId(argTypes);
     }
 
