@@ -84,6 +84,20 @@ public class ConstructorGeneratorTest {
         assertEquals(1, instance.invoked);
     }
 
+    @Test
+    public void testManuallyPickingConstructor() throws Throwable {
+        declareClass(SuperClassWithMultipleConstructors.class);
+        declareConstructor(
+                new SuperInvocation(
+                        new Class[] { String.class },
+                        new Object[] { "foo" }));
+
+        Class klass = generateClass();
+        SuperClassWithMultipleConstructors instance =
+                (SuperClassWithMultipleConstructors) klass.newInstance();
+        // assertEquals(2, instance.invoked);
+    }
+
     private void declareConstructor(SuperInvocation expectedSuperInvocation) {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
         superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
@@ -93,6 +107,10 @@ public class ConstructorGeneratorTest {
         Local<Class> nextArgType = code.newLocal(TypeId.get(Class.class));
         Local<Object> nextArg = code.newLocal(TypeId.OBJECT);
         Local<Integer> arrLength = code.newLocal(TypeId.get(int.class));
+        Local<Class> tmpClass = code.newLocal(TypeId.get(Class.class));
+        Local<Object> tmpObject = code.newLocal(TypeId.OBJECT);
+        Local<Integer> index = code.newLocal(TypeId.INT);
+
         ConstructorGenerator generator = createGenerator(code);
         generator.declareLocals();
 
@@ -100,6 +118,21 @@ public class ConstructorGeneratorTest {
         code.newArray(argTypes, arrLength);
         code.loadConstant(arrLength, expectedSuperInvocation.getArgs().length);
         code.newArray(args, arrLength);
+
+
+
+        for (int i = 0 ; i < expectedSuperInvocation.getArgTypes().length; i++) {
+            code.loadConstant(tmpClass, expectedSuperInvocation.getArgTypes()[i]);
+            code.loadConstant(index, i);
+            code.aput(argTypes, index, tmpClass);
+        }
+
+        for (int i = 0 ; i < expectedSuperInvocation.getArgs().length; i++) {
+            code.loadConstant(tmpObject, expectedSuperInvocation.getArgs()[i]);
+            code.loadConstant(index, i);
+            code.aput(args, index, tmpObject);
+        }
+
 
         MethodId constructor = TypeId.get(SuperInvocation.class)
                 .getConstructor(
