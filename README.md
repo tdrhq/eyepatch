@@ -103,6 +103,19 @@ tests:
 $ adb shell setprop dalvik.vm.dexopt-flags v=n,o=n
 ```
 
+## Installing
+
+EyePatch is available as in mavenCentral() and jcenter(). You can
+install it as:
+
+```groovy
+dependencies {
+    // ...
+    androidTestImplementation 'com.tdrhq.eyepatch:eyepatch:0.1.0'
+}
+```
+
+
 ## Author
 
 Arnold Noronha <arnold@tdrhq.com>
