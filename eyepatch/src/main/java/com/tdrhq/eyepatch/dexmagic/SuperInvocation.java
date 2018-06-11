@@ -23,4 +23,10 @@ public class SuperInvocation {
         mArgTypes = argTypes;
         mArgs = args;
     }
+
+    public static SuperInvocation empty() {
+        return new SuperInvocation(
+                new Class[] {},
+                new Object[] {});
+    }
 }

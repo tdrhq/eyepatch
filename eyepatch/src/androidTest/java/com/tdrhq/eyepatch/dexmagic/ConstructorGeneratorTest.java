@@ -3,6 +3,7 @@ package com.tdrhq.eyepatch.dexmagic;
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
 import com.android.dx.Local;
+import com.android.dx.MethodId;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.Checks;
@@ -10,6 +11,7 @@ import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +46,7 @@ public class ConstructorGeneratorTest {
     @Test
     public void testPreconditions() throws Throwable {
         declareClass(SuperClassSimpleConstructor.class);
-        declareConstructor();
+        declareConstructor(SuperInvocation.empty());
 
         Class klass = generateClass();
         klass.newInstance();
@@ -53,7 +55,7 @@ public class ConstructorGeneratorTest {
     @Test
     public void testVerifySuperIsCalled() throws Throwable {
         declareClass(SuperClassSimpleConstructor.class);
-        declareConstructor();
+        declareConstructor(SuperInvocation.empty());
 
         Class klass = generateClass();
         SuperClassSimpleConstructor instance = (SuperClassSimpleConstructor) klass.newInstance();
@@ -63,7 +65,7 @@ public class ConstructorGeneratorTest {
     @Test
     public void testSingleConstructor() throws Throwable {
         declareClass(SuperClassSingleConstructor.class);
-        declareConstructor();
+        declareConstructor(SuperInvocation.empty());
 
         Class klass = generateClass();
         SuperClassSingleConstructor instance = (SuperClassSingleConstructor) klass.newInstance();
@@ -74,7 +76,7 @@ public class ConstructorGeneratorTest {
     @Test
     public void testMultipleConstructors() throws Throwable {
         declareClass(SuperClassWithMultipleConstructors.class);
-        declareConstructor();
+        declareConstructor(SuperInvocation.empty());
 
         Class klass = generateClass();
         SuperClassWithMultipleConstructors instance =
@@ -82,11 +84,33 @@ public class ConstructorGeneratorTest {
         assertEquals(1, instance.invoked);
     }
 
-    private void declareConstructor() {
+    private void declareConstructor(SuperInvocation expectedSuperInvocation) {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
         superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
+
+        Local<Class[]> argTypes = code.newLocal(TypeId.get(Class[].class));
+        Local<Object[]> args = code.newLocal(TypeId.get(Object[].class));
+        Local<Class> nextArgType = code.newLocal(TypeId.get(Class.class));
+        Local<Object> nextArg = code.newLocal(TypeId.OBJECT);
+        Local<Integer> arrLength = code.newLocal(TypeId.get(int.class));
         ConstructorGenerator generator = createGenerator(code);
         generator.declareLocals();
+
+        code.loadConstant(arrLength, expectedSuperInvocation.getArgTypes().length);
+        code.newArray(argTypes, arrLength);
+        code.loadConstant(arrLength, expectedSuperInvocation.getArgs().length);
+        code.newArray(args, arrLength);
+
+        MethodId constructor = TypeId.get(SuperInvocation.class)
+                .getConstructor(
+                        TypeId.get(Class[].class),
+                        TypeId.get(Object[].class));
+        code.newInstance(
+                superInvocation,
+                constructor,
+                argTypes,
+                args);
+
         generator.invokeSuper();
         code.returnVoid();
     }
