@@ -2,7 +2,9 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import java.util.Arrays;
+import android.util.Log;
+import com.tdrhq.eyepatch.util.Checks;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +14,7 @@ import java.util.Map;
  * figure out what to call to super.
  */
 public class SuperInvocation {
-    private static Map<List<Class>, Integer> idMap = new HashMap<>();
+    private static Map<List<String>, Integer> idMap = new HashMap<>();
     private Class[] mArgTypes;
     private Object[] mArgs;
     private int mConsId;
@@ -27,19 +29,12 @@ public class SuperInvocation {
 
     public SuperInvocation(Class[] argTypes,
                            Object[] args) {
+        for (Class klass :argTypes) {
+            Checks.notNull(klass);
+        }
         mArgTypes = argTypes;
         mArgs = args;
-
-        synchronized (SuperInvocation.class) {
-            List<Class> key = Arrays.asList(argTypes);
-            Integer oldId = idMap.get(key);
-            if (oldId == null) {
-                oldId = idMap.size() + 1;
-                idMap.put(key, oldId);
-            }
-
-            mConsId = oldId;
-        }
+        mConsId = getConstructorId(argTypes);
     }
 
     public static SuperInvocation empty() {
@@ -50,5 +45,28 @@ public class SuperInvocation {
 
     public int getConsId() {
         return mConsId;
+    }
+
+    public synchronized static int getConstructorId(Class[] types) {
+        List<String> key = new ArrayList<String>();
+        for (Class klass : types) {
+            key.add(klass.getName());
+        }
+        Integer oldId = idMap.get(key);
+        if (oldId == null) {
+            oldId = idMap.size() + 1;
+            idMap.put(key, oldId);
+            Log.i("SuperInvocation", String.format("%s is getting: %d", key, oldId));
+        }
+
+        return oldId;
+    }
+
+    public static int getConstructorId(SuperInvocation superInvocation) {
+        if (superInvocation == null) {
+            return getConstructorId(new Class[] {});
+        }
+
+        return superInvocation.getConsId();
     }
 }
