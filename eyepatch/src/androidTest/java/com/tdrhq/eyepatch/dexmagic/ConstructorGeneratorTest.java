@@ -2,6 +2,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
+import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.Checks;
@@ -23,6 +24,7 @@ public class ConstructorGeneratorTest {
     DexMaker dexmaker;
     TypeId<?> typeId;
     Class superClass;
+    Local<SuperInvocation> superInvocation;
 
     @Before
     public void before() throws Throwable {
@@ -71,6 +73,7 @@ public class ConstructorGeneratorTest {
 
     private void declareConstructor() {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
+        superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
         ConstructorGenerator generator = createGenerator(code);
         generator.declareLocals();
         generator.invokeSuper();
@@ -81,6 +84,7 @@ public class ConstructorGeneratorTest {
         return new ConstructorGenerator(
                 typeId,
                 superClass,
+                superInvocation,
                 code);
     }
 

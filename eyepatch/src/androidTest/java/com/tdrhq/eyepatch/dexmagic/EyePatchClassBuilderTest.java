@@ -2,6 +2,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
 import com.android.dx.Code;
+import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.Checks;
@@ -32,8 +33,9 @@ public class EyePatchClassBuilderTest {
         @Override
         public ConstructorGenerator newInstance(final TypeId<?> typeId,
                                                 final Class parent,
+                                                final Local<SuperInvocation> superInvocation,
                                                 final Code code) {
-            return new ConstructorGenerator(null, null, null) {
+            return new ConstructorGenerator(null, null, null, null) {
                 @Override
                 public void declareLocals() {
                 }

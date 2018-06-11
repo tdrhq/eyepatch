@@ -33,15 +33,21 @@ public class ConstructorGenerator {
     private Local<Class> currentClass = null;
     private Local<Object> getDefaultReturnVal = null;
 
+    // The value stored in this superinvocation is going to determine
+    // what super constructor to call.
+    private Local<SuperInvocation> superInvocation;
+
     private TypeId<?> mTypeId;
     private Class mParent;
     private Code mCode;
 
     public ConstructorGenerator(TypeId<?> typeId,
                                 Class parent,
+                                Local<SuperInvocation> superInvocation,
                                 Code code) {
         mTypeId = typeId;
         mParent = parent;
+        this.superInvocation = superInvocation;
         mCode = code;
     }
 

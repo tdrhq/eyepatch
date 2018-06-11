@@ -107,7 +107,7 @@ public class EyePatchClassBuilder {
         Local<SuperInvocation> superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
 
         ConstructorGenerator constructorGenerator = constructorGeneratorFactory
-                .newInstance(typeId, original.getSuperclass(), code);
+                .newInstance(typeId, original.getSuperclass(), superInvocation, code);
         constructorGenerator.declareLocals();
 
         generateInvokeWithoutReturn(code, typeId, returnType, parameterTypes, original, modifiers | Modifier.STATIC, PRE_CONSTRUCT, locals);
