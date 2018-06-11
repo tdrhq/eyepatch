@@ -65,7 +65,9 @@ public class ConstructorGeneratorTest {
     @Test
     public void testSingleConstructor() throws Throwable {
         declareClass(SuperClassSingleConstructor.class);
-        declareConstructor(SuperInvocation.empty());
+        declareConstructor(new SuperInvocation(
+                                   new Class[] { String.class },
+                                   new String[] { "" }));
 
         Class klass = generateClass();
         SuperClassSingleConstructor instance = (SuperClassSingleConstructor) klass.newInstance();
@@ -95,7 +97,7 @@ public class ConstructorGeneratorTest {
         Class klass = generateClass();
         SuperClassWithMultipleConstructors instance =
                 (SuperClassWithMultipleConstructors) klass.newInstance();
-        // assertEquals(2, instance.invoked);
+        assertEquals(2, instance.invoked);
     }
 
     private void declareConstructor(SuperInvocation expectedSuperInvocation) {
