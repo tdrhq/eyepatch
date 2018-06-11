@@ -84,6 +84,20 @@ public class ConstructorGeneratorTest {
         assertEquals(1, instance.invoked);
     }
 
+    @Test
+    public void testManuallyPickingConstructor() throws Throwable {
+        declareClass(SuperClassWithMultipleConstructors.class);
+        declareConstructor(
+                new SuperInvocation(
+                        new Class[] { String.class },
+                        new Object[] { "foo" }));
+
+        Class klass = generateClass();
+        SuperClassWithMultipleConstructors instance =
+                (SuperClassWithMultipleConstructors) klass.newInstance();
+        assertEquals(2, instance.invoked);
+    }
+
     private void declareConstructor(SuperInvocation expectedSuperInvocation) {
         Code code = dexmaker.declare(typeId.getConstructor(), Modifier.PUBLIC);
         superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
