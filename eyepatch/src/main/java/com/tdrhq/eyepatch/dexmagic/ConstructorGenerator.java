@@ -17,22 +17,6 @@ import java.util.Map;
  */
 public class ConstructorGenerator {
 
-    private static Constructor getEasiestConstructor(Class klass) {
-        Constructor best = null;
-        int bestCost = Integer.MAX_VALUE;
-        for (Constructor cons : klass.getDeclaredConstructors()) {
-            if (getConstructorCost(cons) < bestCost) {
-                best = cons;
-                bestCost = getConstructorCost(cons);
-            }
-        }
-        return best;
-    }
-
-    private static int getConstructorCost(Constructor cons) {
-        return cons.getParameterTypes().length;
-    }
-
     private Local<Class> currentClass = null;
     private Local<Object> getDefaultReturnVal = null;
 

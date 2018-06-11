@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.util.Log;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,5 +76,40 @@ public class SuperInvocation {
         int ret = superInvocation.getConsId();
         Log.i("SuperInvocation", "Looked up: " + Arrays.toString(superInvocation.getArgTypes()) + " and got " + ret);
         return ret;
+    }
+
+    private static Constructor getEasiestConstructor(Class klass) {
+        Constructor best = null;
+        int bestCost = Integer.MAX_VALUE;
+        for (Constructor cons : klass.getDeclaredConstructors()) {
+            if (getConstructorCost(cons) < bestCost) {
+                best = cons;
+                bestCost = getConstructorCost(cons);
+            }
+        }
+        return best;
+    }
+
+    private static int getConstructorCost(Constructor cons) {
+        return cons.getParameterTypes().length;
+    }
+
+    public static SuperInvocation getEasiestInvocation(Class klass) {
+        Constructor cons = getEasiestConstructor(klass);
+        Class[] parameterTypes = cons.getParameterTypes();
+        Object[] args = new Object[parameterTypes.length];
+        for (int i = 0; i < args.length; i++) {
+            args[i] = getBestDefault(parameterTypes[i]);
+        }
+
+        return new SuperInvocation(parameterTypes, args);
+    }
+
+    private static Object getBestDefault(Class type) {
+        if (type == String.class) {
+            return "";
+        }
+
+        return null;
     }
 }

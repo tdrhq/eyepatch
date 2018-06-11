@@ -105,11 +105,20 @@ public class EyePatchClassBuilder {
         Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
         Local<SuperInvocation> superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
+        Local<Class> thisClass = code.newLocal(TypeId.get(Class.class));
 
         ConstructorGenerator constructorGenerator = constructorGeneratorFactory
                 .newInstance(typeId, original.getSuperclass(), superInvocation, code);
         constructorGenerator.declareLocals();
-        code.loadConstant(superInvocation, null);
+
+        code.loadConstant(thisClass, original.getSuperclass());
+        MethodId getEasiestInvocation = TypeId.get(SuperInvocation.class)
+                .getMethod(
+                        TypeId.get(SuperInvocation.class),
+                        "getEasiestInvocation",
+                        TypeId.get(Class.class));
+
+        code.invokeStatic(getEasiestInvocation, superInvocation, thisClass);
 
         generateInvokeWithoutReturn(code, typeId, returnType, parameterTypes, original, modifiers | Modifier.STATIC, PRE_CONSTRUCT, locals);
         constructorGenerator.invokeSuper();
