@@ -101,14 +101,9 @@ public class ConstructorGenerator {
                         "getConstructorId",
                         TypeId.get(SuperInvocation.class));
         mCode.invokeStatic(getConsId, expectedConstructorId, superInvocation);
-        //mCode.loadConstant(expectedConstructorId, SuperInvocation.empty().getConsId());
         for (Constructor constructor : constructors) {
             int nextId = SuperInvocation.getConstructorId(constructor.getParameterTypes());
-            //if (nextId != SuperInvocation.empty().getConsId()) {
-            //throw new RuntimeException("What: " + nextId + " " + SuperInvocation.empty().getConsId());
-            //}
             mCode.loadConstant(nextConstructorId, nextId);
-            //mCode.loadConstant(nextConstructorId, SuperInvocation.empty().getConsId());
             mCode.compare(Comparison.EQ, labelToSuperInvocation.get(constructor),
                          nextConstructorId, expectedConstructorId);
         }
