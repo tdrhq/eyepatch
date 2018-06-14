@@ -160,7 +160,7 @@ public class ConstructorGeneratorTest {
 
     private Class generateClass() throws IOException {
         File of = new File(tmpdir.getRoot(),
-                           "MyClass.jar");
+                           "MyClass.dex");
         DexFile dexFile = Util.createDexFile(dexmaker, of);
         return Checks.notNull(dexFile.loadClass("com.foo.ForTest", classLoader));
     }

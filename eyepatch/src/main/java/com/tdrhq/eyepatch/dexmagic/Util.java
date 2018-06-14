@@ -2,22 +2,22 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.android.dex.DexFormat;
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;
 import dalvik.system.DexFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
 
 public class Util {
     private Util() {
     }
 
     public static DexFile createDexFile(DexMaker dexmaker, File outputFile) throws IOException {
-        File optFile = new File(outputFile.getAbsolutePath() + ".opt.jar");
+        if (!outputFile.getAbsolutePath().endsWith(".dex")) {
+            throw new RuntimeException("bad extension");
+        }
+        File optFile = new File(outputFile.getAbsolutePath() + ".opt.dex");
         return createDexFile(dexmaker, outputFile, optFile);
     }
 

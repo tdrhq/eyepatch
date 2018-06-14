@@ -37,7 +37,7 @@ public class CompanionBuilder {
         String name = generateName();
         DexMaker dexmaker = buildDexMaker(name, realClass);
         try {
-            File of = new File(mDataDir, generateJarName() +  ".jar");
+            File of = new File(mDataDir, generateJarName() +  ".dex");
             DexFile dexFile = Util.createDexFile(dexmaker, of);
             return dexFile.loadClass(name, classLoader);
         } catch (IOException e) {

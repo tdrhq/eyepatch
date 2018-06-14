@@ -28,7 +28,7 @@ public class SimpleDexloadingTest {
         TypeId<?> typeId = Util.createTypeIdForName(className);
         dexmaker.declare(typeId, className + ".generated", Modifier.PUBLIC, TypeId.OBJECT);
 
-        File of = new File(tmpdir.getRoot(), "blah" + (++counter) + ".jar");
+        File of = new File(tmpdir.getRoot(), "blah" + (++counter) + ".dex");
         DexFile dexFile = Util.createDexFile(dexmaker, of);
         dexFile.loadClass(className, getClass().getClassLoader());
     }
