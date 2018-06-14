@@ -22,15 +22,19 @@ public class Util {
     }
 
     private static DexFile createDexFile(DexMaker dexmaker, File outputFile, File cacheDir) throws IOException {
+        writeDexFile(dexmaker, outputFile);
+
+        return DexFile.loadDex(outputFile.getAbsolutePath(),
+                               cacheDir != null ? cacheDir.getAbsolutePath() : null,
+                               0);
+    }
+
+    public static void writeDexFile(DexMaker dexmaker, File outputFile) throws IOException {
         byte[] dex = dexmaker.generate();
 
         FileOutputStream os = new FileOutputStream(outputFile);
         os.write(dex);
         os.close();
-
-        return DexFile.loadDex(outputFile.getAbsolutePath(),
-                               cacheDir != null ? cacheDir.getAbsolutePath() : null,
-                               0);
     }
 
     public static TypeId<?>  createTypeIdForName(String name) {
