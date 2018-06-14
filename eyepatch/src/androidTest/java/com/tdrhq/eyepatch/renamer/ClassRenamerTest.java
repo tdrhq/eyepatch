@@ -2,10 +2,14 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import com.android.dx.Code;
 import com.android.dx.DexMaker;
+import com.android.dx.Local;
+import com.android.dx.MethodId;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
+import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -30,9 +34,13 @@ public class ClassRenamerTest {
         dexmaker.declare(typeId, "Foo.generated", Modifier.PUBLIC,
                          TypeId.OBJECT);
         // let's generate a bar() method that returns a constant
-        //        MethodId method = typeId.getMethod(
-        //TypeId.STRING,
-        //"getBar");
+        MethodId method = typeId.getMethod(
+                TypeId.STRING,
+                "getBar");
+        Code code = dexmaker.declare(method, Modifier.PUBLIC | Modifier.STATIC);
+        Local<String> ret = code.newLocal(TypeId.STRING);
+        code.loadConstant(ret, "zoidberg");
+        code.returnValue(ret);
 
         Util.writeDexFile(dexmaker, input);
     }
@@ -43,5 +51,6 @@ public class ClassRenamerTest {
         Class FooClass = Util.loadDexFile(input)
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
+        assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
 }
