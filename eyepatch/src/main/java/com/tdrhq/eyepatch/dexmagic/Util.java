@@ -14,13 +14,12 @@ public class Util {
     }
 
     public static DexFile createDexFile(DexMaker dexmaker, File outputFile) throws IOException {
-        File optFile = new File(outputFile.getAbsolutePath() + ".opt.dex");
-        return createDexFile(dexmaker, outputFile, optFile);
+        writeDexFile(dexmaker, outputFile);
+        return loadDexFile(outputFile);
     }
 
-    private static DexFile createDexFile(DexMaker dexmaker, File outputFile, File cacheDir) throws IOException {
-        writeDexFile(dexmaker, outputFile);
-
+    public static DexFile loadDexFile(File outputFile) throws IOException {
+        File cacheDir = new File(outputFile.getAbsolutePath() + ".opt.dex");
         return DexFile.loadDex(outputFile.getAbsolutePath(),
                                cacheDir != null ? cacheDir.getAbsolutePath() : null,
                                0);
