@@ -23,6 +23,8 @@ public class ClassRenamerTest {
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
     private File input;
     private ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader());
+    private ClassRenamer classRenamer;
+    private File output;
 
     @Before
     public void before() throws Throwable {
@@ -43,6 +45,8 @@ public class ClassRenamerTest {
         code.returnValue(ret);
 
         Util.writeDexFile(dexmaker, input);
+
+        classRenamer = new ClassRenamer(input, "suffix");
     }
 
     @Test
@@ -50,6 +54,16 @@ public class ClassRenamerTest {
         // load the original class
         Class FooClass = Util.loadDexFile(input)
                 .loadClass("com.foo.Foo", classLoader);
+        assertNotNull(FooClass);
+        assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+    }
+
+    //@Test
+    public void testWhatIExpect() throws Throwable {
+        output = tmpdir.newFile("output.dex");
+        classRenamer.generate(output);
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo_suffix", classLoader);
         assertNotNull(FooClass);
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
