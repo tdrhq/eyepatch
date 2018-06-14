@@ -85,8 +85,33 @@ public class ClassRenamerTest {
     private void hexDumpPrintLine(byte[] bytes, int len) {
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < len; i++) {
+            if (i == 4) {
+                buf.append(" ");
+            }
             buf.append(String.format("%2x ", bytes[i]));
         }
+
+        for (int i = 0; i < len; i++) {
+            if (i == 4) {
+                buf.append(" ");
+            }
+            char ch = formatByte(bytes[i]);
+            buf.append(ch);
+        }
         Log.i("ClassRenamerTest", buf.toString());
+    }
+
+    private char formatByte(byte b) {
+        int codePoint = new Byte(b).intValue();
+        try {
+            char[] chars = Character.toChars(codePoint);
+            if (Character.isWhitespace(chars[0]) ||
+                Character.isISOControl(chars[0])) {
+                return '.';
+            }
+            return chars[0];
+        } catch (IllegalArgumentException e) {
+            return '.';
+        }
     }
 }
