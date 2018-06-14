@@ -14,9 +14,6 @@ public class Util {
     }
 
     public static DexFile createDexFile(DexMaker dexmaker, File outputFile) throws IOException {
-        if (!outputFile.getAbsolutePath().endsWith(".dex")) {
-            throw new RuntimeException("bad extension");
-        }
         File optFile = new File(outputFile.getAbsolutePath() + ".opt.dex");
         return createDexFile(dexmaker, outputFile, optFile);
     }
@@ -30,6 +27,9 @@ public class Util {
     }
 
     public static void writeDexFile(DexMaker dexmaker, File outputFile) throws IOException {
+        if (!outputFile.getAbsolutePath().endsWith(".dex")) {
+            throw new IllegalArgumentException("bad extension");
+        }
         byte[] dex = dexmaker.generate();
 
         FileOutputStream os = new FileOutputStream(outputFile);
