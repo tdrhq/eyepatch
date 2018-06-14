@@ -24,13 +24,9 @@ public class Util {
     private static DexFile createDexFile(DexMaker dexmaker, File outputFile, File cacheDir) throws IOException {
         byte[] dex = dexmaker.generate();
 
-        JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(outputFile));
-        JarEntry entry = new JarEntry(DexFormat.DEX_IN_JAR_NAME);
-        entry.setSize(dex.length);
-        jarOut.putNextEntry(entry);
-        jarOut.write(dex);
-        jarOut.closeEntry();
-        jarOut.close();
+        FileOutputStream os = new FileOutputStream(outputFile);
+        os.write(dex);
+        os.close();
 
         return DexFile.loadDex(outputFile.getAbsolutePath(),
                                cacheDir != null ? cacheDir.getAbsolutePath() : null,
