@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import android.util.Log;
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
 import com.android.dx.Local;
@@ -12,6 +13,8 @@ import com.tdrhq.eyepatch.dexmagic.Util;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +48,6 @@ public class ClassRenamerTest {
         code.returnValue(ret);
 
         Util.writeDexFile(dexmaker, input);
-
         classRenamer = new ClassRenamer(input, "suffix");
     }
 
@@ -56,15 +58,35 @@ public class ClassRenamerTest {
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+
+        hexDump(input);
     }
 
-    //@Test
+    // @Test
     public void testWhatIExpect() throws Throwable {
         output = tmpdir.newFile("output.dex");
         classRenamer.generate(output);
         Class FooClass = Util.loadDexFile(output)
-                .loadClass("com.foo.Foo_suffix", classLoader);
+                .loadClass("com.foo.Fo1", classLoader);
         assertNotNull(FooClass);
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+    }
+
+    private void hexDump(File input) throws IOException {
+        FileInputStream is = new FileInputStream(input);
+        byte[] bytes = new byte[8];
+
+        int len = 0;
+        while ((len = is.read(bytes)) > 0) {
+            hexDumpPrintLine(bytes, len);
+        }
+    }
+
+    private void hexDumpPrintLine(byte[] bytes, int len) {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            buf.append(String.format("%2x ", bytes[i]));
+        }
+        Log.i("ClassRenamerTest", buf.toString());
     }
 }
