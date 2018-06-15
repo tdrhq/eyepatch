@@ -10,6 +10,7 @@ import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
 import com.tdrhq.eyepatch.util.Whitebox;
+import com.android.dx.dex.file.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -56,5 +57,11 @@ public class DexFileReaderTest {
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+    }
+
+    @Test
+    public void testReadDexFile() throws Throwable {
+        DexFile inputFile = new DexFileReader(input).read();
+        assertNotNull(inputFile);
     }
 }
