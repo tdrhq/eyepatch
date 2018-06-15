@@ -43,6 +43,7 @@ public class ClassRenamerTest {
                 TypeId.STRING,
                 "getBar");
         Code code = dexmaker.declare(method, Modifier.PUBLIC | Modifier.STATIC);
+        Local<String> dummy = code.newLocal(TypeId.STRING);
         Local<String> ret = code.newLocal(TypeId.STRING);
         code.loadConstant(ret, "zoidberg");
         code.returnValue(ret);
@@ -62,12 +63,12 @@ public class ClassRenamerTest {
         hexDump(input);
     }
 
-    // @Test
-    public void testWhatIExpect() throws Throwable {
+    @Test
+    public void testOutputGeneratesSomethingThatCanbeLoaded() throws Throwable {
         output = tmpdir.newFile("output.dex");
         classRenamer.generate(output);
         Class FooClass = Util.loadDexFile(output)
-                .loadClass("com.foo.Fo1", classLoader);
+                .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
@@ -77,13 +78,17 @@ public class ClassRenamerTest {
         byte[] bytes = new byte[8];
 
         int len = 0;
+        int pos = 0;
         while ((len = is.read(bytes)) > 0) {
-            hexDumpPrintLine(bytes, len);
+            hexDumpPrintLine(bytes, len, pos);
+            pos += len;
         }
     }
 
-    private void hexDumpPrintLine(byte[] bytes, int len) {
+    private void hexDumpPrintLine(byte[] bytes, int len, int startPos) {
         StringBuilder buf = new StringBuilder();
+
+        buf.append(String.format("(%4x)  ", startPos));
         for (int i = 0; i < len; i++) {
             if (i == 4) {
                 buf.append(" ");
