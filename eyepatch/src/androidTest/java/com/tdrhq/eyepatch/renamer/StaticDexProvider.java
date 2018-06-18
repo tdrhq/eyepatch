@@ -3,6 +3,9 @@
 package com.tdrhq.eyepatch.renamer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Provides contents for a dex file.
@@ -89,5 +92,12 @@ public class StaticDexProvider {
             os.write((byte) (Long.parseLong(b.toUpperCase(), 16) & 0xFF));
         }
         return os.toByteArray();
+    }
+
+    public static void writeToFile(File file) throws IOException {
+        FileOutputStream os = new FileOutputStream(file);
+        byte[] data = getBytes();
+        os.write(data);
+        os.close();
     }
 }
