@@ -75,5 +75,6 @@ public class DexFileReaderTest {
         DexFileReader reader = new DexFileReader(staticInput);
         reader.read();
         assertEquals(7, reader.headerItem.stringIdsSize);
+        assertEquals(0x70, reader.headerItem.stringIdsOff);
     }
 }
