@@ -23,6 +23,8 @@ public class DexFileReaderTest {
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
     private File input;
+    private File staticInput;
+
     private ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader());
     private ClassRenamer classRenamer;
     private File output;
@@ -48,6 +50,9 @@ public class DexFileReaderTest {
 
         Util.writeDexFile(dexmaker, input);
         classRenamer = new ClassRenamer(input, "suffix");
+
+        staticInput = tmpdir.newFile("static_input.dex");
+        StaticDexProvider.writeToFile(staticInput);
     }
 
     @Test
@@ -63,5 +68,12 @@ public class DexFileReaderTest {
     public void testReadDexFile() throws Throwable {
         DexFile inputFile = new DexFileReader(input).read();
         assertNotNull(inputFile);
+    }
+
+    @Test
+    public void testReadStaticInput() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput);
+        reader.read();
+        assertEquals(7, reader.headerItem.stringIdsSize);
     }
 }
