@@ -77,4 +77,11 @@ public class DexFileReaderTest {
         assertEquals(7, reader.headerItem.stringIdsSize);
         assertEquals(0x70, reader.headerItem.stringIdsOff);
     }
+
+    @Test
+    public void testStringIdItem() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput);
+        reader.read();
+        assertEquals(0xe4, reader.stringIdItems[0].stringDataOff);
+    }
 }
