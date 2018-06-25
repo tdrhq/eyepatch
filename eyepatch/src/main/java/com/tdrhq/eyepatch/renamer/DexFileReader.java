@@ -66,6 +66,15 @@ public class DexFileReader {
         public void read(RandomAccessFile raf) throws IOException {
             stringDataOff = readUInt(raf);
         }
+
+        public String getString(RandomAccessFile raf) throws IOException {
+            raf.seek(stringDataOff);
+            int len = readULeb128(raf);
+            byte[] data = new byte[len];
+            raf.read(data);
+
+            return new String(data);
+        }
     }
 
     static long readUInt(RandomAccessFile raf) throws IOException {
@@ -75,7 +84,7 @@ public class DexFileReader {
         return ret;
     }
 
-    static long readULeb128(RandomAccessFile raf) throws IOException {
+    static int readULeb128(RandomAccessFile raf) throws IOException {
         return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }
 
