@@ -21,6 +21,7 @@ public class DexFileReader {
     }
 
     HeaderItem headerItem = null;
+    StringIdItem[] stringIdItems = null;
 
     public DexFile read() throws IOException {
 
@@ -29,6 +30,13 @@ public class DexFileReader {
 
         headerItem = new HeaderItem();
         headerItem.read(raf);
+
+        raf.seek(headerItem.stringIdsOff);
+        stringIdItems = new StringIdItem[(int) headerItem.stringIdsSize];
+        for (int i = 0; i < headerItem.stringIdsSize; i ++) {
+            stringIdItems[i] = new StringIdItem();
+            stringIdItems[i].read(raf);
+        }
 
         return dexFile;
     }
@@ -47,6 +55,14 @@ public class DexFileReader {
             }
             stringIdsSize = readUInt(raf);
             stringIdsOff = readUInt(raf);
+        }
+    }
+
+    class StringIdItem {
+        long stringDataOff;
+
+        public void read(RandomAccessFile raf) throws IOException {
+            stringDataOff = readUInt(raf);
         }
     }
 
