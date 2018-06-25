@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import com.android.dex.Leb128;
 import com.android.dex.util.ByteInput;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.DexFile;
@@ -72,6 +73,10 @@ public class DexFileReader {
         it = Integer.reverseBytes(it);
         long ret = (long) it;
         return ret;
+    }
+
+    static long readULeb128(RandomAccessFile raf) throws IOException {
+        return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }
 
     static class MyByteInput implements ByteInput {
