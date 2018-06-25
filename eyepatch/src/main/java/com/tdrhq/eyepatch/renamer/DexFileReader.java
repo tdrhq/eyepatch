@@ -73,7 +73,7 @@ public class DexFileReader {
         public String getString() throws IOException {
             raf.seek(stringDataOff);
             int len = readULeb128(raf);
-            char[] data = new char[len + 10];
+            char[] data = new char[len];
             return Mutf8.decode(new MyByteInput(raf), data);
         }
     }
