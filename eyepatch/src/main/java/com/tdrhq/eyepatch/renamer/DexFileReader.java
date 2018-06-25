@@ -62,12 +62,14 @@ public class DexFileReader {
 
     class StringIdItem {
         long stringDataOff;
+        RandomAccessFile raf;
 
         public void read(RandomAccessFile raf) throws IOException {
             stringDataOff = readUInt(raf);
+            this.raf = raf;
         }
 
-        public String getString(RandomAccessFile raf) throws IOException {
+        public String getString() throws IOException {
             raf.seek(stringDataOff);
             int len = readULeb128(raf);
             byte[] data = new byte[len];

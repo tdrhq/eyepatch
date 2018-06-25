@@ -83,5 +83,7 @@ public class DexFileReaderTest {
         DexFileReader reader = new DexFileReader(staticInput);
         reader.read();
         assertEquals(0xe4, reader.stringIdItems[0].stringDataOff);
+        assertEquals("Foo.generated", reader.stringIdItems[0].getString());
+        assertEquals("L", reader.stringIdItems[1].getString());
     }
 }
