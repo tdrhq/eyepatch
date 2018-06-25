@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.renamer;
 
 import com.android.dex.Leb128;
+import com.android.dex.Mutf8;
 import com.android.dex.util.ByteInput;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.DexFile;
@@ -72,10 +73,8 @@ public class DexFileReader {
         public String getString() throws IOException {
             raf.seek(stringDataOff);
             int len = readULeb128(raf);
-            byte[] data = new byte[len];
-            raf.read(data);
-
-            return new String(data);
+            char[] data = new char[len + 10];
+            return Mutf8.decode(new MyByteInput(raf), data);
         }
     }
 
