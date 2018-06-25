@@ -87,5 +87,8 @@ public class DexFileReaderTest {
         assertEquals("L", reader.stringIdItems[1].getString());
         assertEquals("Lcom/foo/Foo;", reader.stringIdItems[2].getString());
         assertEquals("Ljava/lang/Object;", reader.stringIdItems[3].getString());
+        assertEquals("Ljava/lang/String;", reader.stringIdItems[4].getString());
+        assertEquals("getBar", reader.stringIdItems[5].getString());
+        assertEquals("zoidberg", reader.stringIdItems[6].getString());
     }
 }
