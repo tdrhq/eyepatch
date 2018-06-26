@@ -60,6 +60,7 @@ public class DexFileReader {
         for (int i = 0; i < headerItem.classDefsSize; i++) {
             classDefItems[i] = new _ClassDefItem();
             classDefItems[i].read();
+            dexFile.add(classDefItems[i].toClassDefItem());
         }
 
         return dexFile;

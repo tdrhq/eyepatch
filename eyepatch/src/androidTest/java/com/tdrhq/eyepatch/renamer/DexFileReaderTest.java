@@ -114,7 +114,7 @@ public class DexFileReaderTest {
 
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo_suffix", classLoader);
-        //assertNotNull(FooClass);
+        assertNotNull(FooClass);
     }
 
     private void writeOutput(DexFile dexFile) throws IOException {
