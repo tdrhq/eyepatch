@@ -54,8 +54,8 @@ public class DexFileReader {
         return dexFile;
     }
 
-    CstString getCstString(int idx) throws IOException {
-        return new CstString(stringIdItems[idx].getString());
+    String getString(int idx) throws IOException {
+        return stringIdItems[idx].getString();
     }
 
     class HeaderItem {
