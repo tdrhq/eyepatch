@@ -25,20 +25,20 @@ public class DexFileReader {
 
     HeaderItem headerItem = null;
     StringIdItem[] stringIdItems = null;
+    RandomAccessFile raf;
 
     public DexFile read() throws IOException {
 
         DexFile dexFile = new DexFile(new DexOptions());
-        RandomAccessFile raf = new RandomAccessFile(file, "r");
-
+        raf = new RandomAccessFile(file, "r");
         headerItem = new HeaderItem();
-        headerItem.read(raf);
+        headerItem.read();
 
         raf.seek(headerItem.stringIdsOff);
         stringIdItems = new StringIdItem[(int) headerItem.stringIdsSize];
         for (int i = 0; i < headerItem.stringIdsSize; i ++) {
             stringIdItems[i] = new StringIdItem();
-            stringIdItems[i].read(raf);
+            stringIdItems[i].read();
         }
 
         return dexFile;
@@ -48,7 +48,7 @@ public class DexFileReader {
         long stringIdsSize;
         long stringIdsOff;
 
-        public void read(RandomAccessFile raf) throws IOException {
+        public void read() throws IOException {
             raf.seek(0);
             raf.skipBytes(8); // magic
             raf.readInt();    // checksum
@@ -56,36 +56,34 @@ public class DexFileReader {
             for (int i = 0; i < 6; i++) {
                 raf.readInt(); // bunch of stuff
             }
-            stringIdsSize = readUInt(raf);
-            stringIdsOff = readUInt(raf);
+            stringIdsSize = readUInt();
+            stringIdsOff = readUInt();
         }
     }
 
     class StringIdItem {
         long stringDataOff;
-        RandomAccessFile raf;
 
-        public void read(RandomAccessFile raf) throws IOException {
-            stringDataOff = readUInt(raf);
-            this.raf = raf;
+        public void read() throws IOException {
+            stringDataOff = readUInt();
         }
 
         public String getString() throws IOException {
             raf.seek(stringDataOff);
-            int len = readULeb128(raf);
+            int len = readULeb128();
             char[] data = new char[len];
             return Mutf8.decode(new MyByteInput(raf), data);
         }
     }
 
-    static long readUInt(RandomAccessFile raf) throws IOException {
+    long readUInt() throws IOException {
         int it = raf.readInt();
         it = Integer.reverseBytes(it);
         long ret = (long) it;
         return ret;
     }
 
-    static int readULeb128(RandomAccessFile raf) throws IOException {
+    int readULeb128() throws IOException {
         return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }
 
