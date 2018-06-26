@@ -15,6 +15,9 @@ import com.android.dx.rop.type.Type;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Reads a {@code DexFile} from the given file.
@@ -42,11 +45,9 @@ public class DexFileReader {
         headerItem.read();
 
         raf.seek(headerItem.stringIdsOff);
-        stringIdItems = new StringIdItem[(int) headerItem.stringIdsSize];
-        for (int i = 0; i < headerItem.stringIdsSize; i ++) {
-            stringIdItems[i] = new StringIdItem();
-            stringIdItems[i].read();
-        }
+        stringIdItems = readArray(
+                (int) headerItem.stringIdsSize,
+                StringIdItem.class);
 
         raf.seek(headerItem.typeIdsOff);
         typeIdItems = new _TypeIdItem[headerItem.typeIdsSize];
@@ -230,18 +231,23 @@ public class DexFileReader {
     }
 
     private <T extends Readable> T[] readArray(int size, Class<T> klass) throws IOException {
-        Object[] ret = new Object[size];
+        T[] ret = (T[]) Array.newInstance(klass, size);
         for (int i = 0; i < size; i ++) {
             try {
-                ret[i] = klass.newInstance();
+                Constructor cons = klass.getDeclaredConstructor(DexFileReader.class);
+                ret[i] = (T) cons.newInstance(this);
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
             }
-            ((T) ret[i]).read();
+            ret[i].read();
         }
-        return (T[]) ret;
+        return ret;
     }
 
     class StringIdItem implements Readable {
