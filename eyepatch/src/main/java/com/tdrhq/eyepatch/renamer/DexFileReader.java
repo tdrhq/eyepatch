@@ -36,6 +36,7 @@ public class DexFileReader {
     RandomAccessFile raf;
     _ClassDefItem[] classDefItems = null;
     _TypeIdItem[] typeIdItems = null;
+    _FieldIdItem[] fieldIdItems = null;
 
     public DexFile read() throws IOException {
 
@@ -54,6 +55,8 @@ public class DexFileReader {
 
         raf.seek(headerItem.classDefsOff);
         classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class);
+
+        fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class);
 
         for (int i = 0; i < headerItem.classDefsSize; i++) {
             dexFile.add(classDefItems[i].toClassDefItem());
@@ -255,6 +258,12 @@ public class DexFileReader {
         return it;
     }
 
+    int readUShort() throws IOException {
+        short it = raf.readShort();
+        it = Short.reverseBytes(it);
+        return it;
+    }
+
     int readULeb128() throws IOException {
         return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }
@@ -277,5 +286,17 @@ public class DexFileReader {
 
     public interface Readable {
         public void read() throws IOException;
+    }
+
+    class _FieldIdItem implements Readable {
+        int classIdx;
+        int typeIdx;
+        int nameIdx;
+
+        public void read() throws IOException {
+            classIdx = readUShort();
+            typeIdx = readUShort();
+            nameIdx = readUInt();
+        }
     }
 }
