@@ -78,13 +78,6 @@ public class DexFileReaderTest {
     }
 
     @Test
-    public void testReadDexFile() throws Throwable {
-        DexFileReader reader = new DexFileReader(input, nameProvider);
-        reader.read();
-        assertNotNull(reader.dexFile);
-    }
-
-    @Test
     public void testReadStaticInput() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();

@@ -45,7 +45,7 @@ public class DexFileReader {
     _MethodIdItem[] methodIdItems = null;
     _ProtoIdItem[] protoIdItems = null;
 
-    DexFile dexFile;
+    private DexFile dexFile;
     public void read() throws IOException {
 
         dexFile = new DexFile(new DexOptions());
