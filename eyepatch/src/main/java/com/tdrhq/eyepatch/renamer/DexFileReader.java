@@ -176,7 +176,7 @@ public class DexFileReader {
         short[] insns;
         short padding;
 
-        // tries
+        _TryItem[] tryItems;
         // handlers
 
         public void read() throws IOException {
@@ -191,6 +191,19 @@ public class DexFileReader {
                 insns[i] = readUShort();
             }
             padding = readUShort();
+            tryItems = readArray(triesSize, _TryItem.class);
+        }
+    }
+
+    class _TryItem implements Readable {
+        int startAddr;
+        short insnCount;
+        short handlerOff;
+
+        public void read() throws IOException {
+            startAddr = readUInt();
+            insnCount = readUShort();
+            handlerOff = readUShort();
         }
     }
 
