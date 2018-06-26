@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import android.util.Log;
 import com.android.dex.Leb128;
 import com.android.dex.Mutf8;
 import com.android.dex.util.ByteInput;
@@ -177,7 +178,7 @@ public class DexFileReader {
         short padding;
 
         _TryItem[] tryItems;
-        _EncodedCatchHandlerList encodedCatchHandlerList;
+        _EncodedCatchHandlerList encodedCatchHandlerList = null;
 
         public void read() throws IOException {
             registersSize = readUShort();
@@ -193,8 +194,10 @@ public class DexFileReader {
             padding = readUShort();
             tryItems = readArray(triesSize, _TryItem.class);
 
-            encodedCatchHandlerList = new _EncodedCatchHandlerList();
-            //encodedCatchHandlerList.read();
+            if (triesSize != 0) {
+                encodedCatchHandlerList = new _EncodedCatchHandlerList();
+                encodedCatchHandlerList.read();
+            }
         }
     }
 
@@ -229,7 +232,12 @@ public class DexFileReader {
         public void read() throws IOException {
             size = readSLeb128();
 
-            handlers = readArray((int) size, _EncodedTypeAddrPair.class);
+            if (size != 0) {
+
+                throw new RuntimeException("unexpected: " + size);
+            }
+
+            handlers = readArray(Math.abs((int) size), _EncodedTypeAddrPair.class);
             catchAllAddr = readULeb128();
         }
 
