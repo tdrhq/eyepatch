@@ -37,6 +37,7 @@ public class DexFileReader {
     _ClassDefItem[] classDefItems = null;
     _TypeIdItem[] typeIdItems = null;
     _FieldIdItem[] fieldIdItems = null;
+    _MethodIdItem[] methodIdItems = null;
 
     public DexFile read() throws IOException {
 
@@ -56,11 +57,15 @@ public class DexFileReader {
         raf.seek(headerItem.classDefsOff);
         classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class);
 
-        fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class);
-
         for (int i = 0; i < headerItem.classDefsSize; i++) {
             dexFile.add(classDefItems[i].toClassDefItem());
         }
+
+        raf.seek(headerItem.fieldIdsOff);
+        fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class);
+
+        raf.seek(headerItem.methodIdsOff);
+        methodIdItems = readArray(headerItem.methodIdsSize, _MethodIdItem.class);
 
         return dexFile;
     }
@@ -296,6 +301,18 @@ public class DexFileReader {
         public void read() throws IOException {
             classIdx = readUShort();
             typeIdx = readUShort();
+            nameIdx = readUInt();
+        }
+    }
+
+    class _MethodIdItem implements Readable {
+        int classIdx;
+        int protoIdx;
+        int nameIdx;
+
+        public void read() throws IOException {
+            classIdx = readUShort();
+            protoIdx = readUShort();
             nameIdx = readUInt();
         }
     }
