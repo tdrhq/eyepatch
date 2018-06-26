@@ -134,6 +134,13 @@ public class DexFileReaderTest {
         assertEquals(1, codeItem.registersSize);
         assertEquals(3, codeItem.insnsSize);
 
+
+        // const-string, register 0
+        assertEquals(0x001a, codeItem.insns[0]);
+
+        // argument to const-string, index 6, see testStringIdItem, this points to "zoidberg"
+        assertEquals(0x0006, codeItem.insns[1]);
+
         // return-object, register 0 insn
         assertEquals(0x0011, codeItem.insns[2]);
     }
