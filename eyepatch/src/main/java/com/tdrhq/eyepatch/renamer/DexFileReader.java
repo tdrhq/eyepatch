@@ -177,6 +177,18 @@ public class DexFileReader {
                 directMethodsSize = readULeb128();
                 virtualMethodsSize = readULeb128();
 
+                staticFields = readEncodedFields(staticFieldsSize);
+                instanceFields = readEncodedFields(instanceFieldsSize);
+            }
+
+            _EncodedField[]  readEncodedFields(int size) throws IOException {
+                _EncodedField[] ret = new _EncodedField[size];
+                for (int i = 0; i < size; i++) {
+                    ret[i] = new _EncodedField();
+                    ret[i].read();
+                }
+
+                return ret;
             }
         }
 
