@@ -151,7 +151,7 @@ public class DexFileReader {
         int codeOff;
 
         // substructures
-        CodeItem codeItem;
+        _CodeItem codeItem;
 
         public void read() throws IOException {
             methodIdxDiff = readULeb128();
@@ -160,13 +160,13 @@ public class DexFileReader {
 
             long mark = raf.getFilePointer();
             raf.seek(codeOff);
-            codeItem = new CodeItem();
+            codeItem = new _CodeItem();
             codeItem.read();
             raf.seek(mark);
         }
     }
 
-    class CodeItem implements Readable {
+    class _CodeItem implements Readable {
         short registersSize;
         short insSize;
         short outsSize;

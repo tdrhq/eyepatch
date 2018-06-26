@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import com.tdrhq.eyepatch.renamer.DexFileReader.NameProvider;
+import com.tdrhq.eyepatch.renamer.DexFileReader.*;
 
 public class DexFileReaderTest {
     @Rule
@@ -130,7 +130,9 @@ public class DexFileReaderTest {
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
-        assertEquals(1, reader.classDefItems[0].classDataItem.directMethods[0].codeItem.registersSize);
+        _CodeItem codeItem = reader.classDefItems[0].classDataItem.directMethods[0].codeItem;
+        assertEquals(1, codeItem.registersSize);
+        assertEquals(3, codeItem.insnsSize);
     }
 
     private void writeOutput(DexFile dexFile) throws IOException {
