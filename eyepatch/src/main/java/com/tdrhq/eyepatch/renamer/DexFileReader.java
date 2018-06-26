@@ -136,8 +136,8 @@ public class DexFileReader {
     }
 
     class _EncodedField implements Readable {
-        int fieldIdxDiff;
-        int accessFlags;
+        long fieldIdxDiff;
+        long accessFlags;
 
         public void read() throws IOException {
             fieldIdxDiff = readULeb128();
@@ -146,9 +146,9 @@ public class DexFileReader {
     }
 
     class _EncodedMethod implements Readable {
-        int methodIdxDiff;
-        int accessFlags;
-        int codeOff;
+        long methodIdxDiff;
+        long accessFlags;
+        long codeOff;
 
         // substructures
         _CodeItem codeItem;
@@ -177,7 +177,7 @@ public class DexFileReader {
         short padding;
 
         _TryItem[] tryItems;
-        // handlers
+        _EncodedCatchHandlerList encodedCatchHandlerList;
 
         public void read() throws IOException {
             registersSize = readUShort();
@@ -192,6 +192,9 @@ public class DexFileReader {
             }
             padding = readUShort();
             tryItems = readArray(triesSize, _TryItem.class);
+
+            encodedCatchHandlerList = new _EncodedCatchHandlerList();
+            //encodedCatchHandlerList.read();
         }
     }
 
@@ -207,11 +210,46 @@ public class DexFileReader {
         }
     }
 
+    class _EncodedCatchHandlerList {
+        long size;
+        _EncodedCatchHandler[] list;
+
+        public void read() throws IOException {
+            size = readULeb128();
+            list = readArray((int) size, _EncodedCatchHandler.class);
+        }
+    }
+
+    class _EncodedCatchHandler implements Readable {
+        long size;
+        _EncodedTypeAddrPair[] handlers;
+        long catchAllAddr;
+
+        @Override
+        public void read() throws IOException {
+            size = readSLeb128();
+
+            handlers = readArray((int) size, _EncodedTypeAddrPair.class);
+            catchAllAddr = readULeb128();
+        }
+
+    }
+
+    class _EncodedTypeAddrPair implements Readable {
+        long typeIdx;
+        long addr;
+
+        public void read() throws IOException {
+            typeIdx = readULeb128();
+            addr = readULeb128();
+        }
+    }
+
     class _ClassDataItem {
-        int staticFieldsSize;
-        int instanceFieldsSize;
-        int directMethodsSize;
-        int virtualMethodsSize;
+        long staticFieldsSize;
+        long instanceFieldsSize;
+        long directMethodsSize;
+        long virtualMethodsSize;
 
         _EncodedField[] staticFields;
         _EncodedField[] instanceFields;
@@ -224,11 +262,11 @@ public class DexFileReader {
             directMethodsSize = readULeb128();
             virtualMethodsSize = readULeb128();
 
-            staticFields = readEncodedFields(staticFieldsSize);
-            instanceFields = readEncodedFields(instanceFieldsSize);
+            staticFields = readEncodedFields((int) staticFieldsSize);
+            instanceFields = readEncodedFields((int) instanceFieldsSize);
 
-            directMethods = readEncodedMethods(directMethodsSize);
-            virtualMethods = readEncodedMethods(virtualMethodsSize);
+            directMethods = readEncodedMethods((int) directMethodsSize);
+            virtualMethods = readEncodedMethods((int) virtualMethodsSize);
         }
 
         _EncodedField[]  readEncodedFields(int size) throws IOException {
@@ -313,8 +351,8 @@ public class DexFileReader {
 
         public String getString() throws IOException {
             raf.seek(stringDataOff);
-            int len = readULeb128();
-            char[] data = new char[len];
+            long len = readULeb128();
+            char[] data = new char[(int) len];
             return Mutf8.decode(new MyByteInput(raf), data);
         }
     }
@@ -334,6 +372,11 @@ public class DexFileReader {
     int readULeb128() throws IOException {
         return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }
+
+    int readSLeb128() throws IOException {
+        return Leb128.readSignedLeb128(new MyByteInput(raf));
+    }
+
 
     static class MyByteInput implements ByteInput {
         RandomAccessFile raf;
