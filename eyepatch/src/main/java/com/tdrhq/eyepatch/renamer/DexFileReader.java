@@ -229,6 +229,21 @@ public class DexFileReader {
         }
     }
 
+    private <T extends Readable> T[] readArray(int size, Class<T> klass) throws IOException {
+        Object[] ret = new Object[size];
+        for (int i = 0; i < size; i ++) {
+            try {
+                ret[i] = klass.newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            ((T) ret[i]).read();
+        }
+        return (T[]) ret;
+    }
+
     class StringIdItem implements Readable {
         long stringDataOff;
 
