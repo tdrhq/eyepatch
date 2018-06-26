@@ -22,12 +22,21 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import com.tdrhq.eyepatch.renamer.DexFileReader.NameProvider;
 
 public class DexFileReaderTest {
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
     private File input;
     private File staticInput;
+    private NameProvider nameProvider = new NameProvider() {
+            @Override
+            public String rename(String input) {
+                return input.replace(";", "_suffix;");
+            }
+        };
+
+
 
     private ClassLoader classLoader = new PathClassLoader("", null, getClass().getClassLoader());
     private ClassRenamer classRenamer;
@@ -70,13 +79,13 @@ public class DexFileReaderTest {
 
     @Test
     public void testReadDexFile() throws Throwable {
-        DexFile inputFile = new DexFileReader(input).read();
+        DexFile inputFile = new DexFileReader(input, nameProvider).read();
         assertNotNull(inputFile);
     }
 
     @Test
     public void testReadStaticInput() throws Throwable {
-        DexFileReader reader = new DexFileReader(staticInput);
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
         assertEquals(7, reader.headerItem.stringIdsSize);
         assertEquals(0x70, reader.headerItem.stringIdsOff);
@@ -84,7 +93,7 @@ public class DexFileReaderTest {
 
     @Test
     public void testStringIdItem() throws Throwable {
-        DexFileReader reader = new DexFileReader(staticInput);
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
         assertEquals(0xe4, reader.stringIdItems[0].stringDataOff);
         assertEquals("Foo.generated", reader.stringIdItems[0].getString());
@@ -98,7 +107,7 @@ public class DexFileReaderTest {
 
     @Test
     public void testClassDefsData() throws Throwable {
-        DexFileReader reader = new DexFileReader(staticInput);
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
         assertEquals(1, reader.headerItem.classDefsSize);
         assertEquals(0xac, reader.headerItem.classDefsOff);
@@ -108,7 +117,7 @@ public class DexFileReaderTest {
 
     @Test
     public void testHasClass() throws Throwable {
-        DexFileReader reader = new DexFileReader(staticInput);
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         DexFile outputDexFile = reader.read();
         writeOutput(outputDexFile);
 

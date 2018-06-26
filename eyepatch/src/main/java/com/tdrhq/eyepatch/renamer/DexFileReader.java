@@ -27,8 +27,11 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class DexFileReader {
     private File file;
-    public DexFileReader(File file) {
+    private NameProvider nameProvider;
+
+    public DexFileReader(File file, NameProvider nameProvider) {
         this.file = file;
+        this.nameProvider = nameProvider;
     }
 
     HeaderItem headerItem = null;
@@ -132,10 +135,6 @@ public class DexFileReader {
         }
     }
 
-    private String addSuffix(String inputType) {
-        return inputType.replace(";", "_suffix;");
-    }
-
     class _EncodedField implements Readable {
         int fieldIdxDiff;
         int accessFlags;
@@ -217,8 +216,9 @@ public class DexFileReader {
 
         public ClassDefItem toClassDefItem() throws IOException {
             return new ClassDefItem(
-                    new CstType(Type.intern(
-                                        addSuffix(typeIdItems[classIdx].getString()))),
+                    new CstType(
+                            Type.intern(
+                                    nameProvider.rename(typeIdItems[classIdx].getString()))),
                     (int) accessFlags,
                     new CstType(Type.intern(typeIdItems[superclassIdx].getString())),
                     StdTypeList.EMPTY, // TODO: fill list
@@ -331,5 +331,9 @@ public class DexFileReader {
             returnTypeIdx = readUInt();
             parametersOff = readUInt();
         }
+    }
+
+    interface NameProvider {
+        public String rename(String input);
     }
 }
