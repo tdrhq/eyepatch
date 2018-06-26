@@ -145,6 +145,7 @@ public class DexFileReader {
             codeOff = readULeb128();
         }
     }
+
     class _ClassDataItem {
         int staticFieldsSize;
         int instanceFieldsSize;
@@ -170,23 +171,11 @@ public class DexFileReader {
         }
 
         _EncodedField[]  readEncodedFields(int size) throws IOException {
-            _EncodedField[] ret = new _EncodedField[size];
-            for (int i = 0; i < size; i++) {
-                ret[i] = new _EncodedField();
-                ret[i].read();
-            }
-
-            return ret;
+            return readArray(size, _EncodedField.class);
         }
 
         _EncodedMethod[]  readEncodedMethods(int size) throws IOException {
-            _EncodedMethod[] ret = new _EncodedMethod[size];
-            for (int i = 0; i < size; i++) {
-                ret[i] = new _EncodedMethod();
-                ret[i].read();
-            }
-
-            return ret;
+            return readArray(size, _EncodedMethod.class);
         }
     }
 
