@@ -150,10 +150,47 @@ public class DexFileReader {
         int accessFlags;
         int codeOff;
 
+        // substructures
+        CodeItem codeItem;
+
         public void read() throws IOException {
             methodIdxDiff = readULeb128();
             accessFlags = readULeb128();
             codeOff = readULeb128();
+
+            long mark = raf.getFilePointer();
+            raf.seek(codeOff);
+            codeItem = new CodeItem();
+            codeItem.read();
+            raf.seek(mark);
+        }
+    }
+
+    class CodeItem implements Readable {
+        short registersSize;
+        short insSize;
+        short outsSize;
+        short triesSize;
+        int debugInfoOff;
+        int insnsSize;
+        short[] insns;
+        short padding;
+
+        // tries
+        // handlers
+
+        public void read() throws IOException {
+            registersSize = readUShort();
+            insSize = readUShort();
+            outsSize = readUShort();
+            triesSize = readUShort();
+            debugInfoOff = readUInt();
+            insnsSize = readUInt();
+            insns = new short[insnsSize];
+            for (int i = 0 ; i < insnsSize; i ++) {
+                insns[i] = readUShort();
+            }
+            padding = readUShort();
         }
     }
 
@@ -267,7 +304,7 @@ public class DexFileReader {
         return it;
     }
 
-    int readUShort() throws IOException {
+    short readUShort() throws IOException {
         short it = raf.readShort();
         it = Short.reverseBytes(it);
         return it;
