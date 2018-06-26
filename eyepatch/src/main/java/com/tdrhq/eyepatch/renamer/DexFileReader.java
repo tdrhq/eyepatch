@@ -237,6 +237,9 @@ public class DexFileReader {
         int classDataOff;
         int staticValuesOff;
 
+        // substructurs
+        _ClassDataItem classDataItem;
+
 
         public void read() throws IOException {
             classIdx = readUInt();
@@ -248,7 +251,12 @@ public class DexFileReader {
             classDataOff = readUInt();
             staticValuesOff = readUInt();
 
+            long mark = raf.getFilePointer();
             raf.seek(classDataOff);
+            classDataItem = new _ClassDataItem();
+            classDataItem.read();
+            raf.seek(mark);
+
         }
 
         public ClassDefItem toClassDefItem() throws IOException {

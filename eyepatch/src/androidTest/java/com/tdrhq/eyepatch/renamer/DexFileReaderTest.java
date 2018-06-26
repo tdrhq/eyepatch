@@ -126,6 +126,13 @@ public class DexFileReaderTest {
         assertNotNull(FooClass);
     }
 
+    @Test
+    public void testCodeItemBasics() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
+        reader.read();
+        assertEquals(1, reader.classDefItems[0].classDataItem.directMethods[0].codeItem.registersSize);
+    }
+
     private void writeOutput(DexFile dexFile) throws IOException {
         output = tmpdir.newFile("output.dex");
         FileOutputStream os = new FileOutputStream(output);
