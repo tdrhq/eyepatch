@@ -79,8 +79,9 @@ public class DexFileReaderTest {
 
     @Test
     public void testReadDexFile() throws Throwable {
-        DexFile inputFile = new DexFileReader(input, nameProvider).read();
-        assertNotNull(inputFile);
+        DexFileReader reader = new DexFileReader(input, nameProvider);
+        reader.read();
+        assertNotNull(reader.dexFile);
     }
 
     @Test
@@ -118,8 +119,9 @@ public class DexFileReaderTest {
     @Test
     public void testHasClass() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
-        DexFile outputDexFile = reader.read();
-        writeOutput(outputDexFile);
+        output = tmpdir.newFile("output.dex");
+        reader.read();
+        reader.write(output);
 
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo_suffix", classLoader);
@@ -143,12 +145,5 @@ public class DexFileReaderTest {
 
         // return-object, register 0 insn
         assertEquals(0x0011, codeItem.insns[2]);
-    }
-
-    private void writeOutput(DexFile dexFile) throws IOException {
-        output = tmpdir.newFile("output.dex");
-        FileOutputStream os = new FileOutputStream(output);
-        dexFile.writeTo(os, new PrintWriter(System.err), false);
-        os.close();
     }
 }

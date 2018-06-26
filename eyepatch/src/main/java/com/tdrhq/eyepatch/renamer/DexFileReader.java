@@ -2,7 +2,6 @@
 
 package com.tdrhq.eyepatch.renamer;
 
-import android.util.Log;
 import com.android.dex.Leb128;
 import com.android.dex.Mutf8;
 import com.android.dex.util.ByteInput;
@@ -14,7 +13,9 @@ import com.android.dx.rop.cst.CstType;
 import com.android.dx.rop.type.StdTypeList;
 import com.android.dx.rop.type.Type;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -44,9 +45,10 @@ public class DexFileReader {
     _MethodIdItem[] methodIdItems = null;
     _ProtoIdItem[] protoIdItems = null;
 
-    public DexFile read() throws IOException {
+    DexFile dexFile;
+    public void read() throws IOException {
 
-        DexFile dexFile = new DexFile(new DexOptions());
+        dexFile = new DexFile(new DexOptions());
         raf = new RandomAccessFile(file, "r");
         headerItem = new HeaderItem();
         headerItem.read();
@@ -74,8 +76,12 @@ public class DexFileReader {
 
         raf.seek(headerItem.protoIdsOff);
         protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class);
+    }
 
-        return dexFile;
+    public void write(File output) throws IOException {
+        FileOutputStream os = new FileOutputStream(output);
+        dexFile.writeTo(os, new PrintWriter(System.err), false);
+        os.close();
     }
 
     String getString(long idx) throws IOException {
