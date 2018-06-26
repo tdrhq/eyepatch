@@ -6,6 +6,7 @@ import com.android.dex.Leb128;
 import com.android.dex.Mutf8;
 import com.android.dex.util.ByteInput;
 import com.android.dx.dex.DexOptions;
+import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class DexFileReader {
     HeaderItem headerItem = null;
     StringIdItem[] stringIdItems = null;
     RandomAccessFile raf;
+    ClassDefItem[] classDefItems = null;
 
     public DexFile read() throws IOException {
 
@@ -47,6 +49,8 @@ public class DexFileReader {
     class HeaderItem {
         long stringIdsSize;
         long stringIdsOff;
+        long classDefsSize;
+        long classDefsOff;
 
         public void read() throws IOException {
             raf.seek(0);
@@ -58,6 +62,13 @@ public class DexFileReader {
             }
             stringIdsSize = readUInt();
             stringIdsOff = readUInt();
+
+            for (int i = 0; i < 8; i++) {
+                readUInt();
+            }
+
+            classDefsSize = readUInt();
+            classDefsOff = readUInt();
         }
     }
 

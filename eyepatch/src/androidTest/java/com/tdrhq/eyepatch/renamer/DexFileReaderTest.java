@@ -7,12 +7,15 @@ import com.android.dx.DexMaker;
 import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
+import com.android.dx.dex.file.DexFile;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
 import com.tdrhq.eyepatch.util.Whitebox;
-import com.android.dx.dex.file.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
@@ -90,5 +93,31 @@ public class DexFileReaderTest {
         assertEquals("Ljava/lang/String;", reader.stringIdItems[4].getString());
         assertEquals("getBar", reader.stringIdItems[5].getString());
         assertEquals("zoidberg", reader.stringIdItems[6].getString());
+    }
+
+    @Test
+    public void testClassDefsData() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput);
+        reader.read();
+        assertEquals(1, reader.headerItem.classDefsSize);
+        assertEquals(0xac, reader.headerItem.classDefsOff);
+    }
+
+    @Test
+    public void testHasClass() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput);
+        DexFile outputDexFile = reader.read();
+        writeOutput(outputDexFile);
+
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo_suffix", classLoader);
+        //        assertNotNull(FooClass);
+    }
+
+    private void writeOutput(DexFile dexFile) throws IOException {
+        output = tmpdir.newFile("output.dex");
+        FileOutputStream os = new FileOutputStream(output);
+        dexFile.writeTo(os, new PrintWriter(System.err), false);
+        os.close();
     }
 }
