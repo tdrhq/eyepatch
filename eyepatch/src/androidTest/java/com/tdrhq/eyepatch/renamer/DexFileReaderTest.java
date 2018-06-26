@@ -7,6 +7,7 @@ import com.android.dx.DexMaker;
 import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
+import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
@@ -101,6 +102,8 @@ public class DexFileReaderTest {
         reader.read();
         assertEquals(1, reader.headerItem.classDefsSize);
         assertEquals(0xac, reader.headerItem.classDefsOff);
+        ClassDefItem item = reader.classDefItems[0].toClassDefItem();
+        //assertEquals("Lcom/foo/Foo_suffix;", item.getThisClass().toString());
     }
 
     @Test

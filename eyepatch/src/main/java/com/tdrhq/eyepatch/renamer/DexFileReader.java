@@ -32,6 +32,7 @@ public class DexFileReader {
     StringIdItem[] stringIdItems = null;
     RandomAccessFile raf;
     _ClassDefItem[] classDefItems = null;
+    _TypeIdItem[] typeIdItems = null;
 
     public DexFile read() throws IOException {
 
@@ -45,6 +46,13 @@ public class DexFileReader {
         for (int i = 0; i < headerItem.stringIdsSize; i ++) {
             stringIdItems[i] = new StringIdItem();
             stringIdItems[i].read();
+        }
+
+        raf.seek(headerItem.typeIdsOff);
+        typeIdItems = new _TypeIdItem[headerItem.typeIdsSize];
+        for (int i = 0; i < headerItem.typeIdsSize; i ++) {
+            typeIdItems[i] = new _TypeIdItem();
+            typeIdItems[i].read();
         }
 
         raf.seek(headerItem.classDefsOff);
@@ -66,6 +74,8 @@ public class DexFileReader {
         long stringIdsOff;
         long classDefsSize;
         long classDefsOff;
+        int typeIdsSize;
+        int typeIdsOff;
 
         public void read() throws IOException {
             raf.seek(0);
@@ -78,7 +88,9 @@ public class DexFileReader {
             stringIdsSize = readUInt();
             stringIdsOff = readUInt();
 
-            for (int i = 0; i < 8; i++) {
+            typeIdsSize = readUInt();
+            typeIdsOff = readUInt();
+            for (int i = 0; i < 6; i++) {
                 readUInt();
             }
 
@@ -87,15 +99,31 @@ public class DexFileReader {
         }
     }
 
+    class _TypeIdItem {
+        int descriptorIdx; // a  pointer to string_ids
+
+        public void read() throws IOException {
+            descriptorIdx = readUInt();
+        }
+
+        public String getString() throws IOException{
+            return DexFileReader.this.getString(descriptorIdx);
+        }
+    }
+
+    private String addSuffix(String inputType) {
+        return inputType.replace(";", "_suffix;");
+    }
+
     class _ClassDefItem {
-        long classIdx;
-        long accessFlags;
-        long superclassIdx;
-        long interfacesOff;
-        long sourceFileIdx;
-        long annotationsOff;
-        long classDataOff;
-        long staticValuesOff;
+        int classIdx;
+        int accessFlags;
+        int superclassIdx;
+        int interfacesOff;
+        int sourceFileIdx;
+        int annotationsOff;
+        int classDataOff;
+        int staticValuesOff;
 
         public void read() throws IOException {
             classIdx = readUInt();
@@ -110,9 +138,10 @@ public class DexFileReader {
 
         public ClassDefItem toClassDefItem() throws IOException {
             return new ClassDefItem(
-                    new CstType(Type.intern(getString(classIdx) + "_suffix")),
+                    new CstType(Type.intern(
+                                        addSuffix(typeIdItems[classIdx].getString()))),
                     (int) accessFlags,
-                    new CstType(Type.intern(getString(superclassIdx))),
+                    new CstType(Type.intern(typeIdItems[superclassIdx].getString())),
                     StdTypeList.EMPTY, // TODO: fill list
                     new CstString(getString(sourceFileIdx)));
         }
@@ -133,11 +162,10 @@ public class DexFileReader {
         }
     }
 
-    long readUInt() throws IOException {
+    int readUInt() throws IOException {
         int it = raf.readInt();
         it = Integer.reverseBytes(it);
-        long ret = (long) it;
-        return ret;
+        return it;
     }
 
     int readULeb128() throws IOException {
