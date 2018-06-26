@@ -128,6 +128,28 @@ public class DexFileReader {
         return inputType.replace(";", "_suffix;");
     }
 
+    class _EncodedField {
+        int fieldIdxDiff;
+        int accessFlags;
+
+        public void read() throws IOException {
+            fieldIdxDiff = readULeb128();
+            accessFlags =readULeb128();
+        }
+    }
+
+    class _EncodedMethod {
+        int methodIdxDiff;
+        int accessFlags;
+        int codeOff;
+
+        public void read() throws IOException {
+            methodIdxDiff = readULeb128();
+            accessFlags = readULeb128();
+            codeOff = readULeb128();
+        }
+    }
+
     class _ClassDefItem {
         int classIdx;
         int accessFlags;
@@ -138,6 +160,26 @@ public class DexFileReader {
         int classDataOff;
         int staticValuesOff;
 
+        class _ClassDataItem {
+            int staticFieldsSize;
+            int instanceFieldsSize;
+            int directMethodsSize;
+            int virtualMethodsSize;
+
+            _EncodedField[] staticFields;
+            _EncodedField[] instanceFields;
+            _EncodedMethod[] directMethods;
+            _EncodedMethod[] virtualMethods;
+
+            public void read() throws IOException {
+                staticFieldsSize = readULeb128();
+                instanceFieldsSize = readULeb128();
+                directMethodsSize = readULeb128();
+                virtualMethodsSize = readULeb128();
+
+            }
+        }
+
         public void read() throws IOException {
             classIdx = readUInt();
             accessFlags = readUInt();
@@ -147,6 +189,8 @@ public class DexFileReader {
             annotationsOff = readUInt();
             classDataOff = readUInt();
             staticValuesOff = readUInt();
+
+            raf.seek(classDataOff);
         }
 
         public ClassDefItem toClassDefItem() throws IOException {
