@@ -50,17 +50,12 @@ public class DexFileReader {
                 StringIdItem.class);
 
         raf.seek(headerItem.typeIdsOff);
-        typeIdItems = new _TypeIdItem[headerItem.typeIdsSize];
-        for (int i = 0; i < headerItem.typeIdsSize; i ++) {
-            typeIdItems[i] = new _TypeIdItem();
-            typeIdItems[i].read();
-        }
+        typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class);
 
         raf.seek(headerItem.classDefsOff);
-        classDefItems = new _ClassDefItem[(int) headerItem.classDefsSize];
+        classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class);
+
         for (int i = 0; i < headerItem.classDefsSize; i++) {
-            classDefItems[i] = new _ClassDefItem();
-            classDefItems[i].read();
             dexFile.add(classDefItems[i].toClassDefItem());
         }
 
