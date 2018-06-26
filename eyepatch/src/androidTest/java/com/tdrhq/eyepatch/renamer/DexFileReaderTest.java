@@ -133,6 +133,9 @@ public class DexFileReaderTest {
         _CodeItem codeItem = reader.classDefItems[0].classDataItem.directMethods[0].codeItem;
         assertEquals(1, codeItem.registersSize);
         assertEquals(3, codeItem.insnsSize);
+
+        // return-object, register 0 insn
+        assertEquals(0x0011, codeItem.insns[2]);
     }
 
     private void writeOutput(DexFile dexFile) throws IOException {
