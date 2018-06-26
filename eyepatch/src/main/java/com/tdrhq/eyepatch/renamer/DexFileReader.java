@@ -77,6 +77,12 @@ public class DexFileReader {
         long classDefsOff;
         int typeIdsSize;
         int typeIdsOff;
+        int protoIdsSize;
+        int protoIdsOff;
+        int fieldIdsSize;
+        int fieldIdsOff;
+        int methodIdsSize;
+        int methodIdsOff;
 
         public void read() throws IOException {
             raf.seek(0);
@@ -91,9 +97,15 @@ public class DexFileReader {
 
             typeIdsSize = readUInt();
             typeIdsOff = readUInt();
-            for (int i = 0; i < 6; i++) {
-                readUInt();
-            }
+
+            protoIdsSize = readUInt();
+            protoIdsOff = readUInt();
+
+            fieldIdsSize = readUInt();
+            fieldIdsOff = readUInt();
+
+            methodIdsSize = readUInt();
+            methodIdsOff = readUInt();
 
             classDefsSize = readUInt();
             classDefsOff = readUInt();
