@@ -8,6 +8,7 @@ import com.android.dex.util.ByteInput;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
+import com.android.dx.rop.cst.CstString;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -51,6 +52,10 @@ public class DexFileReader {
         }
 
         return dexFile;
+    }
+
+    CstString getCstString(int idx) throws IOException {
+        return new CstString(stringIdItems[idx].getString());
     }
 
     class HeaderItem {
