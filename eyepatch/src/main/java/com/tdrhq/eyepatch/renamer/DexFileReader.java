@@ -9,6 +9,9 @@ import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.rop.cst.CstString;
+import com.android.dx.rop.cst.CstType;
+import com.android.dx.rop.type.StdTypeList;
+import com.android.dx.rop.type.Type;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -54,8 +57,8 @@ public class DexFileReader {
         return dexFile;
     }
 
-    String getString(int idx) throws IOException {
-        return stringIdItems[idx].getString();
+    String getString(long idx) throws IOException {
+        return stringIdItems[(int) idx].getString();
     }
 
     class HeaderItem {
@@ -103,6 +106,15 @@ public class DexFileReader {
             annotationsOff = readUInt();
             classDataOff = readUInt();
             staticValuesOff = readUInt();
+        }
+
+        public ClassDefItem toClassDefItem() throws IOException {
+            return new ClassDefItem(
+                    new CstType(Type.intern(getString(classIdx) + "_suffix")),
+                    (int) accessFlags,
+                    new CstType(Type.intern(getString(superclassIdx))),
+                    StdTypeList.EMPTY, // TODO: fill list
+                    new CstString(getString(sourceFileIdx)));
         }
     }
 
