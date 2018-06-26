@@ -145,6 +145,50 @@ public class DexFileReader {
             codeOff = readULeb128();
         }
     }
+    class _ClassDataItem {
+        int staticFieldsSize;
+        int instanceFieldsSize;
+        int directMethodsSize;
+        int virtualMethodsSize;
+
+        _EncodedField[] staticFields;
+        _EncodedField[] instanceFields;
+        _EncodedMethod[] directMethods;
+        _EncodedMethod[] virtualMethods;
+
+        public void read() throws IOException {
+            staticFieldsSize = readULeb128();
+            instanceFieldsSize = readULeb128();
+            directMethodsSize = readULeb128();
+            virtualMethodsSize = readULeb128();
+
+            staticFields = readEncodedFields(staticFieldsSize);
+            instanceFields = readEncodedFields(instanceFieldsSize);
+
+            directMethods = readEncodedMethods(directMethodsSize);
+            virtualMethods = readEncodedMethods(virtualMethodsSize);
+        }
+
+        _EncodedField[]  readEncodedFields(int size) throws IOException {
+            _EncodedField[] ret = new _EncodedField[size];
+            for (int i = 0; i < size; i++) {
+                ret[i] = new _EncodedField();
+                ret[i].read();
+            }
+
+            return ret;
+        }
+
+        _EncodedMethod[]  readEncodedMethods(int size) throws IOException {
+            _EncodedMethod[] ret = new _EncodedMethod[size];
+            for (int i = 0; i < size; i++) {
+                ret[i] = new _EncodedMethod();
+                ret[i].read();
+            }
+
+            return ret;
+        }
+    }
 
     class _ClassDefItem implements Readable {
         int classIdx;
@@ -156,50 +200,6 @@ public class DexFileReader {
         int classDataOff;
         int staticValuesOff;
 
-        class _ClassDataItem {
-            int staticFieldsSize;
-            int instanceFieldsSize;
-            int directMethodsSize;
-            int virtualMethodsSize;
-
-            _EncodedField[] staticFields;
-            _EncodedField[] instanceFields;
-            _EncodedMethod[] directMethods;
-            _EncodedMethod[] virtualMethods;
-
-            public void read() throws IOException {
-                staticFieldsSize = readULeb128();
-                instanceFieldsSize = readULeb128();
-                directMethodsSize = readULeb128();
-                virtualMethodsSize = readULeb128();
-
-                staticFields = readEncodedFields(staticFieldsSize);
-                instanceFields = readEncodedFields(instanceFieldsSize);
-
-                directMethods = readEncodedMethods(directMethodsSize);
-                virtualMethods = readEncodedMethods(virtualMethodsSize);
-            }
-
-            _EncodedField[]  readEncodedFields(int size) throws IOException {
-                _EncodedField[] ret = new _EncodedField[size];
-                for (int i = 0; i < size; i++) {
-                    ret[i] = new _EncodedField();
-                    ret[i].read();
-                }
-
-                return ret;
-            }
-
-            _EncodedMethod[]  readEncodedMethods(int size) throws IOException {
-                _EncodedMethod[] ret = new _EncodedMethod[size];
-                for (int i = 0; i < size; i++) {
-                    ret[i] = new _EncodedMethod();
-                    ret[i].read();
-                }
-
-                return ret;
-            }
-        }
 
         public void read() throws IOException {
             classIdx = readUInt();
