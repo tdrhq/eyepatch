@@ -70,7 +70,7 @@ public class DexFileReader {
         return stringIdItems[(int) idx].getString();
     }
 
-    class HeaderItem {
+    class HeaderItem implements Readable {
         long stringIdsSize;
         long stringIdsOff;
         long classDefsSize;
@@ -112,7 +112,7 @@ public class DexFileReader {
         }
     }
 
-    class _TypeIdItem {
+    class _TypeIdItem implements Readable {
         int descriptorIdx; // a  pointer to string_ids
 
         public void read() throws IOException {
@@ -128,7 +128,7 @@ public class DexFileReader {
         return inputType.replace(";", "_suffix;");
     }
 
-    class _EncodedField {
+    class _EncodedField implements Readable {
         int fieldIdxDiff;
         int accessFlags;
 
@@ -138,7 +138,7 @@ public class DexFileReader {
         }
     }
 
-    class _EncodedMethod {
+    class _EncodedMethod implements Readable {
         int methodIdxDiff;
         int accessFlags;
         int codeOff;
@@ -150,7 +150,7 @@ public class DexFileReader {
         }
     }
 
-    class _ClassDefItem {
+    class _ClassDefItem implements Readable {
         int classIdx;
         int accessFlags;
         int superclassIdx;
@@ -229,7 +229,7 @@ public class DexFileReader {
         }
     }
 
-    class StringIdItem {
+    class StringIdItem implements Readable {
         long stringDataOff;
 
         public void read() throws IOException {
@@ -268,5 +268,9 @@ public class DexFileReader {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public interface Readable {
+        public void read() throws IOException;
     }
 }
