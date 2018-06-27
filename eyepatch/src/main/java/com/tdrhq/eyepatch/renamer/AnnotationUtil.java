@@ -36,4 +36,18 @@ public class AnnotationUtil {
         }
         return f.idx();
     }
+
+    public static int getSizeFromSizeIdx(List<Field> fields, Object instance, Field f) throws IllegalAccessException {
+        int size = -1;
+        int sizeIdx = f.getAnnotation(F.class).sizeIdx();
+        for (Field sizeField : fields) {
+            if (AnnotationUtil.getIndex(sizeField) == sizeIdx) {
+                size = (int) sizeField.get(instance);
+            }
+        }
+        if (size == -1) {
+            throw new RuntimeException("could not find index: " + sizeIdx);
+        }
+        return size;
+    }
 }

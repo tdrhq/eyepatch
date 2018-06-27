@@ -432,13 +432,13 @@ public class DexFileReader {
                         }
                         raf.read(arr);
                     } else if (f.getType() == short[].class) {
-                        int size = getSizeFromSizeIdx(fields, f);
+                        int size = AnnotationUtil.getSizeFromSizeIdx(fields, this, f);
                         f.set(this, readShortArray(size));
                     } else if (f.getType().isArray()) {
                         Class type = f.getType();
                         Class<? extends Streamable> componentType =
                                 (Class<? extends Streamable>) type.getComponentType();
-                        int size = getSizeFromSizeIdx(fields, f);
+                        int size = AnnotationUtil.getSizeFromSizeIdx(fields, this, f);
                         f.set(this, readArray(size, componentType));
                     }
                     else {
@@ -448,20 +448,6 @@ public class DexFileReader {
                     throw new RuntimeException(e);
                 }
             }
-        }
-
-        private int getSizeFromSizeIdx(List<Field> fields, Field f) throws IllegalAccessException {
-            int size = -1;
-            int sizeIdx = f.getAnnotation(F.class).sizeIdx();
-            for (Field sizeField : fields) {
-                if (AnnotationUtil.getIndex(sizeField) == sizeIdx) {
-                    size = (int) sizeField.get(this);
-                }
-            }
-            if (size == -1) {
-                throw new RuntimeException("could not find index: " + sizeIdx);
-            }
-            return size;
         }
 
         protected void readImpl() throws IOException {
