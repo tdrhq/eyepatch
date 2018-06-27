@@ -47,6 +47,7 @@ public class DexFileReader {
     _DebugInfoItem[] debugInfoItems;
     _StringDataItem[] stringDataItems;
     _ClassDataItem[] classDataItems;
+    _CodeItem[] codeItems;
 
     private DexFile dexFile;
     public void read() throws IOException {
@@ -75,10 +76,6 @@ public class DexFileReader {
         raf.seek(headerItem.classDefsOff);
         classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class, this, raf);
 
-        for (int i = 0; i < headerItem.classDefsSize; i++) {
-            dexFile.add(classDefItems[i].toClassDefItem());
-        }
-
         readClassDataItems();
 
         raf.seek(headerItem.fieldIdsOff);
@@ -95,6 +92,7 @@ public class DexFileReader {
         readAnnotationSetRefList();
         readAnnotationSetItem();
         readEncodedArrayItems();
+        readCodeItems();
     }
 
     private void readDebugInfoItems() throws IOException {
@@ -123,6 +121,15 @@ public class DexFileReader {
         throw new UnsupportedOperationException();
     }
 
+    private void readCodeItems() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_CODE_ITEM);
+        if (item == null) {
+            return;
+        }
+
+        codeItems = readArray(item.size, _CodeItem.class, this, raf);
+    }
+
     private void readStringDataItems() throws IOException {
         _MapItem item = getMapItem(ItemType.TYPE_STRING_DATA_ITEM);
         if (item == null) {
@@ -142,7 +149,6 @@ public class DexFileReader {
         raf.seek(item.offset);
         classDataItems = readArray(item.size, _ClassDataItem.class, this, raf);
     }
-
 
     static class _StringDataItem extends Streamable {
         int size;
@@ -180,9 +186,48 @@ public class DexFileReader {
 
 
     public void write(File output) throws IOException {
-        FileOutputStream os = new FileOutputStream(output);
-        dexFile.writeTo(os, new PrintWriter(System.err), false);
-        os.close();
+        RandomAccessFile raf = new RandomAccessFile(output, "rw");
+        headerItem.write(raf);
+        mapList.write(raf);
+
+        for (_MapItem item : mapList.list) {
+            switch(item.getItemType()) {
+            case TYPE_HEADER_ITEM:
+                continue;
+            case TYPE_MAP_LIST:
+                continue;
+            case TYPE_STRING_ID_ITEM:
+                writeArray(stringIdItems, raf);
+                break;
+            case TYPE_TYPE_ID_ITEM:
+                writeArray(typeIdItems, raf);
+                break;
+            case TYPE_PROTO_ID_ITEM:
+                writeArray(protoIdItems, raf);
+                break;
+            case TYPE_FIELD_ID_ITEM:
+                writeArray(fieldIdItems, raf);
+                break;
+            case TYPE_METHOD_ID_ITEM:
+                writeArray(methodIdItems, raf);
+                break;
+            case TYPE_CLASS_DEF_ITEM:
+                writeArray(classDefItems, raf);
+                break;
+            case TYPE_CODE_ITEM:
+                writeArray(codeItems, raf);
+                break;
+            case TYPE_STRING_DATA_ITEM:
+                writeArray(stringDataItems, raf);
+                break;
+            case TYPE_CLASS_DATA_ITEM:
+                writeArray(classDataItems, raf);
+                break;
+            default:
+                throw new RuntimeException("unsupported type: " + item.getItemType().toString());
+            }
+        }
+        raf.close();
     }
 
     String getString(long idx) throws IOException {
@@ -250,6 +295,15 @@ public class DexFileReader {
 
         public _MapItem(DexFileReader dexFileReader) {
             super(dexFileReader);
+        }
+
+        public ItemType getItemType() {
+            for (ItemType _type : ItemType.values()) {
+                if (_type.getMapValue() == type) {
+                    return _type;
+                }
+            }
+            throw new RuntimeException("unknown type");
         }
     }
 
@@ -430,16 +484,6 @@ public class DexFileReader {
             readObject(raf);
         }
 
-        public ClassDefItem toClassDefItem() throws IOException {
-            return new ClassDefItem(
-                    new CstType(
-                            Type.intern(
-                                    dexFileReader.nameProvider.rename(dexFileReader.typeIdItems[classIdx].getString()))),
-                    (int) accessFlags,
-                    new CstType(Type.intern(dexFileReader.typeIdItems[superclassIdx].getString())),
-                    StdTypeList.EMPTY, // TODO: fill list
-                    new CstString(dexFileReader.getString(sourceFileIdx)));
-        }
     }
 
     static <T extends Streamable> T[] readArray(int size, Class<T> klass, Object parent, RandomAccessFile raf) throws IOException {
@@ -468,6 +512,12 @@ public class DexFileReader {
             ret[i].read(raf);
         }
         return ret;
+    }
+
+    static <T extends Streamable> void writeArray(T[] ts, RandomAccessFile raf) throws IOException  {
+        for (int i = 0; i < ts.length; i++) {
+            ts[i].write(raf);
+        }
     }
 
     static class StringIdItem extends Streamable {

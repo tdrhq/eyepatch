@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch.renamer;
 
+import android.util.Log;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
@@ -25,7 +26,7 @@ public abstract class Streamable {
 
     public void write(RandomAccessFile output) throws IOException {
         writeOffset = output.getFilePointer();
-        writeImpl();
+        writeImpl(output);
     }
 
     final protected void readObject(RandomAccessFile raf) throws IOException {
@@ -69,11 +70,56 @@ public abstract class Streamable {
         }
     }
 
+    final protected void writeObject(RandomAccessFile raf) throws IOException {
+        Log.i("Streamable", "Writing object: " + this.toString());
+        Class klass = this.getClass();
+        List<Field> fields = AnnotationUtil.getAnnotatedFields(klass);
+
+        for (Field f : fields) {
+            try {
+                if (f.getType() == int.class) {
+                    if (f.getAnnotation(F.class).uleb()) {
+                        RafUtil.writeULeb128(raf, (int) f.get(this));
+                    } else {
+                        RafUtil.writeUInt(raf, (int) f.get(this));
+                    }
+                } else if (f.getType() == short.class) {
+                    RafUtil.writeUShort(raf, (short) f.get(this));
+                } else if (f.getType() == byte[].class) {
+                    byte[] arr = (byte[]) f.get(this);
+                    raf.write(arr);
+                } else if (f.getType() == short[].class) {
+                    RafUtil.writeShortArray(raf, (short[]) f.get(this));
+                } else if (f.getType().isArray()) {
+                    Class type = f.getType();
+                    Class<? extends Streamable> componentType =
+                            (Class<? extends Streamable>) type.getComponentType();
+                    int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
+
+                    Object[] values = (Object[]) f.get(this);
+
+                    if (size != values.length) {
+                        throw new RuntimeException("array size doesn't match");
+                    }
+
+                    for (int i = 0; i < size; i++) {
+                        ((Streamable) values[i]).write(raf);
+                    }
+                } else {
+                    throw new UnsupportedOperationException("Type is: " + f.getType().toString());
+                }
+
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     protected void readImpl(RandomAccessFile raf) throws IOException {
         readObject(raf);
     }
 
-    public void writeImpl() throws IOException {
-        throw new UnsupportedOperationException();
+    public void writeImpl(RandomAccessFile raf) throws IOException {
+        writeObject(raf);
     }
 }
