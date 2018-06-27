@@ -208,22 +208,20 @@ public class DexFileReader {
     }
 
     class _EncodedField extends Streamable {
-        @F(idx=1, uleb=true) long fieldIdxDiff;
-        @F(idx=2, uleb=true) long accessFlags;
+        @F(idx=1, uleb=true) int fieldIdxDiff;
+        @F(idx=2, uleb=true) int accessFlags;
     }
 
     class _EncodedMethod extends Streamable {
-        long methodIdxDiff;
-        long accessFlags;
-        long codeOff;
+        @F(idx=1, uleb=true) int methodIdxDiff;
+        @F(idx=2, uleb=true) int accessFlags;
+        @F(idx=3, uleb=true) int codeOff;
 
         // substructures
         _CodeItem codeItem;
 
         public void readImpl() throws IOException {
-            methodIdxDiff = readULeb128();
-            accessFlags = readULeb128();
-            codeOff = readULeb128();
+            readObject();
 
             long mark = raf.getFilePointer();
             raf.seek(codeOff);
@@ -492,6 +490,9 @@ public class DexFileReader {
             Arrays.sort(fields, new Comparator<Field>() {
                 @Override
                 public int compare(Field field, Field t1) {
+                    if (getIndex(field) == getIndex(t1) && getIndex(field) >= 0) {
+                        throw new RuntimeException("multiple fields have the same index");
+                    }
                     return getIndex(field) - getIndex(t1);
                 }
             });
