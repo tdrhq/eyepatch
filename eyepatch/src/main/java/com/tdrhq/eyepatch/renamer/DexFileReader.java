@@ -515,12 +515,23 @@ public class DexFileReader {
 
     public abstract class Streamable {
         private long origOffset = -1;
+        private long writeOffset = -1;
 
         public void read() throws IOException {
             origOffset = raf.getFilePointer();
             readImpl();
         }
+
+        public void write(RandomAccessFile output) throws IOException {
+            writeOffset = output.getFilePointer();
+            writeImpl();
+        }
+
         abstract void readImpl() throws IOException;
+
+        public void writeImpl() throws IOException {
+            throw new UnsupportedOperationException();
+        }
     }
 
     class _FieldIdItem extends Streamable {
