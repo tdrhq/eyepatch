@@ -57,6 +57,7 @@ public class DexFileReader {
         dexFile = new DexFile(new DexOptions());
         raf = new RandomAccessFile(file, "r");
         headerItem = new HeaderItem();
+        raf.seek(0);
         headerItem.read();
 
         mapList = new _MapList();
@@ -173,7 +174,6 @@ public class DexFileReader {
         int methodIdsOff;
 
         public void readImpl() throws IOException {
-            raf.seek(0);
             raf.read(magic);
             checksum = readUInt();
             raf.read(signature);
