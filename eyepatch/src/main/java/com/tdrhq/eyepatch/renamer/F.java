@@ -11,4 +11,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface F {
     int idx();
+    int sizeIdx() default -10;
 }

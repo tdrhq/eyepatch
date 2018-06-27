@@ -184,12 +184,8 @@ public class DexFileReader {
     }
 
     class _MapList extends Streamable {
-        int size;
-        _MapItem[] list;
-        public void readImpl() throws IOException {
-            size = readUInt();
-            list = readArray(size, _MapItem.class);
-        }
+        @F(idx=1) int size;
+        @F(idx=2, sizeIdx=1) _MapItem[] list;
     }
 
     class _MapItem extends Streamable {
@@ -491,6 +487,14 @@ public class DexFileReader {
             writeImpl();
         }
 
+        private int getIndex(Field field) {
+            F f = field.getAnnotation(F.class);
+            if (f == null) {
+                return -1;
+            }
+            return f.idx();
+        }
+
         void readObject() throws IOException {
             Class klass = this.getClass();
             if (klass == Streamable.class) {
@@ -501,14 +505,6 @@ public class DexFileReader {
                 @Override
                 public int compare(Field field, Field t1) {
                     return getIndex(field) - getIndex(t1);
-                }
-
-                private int getIndex(Field field) {
-                    F f = field.getAnnotation(F.class);
-                    if (f == null) {
-                        return -1;
-                    }
-                    return f.idx();
                 }
             });
 
@@ -525,7 +521,23 @@ public class DexFileReader {
                             throw new NullPointerException();
                         }
                         raf.read(arr);
-                    } else {
+                    } else if (f.getType().isArray()) {
+                        Class type = f.getType();
+                        Class<? extends Streamable> componentType =
+                                (Class<? extends Streamable>) type.getComponentType();
+                        int size = -1;
+                        int sizeIdx = f.getAnnotation(F.class).sizeIdx();
+                        for (Field sizeField : fields) {
+                            if (getIndex(sizeField) == sizeIdx) {
+                                size = (int) sizeField.get(this);
+                            }
+                        }
+                        if (size == -1) {
+                            throw new RuntimeException("could not find index: " + sizeIdx);
+                        }
+                        f.set(this, readArray(size, componentType));
+                    }
+                    else {
                         throw new UnsupportedOperationException();
                     }
                 } catch (IllegalAccessException e) {
