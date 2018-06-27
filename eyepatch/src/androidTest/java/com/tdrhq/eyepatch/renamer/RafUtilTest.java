@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import java.io.EOFException;
 import java.io.RandomAccessFile;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +39,24 @@ public class RafUtilTest {
         RafUtil.writeULeb128(raf, a);
         raf.seek(0);
         assertEquals(5256, RafUtil.readULeb128(raf));
+    }
+
+    @Test
+    public void testInOutIntULebZero() throws Throwable {
+        int a = 0;
+        RandomAccessFile raf = new RandomAccessFile(tmpdir.newFile("foo"), "rw");
+        RafUtil.writeULeb128(raf, a);
+        raf.seek(0);
+        assertEquals((byte) 0, raf.readByte());
+        try {
+            raf.readByte();
+            fail("expeced exception");
+        } catch (EOFException e) {
+            // expected
+        }
+        raf.seek(0);
+
+        assertEquals(0, RafUtil.readULeb128(raf));
     }
 
     @Test
