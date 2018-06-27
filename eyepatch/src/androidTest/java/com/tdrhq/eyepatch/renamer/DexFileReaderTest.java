@@ -100,22 +100,8 @@ public class DexFileReaderTest {
     public void testMapOff() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
-        _MapList  mapList = reader.mapList;
-        int off = -1;
-        int classDefsOff = -1;
-        for (int i = 0; i < mapList.size; i++) {
-            if (mapList.list[i].type == ItemType.TYPE_STRING_ID_ITEM.getMapValue()) {
-                off = mapList.list[i].offset;
-            }
-
-            if (mapList.list[i].type == ItemType.TYPE_CLASS_DEF_ITEM.getMapValue()) {
-                classDefsOff = mapList.list[i].offset;
-            }
-
-        }
-
-        assertEquals(0x70, off);
-        assertEquals(0xac, classDefsOff);
+        assertEquals(0x70, reader.getMapItem(ItemType.TYPE_STRING_ID_ITEM).offset);
+        assertEquals(0xac, reader.getMapItem(ItemType.TYPE_CLASS_DEF_ITEM).offset);
     }
 
     @Test

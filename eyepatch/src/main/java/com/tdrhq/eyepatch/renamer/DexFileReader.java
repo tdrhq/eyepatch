@@ -8,6 +8,7 @@ import com.android.dex.util.ByteInput;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
+import com.android.dx.dex.file.ItemType;
 import com.android.dx.rop.cst.CstString;
 import com.android.dx.rop.cst.CstType;
 import com.android.dx.rop.type.StdTypeList;
@@ -148,6 +149,15 @@ public class DexFileReader {
             classDefsSize = readUInt();
             classDefsOff = readUInt();
         }
+    }
+
+    _MapItem getMapItem(ItemType itemType) {
+        for (int i = 0; i < mapList.size; i++) {
+            if (mapList.list[i].type == itemType.getMapValue()) {
+                return mapList.list[i];
+            }
+        }
+        return null;
     }
 
     class _MapList implements Streamable {
