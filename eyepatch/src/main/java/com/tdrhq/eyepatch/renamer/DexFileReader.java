@@ -89,6 +89,15 @@ public class DexFileReader {
     }
 
     class HeaderItem implements Streamable {
+        byte[] magic;
+        int checksum;
+        byte[] signature;
+        int fileSize;
+        int headerSize;
+        int endianTag;
+        int linkSize;
+        int linkOff;
+        int mapOff;
         long stringIdsSize;
         long stringIdsOff;
         long classDefsSize;
@@ -104,12 +113,18 @@ public class DexFileReader {
 
         public void read() throws IOException {
             raf.seek(0);
-            raf.skipBytes(8); // magic
-            raf.readInt();    // checksum
-            raf.skipBytes(20); // signature
-            for (int i = 0; i < 6; i++) {
-                raf.readInt(); // bunch of stuff
-            }
+            magic = new byte[8];
+            raf.read(magic);
+            checksum = readUInt();
+            signature = new byte[20];
+            raf.read(signature);
+            fileSize = readUInt();
+            headerSize = readUInt();
+            endianTag = readUInt();
+            linkSize = readUInt();
+            linkOff = readUInt();
+            mapOff = readUInt();
+
             stringIdsSize = readUInt();
             stringIdsOff = readUInt();
 
