@@ -409,40 +409,12 @@ public class DexFileReader {
             writeImpl();
         }
 
-        private int getIndex(Field field) {
-            F f = field.getAnnotation(F.class);
-            if (f == null) {
-                return -1;
-            }
-            return f.idx();
-        }
-
-        List<Field> getAnnotatedFields(Class klass) {
-            Field[] fields = klass.getDeclaredFields();
-            Arrays.sort(fields, new Comparator<Field>() {
-                @Override
-                public int compare(Field field, Field t1) {
-                    if (getIndex(field) == getIndex(t1) && getIndex(field) >= 0) {
-                        throw new RuntimeException("multiple fields have the same index");
-                    }
-                    return getIndex(field) - getIndex(t1);
-                }
-            });
-            List<Field> ret = new ArrayList<>();
-            for (Field field : fields) {
-                if (getIndex(field) >= 0) {
-                    ret.add(field);
-                }
-            }
-            return ret;
-        }
-
         void readObject() throws IOException {
             Class klass = this.getClass();
             if (klass == Streamable.class) {
                 throw new RuntimeException("unexpected");
             }
-            List<Field> fields = getAnnotatedFields(klass);
+            List<Field> fields = AnnotationUtil.getAnnotatedFields(klass);
             for (Field f : fields) {
                 try {
                     if (f.getType() == int.class) {
@@ -482,7 +454,7 @@ public class DexFileReader {
             int size = -1;
             int sizeIdx = f.getAnnotation(F.class).sizeIdx();
             for (Field sizeField : fields) {
-                if (getIndex(sizeField) == sizeIdx) {
+                if (AnnotationUtil.getIndex(sizeField) == sizeIdx) {
                     size = (int) sizeField.get(this);
                 }
             }
