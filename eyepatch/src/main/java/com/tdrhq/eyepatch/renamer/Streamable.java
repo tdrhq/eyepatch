@@ -28,7 +28,7 @@ public abstract class Streamable {
         writeImpl();
     }
 
-    void readObject(RandomAccessFile raf) throws IOException {
+    final protected void readObject(RandomAccessFile raf) throws IOException {
         Class klass = this.getClass();
         if (klass == Streamable.class) {
             throw new RuntimeException("unexpected");
