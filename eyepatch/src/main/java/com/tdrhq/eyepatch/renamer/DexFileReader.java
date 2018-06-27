@@ -294,10 +294,10 @@ public class DexFileReader {
     }
 
     class _ClassDataItem {
-        long staticFieldsSize;
-        long instanceFieldsSize;
-        long directMethodsSize;
-        long virtualMethodsSize;
+        int staticFieldsSize;
+        int instanceFieldsSize;
+        int directMethodsSize;
+        int virtualMethodsSize;
 
         _EncodedField[] staticFields;
         _EncodedField[] instanceFields;
