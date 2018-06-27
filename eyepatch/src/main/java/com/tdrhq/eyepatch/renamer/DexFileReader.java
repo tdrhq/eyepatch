@@ -524,8 +524,8 @@ public class DexFileReader {
     }
 
     class _MethodIdItem extends Streamable {
-        int classIdx;
-        int protoIdx;
+        short classIdx;
+        short protoIdx;
         int nameIdx;
 
         public void readImpl() throws IOException {
