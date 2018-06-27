@@ -518,8 +518,8 @@ public class DexFileReader {
     }
 
     class _FieldIdItem extends Streamable {
-        int classIdx;
-        int typeIdx;
+        short classIdx;
+        short typeIdx;
         int nameIdx;
 
         public void readImpl() throws IOException {
