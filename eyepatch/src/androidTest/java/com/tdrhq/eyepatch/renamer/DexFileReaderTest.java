@@ -32,7 +32,7 @@ public class DexFileReaderTest {
     private NameProvider nameProvider = new NameProvider() {
             @Override
             public String rename(String input) {
-                return input.replace(";", "_suffix;");
+                return input;
             }
         };
 
@@ -117,7 +117,7 @@ public class DexFileReaderTest {
         reader.write(output);
 
         Class FooClass = Util.loadDexFile(output)
-                .loadClass("com.foo.Foo_suffix", classLoader);
+                .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
     }
 
