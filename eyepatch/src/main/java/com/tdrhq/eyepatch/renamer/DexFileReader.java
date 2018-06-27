@@ -20,7 +20,10 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Reads a {@code DexFile} from the given file.
@@ -398,28 +401,21 @@ public class DexFileReader {
     }
 
     class _ClassDefItem extends Streamable {
-        int classIdx;
-        int accessFlags;
-        int superclassIdx;
-        int interfacesOff;
-        int sourceFileIdx;
-        int annotationsOff;
-        int classDataOff;
-        int staticValuesOff;
+        @F(idx=1) int classIdx;
+        @F(idx=2) int accessFlags;
+        @F(idx=3) int superclassIdx;
+        @F(idx=4) int interfacesOff;
+        @F(idx=5) int sourceFileIdx;
+        @F(idx=6) int annotationsOff;
+        @F(idx=7) int classDataOff;
+        @F(idx=8) int staticValuesOff;
 
         // substructurs
         _ClassDataItem classDataItem;
 
 
         public void readImpl() throws IOException {
-            classIdx = readUInt();
-            accessFlags = readUInt();
-            superclassIdx = readUInt();
-            interfacesOff = readUInt();
-            sourceFileIdx = readUInt();
-            annotationsOff = readUInt();
-            classDataOff = readUInt();
-            staticValuesOff = readUInt();
+            readObject();
 
             long mark = raf.getFilePointer();
             raf.seek(classDataOff);
@@ -525,6 +521,43 @@ public class DexFileReader {
         public void write(RandomAccessFile output) throws IOException {
             writeOffset = output.getFilePointer();
             writeImpl();
+        }
+
+        void readObject() throws IOException {
+            Class klass = this.getClass();
+            if (klass == Streamable.class) {
+                throw new RuntimeException("unexpected");
+            }
+            Field[] fields = klass.getDeclaredFields();
+            Arrays.sort(fields, new Comparator<Field>() {
+                @Override
+                public int compare(Field field, Field t1) {
+                    return getIndex(field) - getIndex(t1);
+                }
+
+                private int getIndex(Field field) {
+                    F f = field.getAnnotation(F.class);
+                    if (f == null) {
+                        return -1;
+                    }
+                    return f.idx();
+                }
+            });
+
+            for (Field f : fields) {
+                if (f.getAnnotation(F.class) == null) {
+                    continue;
+                }
+                if (f.getType() == int.class) {
+                    try {
+                        f.set(this, readUInt());
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            }
         }
 
         abstract void readImpl() throws IOException;
