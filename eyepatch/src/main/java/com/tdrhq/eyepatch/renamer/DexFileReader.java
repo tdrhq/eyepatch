@@ -293,37 +293,16 @@ public class DexFileReader {
         @F(idx=1, uleb=true) long addr;
     }
 
-    class _ClassDataItem {
-        int staticFieldsSize;
-        int instanceFieldsSize;
-        int directMethodsSize;
-        int virtualMethodsSize;
+    class _ClassDataItem extends Streamable {
+        @F(idx=1, uleb=true) int staticFieldsSize;
+        @F(idx=2, uleb=true) int instanceFieldsSize;
+        @F(idx=3, uleb=true) int directMethodsSize;
+        @F(idx=4, uleb=true) int virtualMethodsSize;
 
-        _EncodedField[] staticFields;
-        _EncodedField[] instanceFields;
-        _EncodedMethod[] directMethods;
-        _EncodedMethod[] virtualMethods;
-
-        public void read() throws IOException {
-            staticFieldsSize = readULeb128();
-            instanceFieldsSize = readULeb128();
-            directMethodsSize = readULeb128();
-            virtualMethodsSize = readULeb128();
-
-            staticFields = readEncodedFields((int) staticFieldsSize);
-            instanceFields = readEncodedFields((int) instanceFieldsSize);
-
-            directMethods = readEncodedMethods((int) directMethodsSize);
-            virtualMethods = readEncodedMethods((int) virtualMethodsSize);
-        }
-
-        _EncodedField[]  readEncodedFields(int size) throws IOException {
-            return readArray(size, _EncodedField.class);
-        }
-
-        _EncodedMethod[]  readEncodedMethods(int size) throws IOException {
-            return readArray(size, _EncodedMethod.class);
-        }
+        @F(idx=5, sizeIdx=1) _EncodedField[] staticFields;
+        @F(idx=6, sizeIdx=2) _EncodedField[] instanceFields;
+        @F(idx=7, sizeIdx=3) _EncodedMethod[] directMethods;
+        @F(idx=8, sizeIdx=4) _EncodedMethod[] virtualMethods;
     }
 
     class _ClassDefItem extends Streamable {
