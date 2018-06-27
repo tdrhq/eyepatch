@@ -46,6 +46,7 @@ public class DexFileReader {
     _MapList mapList = null;
     _DebugInfoItem[] debugInfoItems;
     _StringDataItem[] stringDataItems;
+    _ClassDataItem[] classDataItems;
 
     private DexFile dexFile;
     public void read() throws IOException {
@@ -77,6 +78,8 @@ public class DexFileReader {
         for (int i = 0; i < headerItem.classDefsSize; i++) {
             dexFile.add(classDefItems[i].toClassDefItem());
         }
+
+        readClassDataItems();
 
         raf.seek(headerItem.fieldIdsOff);
         fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class, this, raf);
@@ -129,6 +132,17 @@ public class DexFileReader {
         raf.seek(item.offset);
         stringDataItems = readArray(item.size, _StringDataItem.class, this, raf);
     }
+
+    private void readClassDataItems() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_CLASS_DATA_ITEM);
+        if (item == null) {
+            throw new RuntimeException("could not find data items");
+        }
+
+        raf.seek(item.offset);
+        classDataItems = readArray(item.size, _ClassDataItem.class, this, raf);
+    }
+
 
     static class _StringDataItem extends Streamable {
         int size;
