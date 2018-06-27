@@ -87,13 +87,13 @@ public class DexFileReaderTest {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
         assertEquals(0xe4, reader.stringIdItems[0].stringDataOff);
-        assertEquals("Foo.generated", reader.stringIdItems[0].getString());
-        assertEquals("L", reader.stringIdItems[1].getString());
-        assertEquals("Lcom/foo/Foo;", reader.stringIdItems[2].getString());
-        assertEquals("Ljava/lang/Object;", reader.stringIdItems[3].getString());
-        assertEquals("Ljava/lang/String;", reader.stringIdItems[4].getString());
-        assertEquals("getBar", reader.stringIdItems[5].getString());
-        assertEquals("zoidberg", reader.stringIdItems[6].getString());
+        assertEquals("Foo.generated", reader.getString(0));
+        assertEquals("L", reader.getString(1));
+        assertEquals("Lcom/foo/Foo;", reader.getString(2));
+        assertEquals("Ljava/lang/Object;", reader.getString(3));
+        assertEquals("Ljava/lang/String;", reader.getString(4));
+        assertEquals("getBar", reader.getString(5));
+        assertEquals("zoidberg", reader.getString(6));
     }
 
     @Test

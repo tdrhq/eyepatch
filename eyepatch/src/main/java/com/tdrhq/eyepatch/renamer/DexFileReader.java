@@ -18,9 +18,7 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 /**
  * Reads a {@code DexFile} from the given file.
@@ -39,7 +37,7 @@ public class DexFileReader {
 
     HeaderItem headerItem = null;
     StringIdItem[] stringIdItems = null;
-    RandomAccessFile raf;
+    private RandomAccessFile raf;
     _ClassDefItem[] classDefItems = null;
     _TypeIdItem[] typeIdItems = null;
     _FieldIdItem[] fieldIdItems = null;
@@ -47,6 +45,7 @@ public class DexFileReader {
     _ProtoIdItem[] protoIdItems = null;
     _MapList mapList = null;
     _DebugInfoItem[] debugInfoItems;
+    _StringDataItem[] stringDataItems;
 
     private DexFile dexFile;
     public void read() throws IOException {
@@ -55,11 +54,11 @@ public class DexFileReader {
         raf = new RandomAccessFile(file, "r");
         headerItem = new HeaderItem(this);
         raf.seek(0);
-        headerItem.read();
+        headerItem.read(raf);
 
         mapList = new _MapList(this);
         raf.seek(headerItem.mapOff);
-        mapList.read();
+        mapList.read(raf);
 
         raf.seek(headerItem.stringIdsOff);
         stringIdItems = readArray(
@@ -67,6 +66,7 @@ public class DexFileReader {
                 StringIdItem.class,
                 this,
                 raf);
+        readStringDataItems();
 
         raf.seek(headerItem.typeIdsOff);
         typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class, this, raf);
@@ -120,6 +120,32 @@ public class DexFileReader {
         throw new UnsupportedOperationException();
     }
 
+    private void readStringDataItems() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_STRING_DATA_ITEM);
+        if (item == null) {
+            throw new RuntimeException("could not find data items");
+        }
+
+        raf.seek(item.offset);
+        stringDataItems = readArray(item.size, _StringDataItem.class, this, raf);
+    }
+
+    static class _StringDataItem extends Streamable {
+        int size;
+        String decoded;
+
+        public _StringDataItem(DexFileReader dexFileReader) {
+            super(dexFileReader);
+        }
+
+        @Override
+        public void readImpl(RandomAccessFile raf) throws IOException {
+            size = RafUtil.readULeb128(raf);
+            char[] data = new char[size];
+            decoded = Mutf8.decode(new MyByteInput(raf), data);
+        }
+    }
+
     private void readAnnotationSetItem() throws IOException {
         _MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_ITEM);
         if (item == null) {
@@ -146,7 +172,14 @@ public class DexFileReader {
     }
 
     String getString(long idx) throws IOException {
-        return stringIdItems[(int) idx].getString();
+        long off = stringIdItems[(int) idx].stringDataOff;
+        for (_StringDataItem  dataItem : stringDataItems) {
+            if (dataItem.getOrigOffset() == off) {
+                return dataItem.decoded;
+            }
+        }
+
+        throw new RuntimeException("could not find data for this string");
     }
 
     static class HeaderItem extends Streamable {
@@ -213,7 +246,8 @@ public class DexFileReader {
             super(dexFileReader);
         }
 
-        public void readImpl() throws IOException {
+        @Override
+        public void readImpl(RandomAccessFile raf) throws IOException {
             descriptorIdx = RafUtil.readUInt(raf);
         }
 
@@ -243,13 +277,13 @@ public class DexFileReader {
             super(dexFileReader);
         }
 
-        public void readImpl() throws IOException {
-            readObject();
+        public void readImpl(RandomAccessFile raf) throws IOException {
+            readObject(raf);
 
             long mark = raf.getFilePointer();
             raf.seek(codeOff);
             codeItem = new _CodeItem(dexFileReader);
-            codeItem.read();
+            codeItem.read(raf);
             raf.seek(mark);
         }
     }
@@ -271,14 +305,15 @@ public class DexFileReader {
             super(dexFileReader);
         }
 
-        public void readImpl() throws IOException {
-            readObject();
+        @Override
+        public void readImpl(RandomAccessFile raf) throws IOException {
+            readObject(raf);
             padding = RafUtil.readUShort(raf);
             tryItems = readArray(triesSize, _TryItem.class, dexFileReader, raf);
 
             if (triesSize != 0) {
                 encodedCatchHandlerList = new _EncodedCatchHandlerList(dexFileReader);
-                encodedCatchHandlerList.read();
+                encodedCatchHandlerList.read(raf);
             }
         }
     }
@@ -311,7 +346,7 @@ public class DexFileReader {
         }
 
         @Override
-        public void readImpl() throws IOException {
+        public void readImpl(RandomAccessFile raf) throws IOException {
             size = RafUtil.readSLeb128(raf);
 
             // handle negative numbers here.
@@ -369,13 +404,14 @@ public class DexFileReader {
         }
 
 
-        public void readImpl() throws IOException {
-            readObject();
+        @Override
+        public void readImpl(RandomAccessFile raf) throws IOException {
+            readObject(raf);
 
             long mark = raf.getFilePointer();
             raf.seek(classDataOff);
             classDataItem = new _ClassDataItem(dexFileReader);
-            classDataItem.read();
+            classDataItem.read(raf);
             raf.seek(mark);
 
         }
@@ -392,7 +428,7 @@ public class DexFileReader {
         }
     }
 
-    private static <T extends Streamable> T[] readArray(int size, Class<T> klass, Object parent, RandomAccessFile raf) throws IOException {
+    static <T extends Streamable> T[] readArray(int size, Class<T> klass, Object parent, RandomAccessFile raf) throws IOException {
         T[] ret = (T[]) Array.newInstance(klass, size);
         for (int i = 0; i < size; i ++) {
             try {
@@ -415,7 +451,7 @@ public class DexFileReader {
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-            ret[i].read();
+            ret[i].read(raf);
         }
         return ret;
     }
@@ -425,85 +461,6 @@ public class DexFileReader {
 
         public StringIdItem(DexFileReader reader) {
             super(reader);
-        }
-
-        public String getString() throws IOException {
-            raf.seek(stringDataOff);
-            long len = RafUtil.readULeb128(raf);
-            char[] data = new char[(int) len];
-            return Mutf8.decode(new MyByteInput(raf), data);
-        }
-    }
-
-
-    public abstract static class Streamable {
-        private long origOffset = -1;
-        private long writeOffset = -1;
-        protected DexFileReader dexFileReader;
-        protected RandomAccessFile raf;
-
-        public Streamable(DexFileReader dexFileReader) {
-            this.dexFileReader = dexFileReader;
-            this.raf = dexFileReader.raf;
-        }
-
-        public void read() throws IOException {
-            origOffset = dexFileReader.raf.getFilePointer();
-            readImpl();
-        }
-
-        public void write(RandomAccessFile output) throws IOException {
-            writeOffset = output.getFilePointer();
-            writeImpl();
-        }
-
-        void readObject() throws IOException {
-            Class klass = this.getClass();
-            if (klass == Streamable.class) {
-                throw new RuntimeException("unexpected");
-            }
-            List<Field> fields = AnnotationUtil.getAnnotatedFields(klass);
-            for (Field f : fields) {
-                try {
-                    if (f.getType() == int.class) {
-                        if (f.getAnnotation(F.class).uleb()) {
-                            f.set(this, RafUtil.readULeb128(dexFileReader.raf));
-                        } else {
-                            f.set(this, RafUtil.readUInt(dexFileReader.raf));
-                        }
-                    } else if (f.getType() == short.class) {
-                        f.set(this, RafUtil.readUShort(dexFileReader.raf));
-                    } else if (f.getType() == byte[].class) {
-                        byte[] arr = (byte[]) f.get(this);
-                        if (arr == null) {
-                            throw new NullPointerException();
-                        }
-                        dexFileReader.raf.read(arr);
-                    } else if (f.getType() == short[].class) {
-                        int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
-                        f.set(this, RafUtil.readShortArray(size, dexFileReader.raf));
-                    } else if (f.getType().isArray()) {
-                        Class type = f.getType();
-                        Class<? extends Streamable> componentType =
-                                (Class<? extends Streamable>) type.getComponentType();
-                        int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
-                        f.set(this, readArray(size, componentType, dexFileReader, dexFileReader.raf));
-                    }
-                    else {
-                        throw new UnsupportedOperationException();
-                    }
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        protected void readImpl() throws IOException {
-            readObject();
-        }
-
-        public void writeImpl() throws IOException {
-            throw new UnsupportedOperationException();
         }
     }
 
@@ -546,7 +503,8 @@ public class DexFileReader {
             super(dexFileReader);
         }
 
-        public void readImpl() throws IOException {
+        @Override
+        public void readImpl(RandomAccessFile raf) throws IOException {
             lineStart = RafUtil.readULeb128(raf);
             parametersSize = RafUtil.readULeb128(raf);
             parameterNames = new int[parametersSize];
