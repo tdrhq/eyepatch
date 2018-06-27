@@ -246,7 +246,7 @@ public class DexFileReader {
         public void readImpl() throws IOException {
             readObject();
             padding = RafUtil.readUShort(raf);
-            tryItems = readArray(triesSize, _TryItem.class, this, raf);
+            tryItems = readArray(triesSize, _TryItem.class, DexFileReader.this, raf);
 
             if (triesSize != 0) {
                 encodedCatchHandlerList = new _EncodedCatchHandlerList();
