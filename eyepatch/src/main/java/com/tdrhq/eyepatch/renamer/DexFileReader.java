@@ -64,26 +64,28 @@ public class DexFileReader {
         raf.seek(headerItem.stringIdsOff);
         stringIdItems = readArray(
                 (int) headerItem.stringIdsSize,
-                StringIdItem.class);
+                StringIdItem.class,
+                this,
+                raf);
 
         raf.seek(headerItem.typeIdsOff);
-        typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class);
+        typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class, this, raf);
 
         raf.seek(headerItem.classDefsOff);
-        classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class);
+        classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class, this, raf);
 
         for (int i = 0; i < headerItem.classDefsSize; i++) {
             dexFile.add(classDefItems[i].toClassDefItem());
         }
 
         raf.seek(headerItem.fieldIdsOff);
-        fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class);
+        fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class, this, raf);
 
         raf.seek(headerItem.methodIdsOff);
-        methodIdItems = readArray(headerItem.methodIdsSize, _MethodIdItem.class);
+        methodIdItems = readArray(headerItem.methodIdsSize, _MethodIdItem.class, this, raf);
 
         raf.seek(headerItem.protoIdsOff);
-        protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class);
+        protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class, this, raf);
 
         readDebugInfoItems();
         readTypeList();
@@ -98,7 +100,7 @@ public class DexFileReader {
             return;
         }
         raf.seek(item.offset);
-        debugInfoItems = readArray(item.size, _DebugInfoItem.class);
+        debugInfoItems = readArray(item.size, _DebugInfoItem.class, this, raf);
     }
 
     private void readTypeList() throws IOException {
@@ -244,7 +246,7 @@ public class DexFileReader {
         public void readImpl() throws IOException {
             readObject();
             padding = RafUtil.readUShort(raf);
-            tryItems = readArray(triesSize, _TryItem.class);
+            tryItems = readArray(triesSize, _TryItem.class, this, raf);
 
             if (triesSize != 0) {
                 encodedCatchHandlerList = new _EncodedCatchHandlerList();
@@ -279,7 +281,7 @@ public class DexFileReader {
                 throw new RuntimeException("unexpected: " + size);
             }
 
-            handlers = readArray(Math.abs((int) size), _EncodedTypeAddrPair.class);
+            handlers = readArray(Math.abs((int) size), _EncodedTypeAddrPair.class, this, raf);
             catchAllAddr = RafUtil.readULeb128(raf);
         }
 
@@ -339,12 +341,12 @@ public class DexFileReader {
         }
     }
 
-    private <T extends Streamable> T[] readArray(int size, Class<T> klass) throws IOException {
+    private static <T extends Streamable> T[] readArray(int size, Class<T> klass, Object parent, RandomAccessFile raf) throws IOException {
         T[] ret = (T[]) Array.newInstance(klass, size);
         for (int i = 0; i < size; i ++) {
             try {
-                Constructor cons = klass.getDeclaredConstructor(DexFileReader.class);
-                ret[i] = (T) cons.newInstance(this);
+                Constructor cons = klass.getDeclaredConstructor(parent.getClass());
+                ret[i] = (T) cons.newInstance(parent);
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -415,7 +417,7 @@ public class DexFileReader {
                         Class<? extends Streamable> componentType =
                                 (Class<? extends Streamable>) type.getComponentType();
                         int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
-                        f.set(this, readArray(size, componentType));
+                        f.set(this, readArray(size, componentType, DexFileReader.this, raf));
                     }
                     else {
                         throw new UnsupportedOperationException();
