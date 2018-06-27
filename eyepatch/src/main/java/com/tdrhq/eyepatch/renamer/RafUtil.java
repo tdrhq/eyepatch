@@ -28,6 +28,10 @@ public class RafUtil {
         return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }
 
+    public static void writeULeb128(RandomAccessFile raf, int value) throws IOException {
+        Leb128.writeUnsignedLeb128(new MyByteOutput(raf), value);
+    }
+
     public static int readSLeb128(RandomAccessFile raf) throws IOException {
         return Leb128.readSignedLeb128(new MyByteInput(raf));
     }

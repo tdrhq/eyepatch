@@ -21,4 +21,12 @@ public class RafUtilTest {
         assertEquals(5256, RafUtil.readUInt(raf));
     }
 
+    @Test
+    public void testInOutIntULeb() throws Throwable {
+        int a = 5256;
+        RandomAccessFile raf = new RandomAccessFile(tmpdir.newFile("foo"), "rw");
+        RafUtil.writeULeb128(raf, a);
+        raf.seek(0);
+        assertEquals(5256, RafUtil.readULeb128(raf));
+    }
 }
