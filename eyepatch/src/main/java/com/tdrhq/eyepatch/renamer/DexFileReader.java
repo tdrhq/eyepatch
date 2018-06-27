@@ -150,9 +150,9 @@ public class DexFileReader {
     }
 
     class HeaderItem extends Streamable {
-        byte[] magic;
+        byte[] magic = new byte[8];
         int checksum;
-        byte[] signature;
+        byte[] signature = new byte[20];
         int fileSize;
         int headerSize;
         int endianTag;
@@ -174,10 +174,8 @@ public class DexFileReader {
 
         public void readImpl() throws IOException {
             raf.seek(0);
-            magic = new byte[8];
             raf.read(magic);
             checksum = readUInt();
-            signature = new byte[20];
             raf.read(signature);
             fileSize = readUInt();
             headerSize = readUInt();
