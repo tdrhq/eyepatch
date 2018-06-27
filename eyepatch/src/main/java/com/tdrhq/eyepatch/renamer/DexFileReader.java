@@ -159,10 +159,10 @@ public class DexFileReader {
         int linkSize;
         int linkOff;
         int mapOff;
-        long stringIdsSize;
-        long stringIdsOff;
-        long classDefsSize;
-        long classDefsOff;
+        int stringIdsSize;
+        int stringIdsOff;
+        int classDefsSize;
+        int classDefsOff;
         int typeIdsSize;
         int typeIdsOff;
         int protoIdsSize;
