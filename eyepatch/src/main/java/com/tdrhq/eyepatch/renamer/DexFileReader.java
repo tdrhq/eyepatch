@@ -257,25 +257,14 @@ public class DexFileReader {
     }
 
     class _TryItem extends Streamable {
-        int startAddr;
-        short insnCount;
-        short handlerOff;
-
-        public void readImpl() throws IOException {
-            startAddr = readUInt();
-            insnCount = readUShort();
-            handlerOff = readUShort();
-        }
+        @F(idx=1) int startAddr;
+        @F(idx=2) short insnCount;
+        @F(idx=3) short handlerOff;
     }
 
-    class _EncodedCatchHandlerList {
-        long size;
-        _EncodedCatchHandler[] list;
-
-        public void read() throws IOException {
-            size = readULeb128();
-            list = readArray((int) size, _EncodedCatchHandler.class);
-        }
+    class _EncodedCatchHandlerList extends Streamable {
+        @F(idx=1, uleb=true) int size;
+        @F(idx=2, sizeIdx=1) _EncodedCatchHandler[] list;
     }
 
     class _EncodedCatchHandler extends Streamable {
