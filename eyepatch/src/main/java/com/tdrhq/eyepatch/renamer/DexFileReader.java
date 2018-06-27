@@ -345,8 +345,13 @@ public class DexFileReader {
         T[] ret = (T[]) Array.newInstance(klass, size);
         for (int i = 0; i < size; i ++) {
             try {
-                Constructor cons = klass.getDeclaredConstructor(parent.getClass());
-                ret[i] = (T) cons.newInstance(parent);
+                try {
+                    Constructor cons = klass.getDeclaredConstructor();
+                    ret[i] = (T) cons.newInstance();
+                } catch (NoSuchMethodException e) {
+                    Constructor cons = klass.getDeclaredConstructor(parent.getClass());
+                    ret[i] = (T) cons.newInstance(parent);
+                }
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
