@@ -46,6 +46,7 @@ public class DexFileReader {
     _MethodIdItem[] methodIdItems = null;
     _ProtoIdItem[] protoIdItems = null;
     _MapList mapList = null;
+    _DebugInfoItem[] debugInfoItems;
 
     private DexFile dexFile;
     public void read() throws IOException {
@@ -82,6 +83,17 @@ public class DexFileReader {
 
         raf.seek(headerItem.protoIdsOff);
         protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class);
+
+        readDebugInfoItems();
+    }
+
+    private void readDebugInfoItems() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_DEBUG_INFO_ITEM);
+        if (item == null) {
+            return;
+        }
+        raf.seek(item.offset);
+        debugInfoItems = readArray(item.size, _DebugInfoItem.class);
     }
 
     public void write(File output) throws IOException {
@@ -498,6 +510,21 @@ public class DexFileReader {
             shortyIdx = readUInt();
             returnTypeIdx = readUInt();
             parametersOff = readUInt();
+        }
+    }
+
+    class _DebugInfoItem implements Streamable {
+        int lineStart;
+        int parametersSize;
+        int[] parameterNames;
+
+        public void read() throws IOException {
+            lineStart = readULeb128();
+            parametersSize = readULeb128();
+            parameterNames = new int[parametersSize];
+            for (int i = 0; i < parametersSize; i++) {
+                parameterNames[i] = readULeb128();
+            }
         }
     }
 
