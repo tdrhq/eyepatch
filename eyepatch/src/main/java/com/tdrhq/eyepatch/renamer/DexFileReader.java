@@ -189,17 +189,10 @@ public class DexFileReader {
     }
 
     class _MapItem extends Streamable {
-        short type;
-        short unused;
-        int size;
-        int offset;
-
-        public void readImpl() throws IOException {
-            type = readUShort();
-            unused = readUShort();
-            size = readUInt();
-            offset = readUInt();
-        }
+        @F(idx=1) short type;
+        @F(idx=2) short unused;
+        @F(idx=3) int size;
+        @F(idx=4) int offset;
     }
 
     class _TypeIdItem extends Streamable {
@@ -515,6 +508,8 @@ public class DexFileReader {
                 try {
                     if (f.getType() == int.class) {
                         f.set(this, readUInt());
+                    } else if (f.getType() == short.class) {
+                        f.set(this, readUShort());
                     } else if (f.getType() == byte[].class) {
                         byte[] arr = (byte[]) f.get(this);
                         if (arr == null) {
