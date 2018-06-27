@@ -69,7 +69,7 @@ public abstract class Streamable {
                     if (arr == null) {
                         throw new NullPointerException();
                     }
-                    raf.read(arr);
+                    raf.readFully(arr);
                 } else if (f.getType() == short[].class) {
                     int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
                     f.set(this, RafUtil.readShortArray(size, raf));
