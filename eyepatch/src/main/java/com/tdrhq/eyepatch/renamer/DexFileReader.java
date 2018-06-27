@@ -432,13 +432,13 @@ public class DexFileReader {
                         }
                         raf.read(arr);
                     } else if (f.getType() == short[].class) {
-                        int size = AnnotationUtil.getSizeFromSizeIdx(fields, this, f);
+                        int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
                         f.set(this, readShortArray(size));
                     } else if (f.getType().isArray()) {
                         Class type = f.getType();
                         Class<? extends Streamable> componentType =
                                 (Class<? extends Streamable>) type.getComponentType();
-                        int size = AnnotationUtil.getSizeFromSizeIdx(fields, this, f);
+                        int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
                         f.set(this, readArray(size, componentType));
                     }
                     else {

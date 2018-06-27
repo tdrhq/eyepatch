@@ -37,7 +37,8 @@ public class AnnotationUtil {
         return f.idx();
     }
 
-    public static int getSizeFromSizeIdx(List<Field> fields, Object instance, Field f) throws IllegalAccessException {
+    public static int getSizeFromSizeIdx(Object instance, Field f) throws IllegalAccessException {
+        List<Field> fields = getAnnotatedFields(instance.getClass());
         int size = -1;
         int sizeIdx = f.getAnnotation(F.class).sizeIdx();
         for (Field sizeField : fields) {
