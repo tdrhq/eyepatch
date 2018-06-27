@@ -432,11 +432,7 @@ public class DexFileReader {
             return f.idx();
         }
 
-        void readObject() throws IOException {
-            Class klass = this.getClass();
-            if (klass == Streamable.class) {
-                throw new RuntimeException("unexpected");
-            }
+        Field[] getAnnotatedFields(Class klass) {
             Field[] fields = klass.getDeclaredFields();
             Arrays.sort(fields, new Comparator<Field>() {
                 @Override
@@ -447,7 +443,15 @@ public class DexFileReader {
                     return getIndex(field) - getIndex(t1);
                 }
             });
+            return fields;
+        }
 
+        void readObject() throws IOException {
+            Class klass = this.getClass();
+            if (klass == Streamable.class) {
+                throw new RuntimeException("unexpected");
+            }
+            Field[] fields = getAnnotatedFields(klass);
             for (Field f : fields) {
                 if (f.getAnnotation(F.class) == null) {
                     continue;
