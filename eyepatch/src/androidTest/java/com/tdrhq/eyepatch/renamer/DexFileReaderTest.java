@@ -107,9 +107,15 @@ public class DexFileReaderTest {
             if (mapList.list[i].type == ItemType.TYPE_STRING_ID_ITEM.getMapValue()) {
                 off = mapList.list[i].offset;
             }
+
+            if (mapList.list[i].type == ItemType.TYPE_CLASS_DEF_ITEM.getMapValue()) {
+                classDefsOff = mapList.list[i].offset;
+            }
+
         }
 
         assertEquals(0x70, off);
+        assertEquals(0xac, classDefsOff);
     }
 
     @Test
