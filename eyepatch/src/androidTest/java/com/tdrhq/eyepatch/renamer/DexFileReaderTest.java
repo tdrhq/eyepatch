@@ -15,6 +15,7 @@ import com.tdrhq.eyepatch.renamer.DexFileReader.*;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
@@ -121,16 +122,31 @@ public class DexFileReaderTest {
         reader.read();
         reader.write(output);
 
-        //        Class FooClass = Util.loadDexFile(output)
-        //                .loadClass("com.foo.Foo", classLoader);
-        //        assertNotNull(FooClass);
+        // Now we verify each and every byte:
+        RandomAccessFile inputf = new RandomAccessFile(staticInput, "r");
+        RandomAccessFile outputf = new RandomAccessFile(output, "r");
+
+        for (int i = 0; i < 452; i++) {
+            assertEquals("at byte " + i,
+                         String.format("%2x", inputf.readByte()),
+                         String.format("%2x", outputf.readByte()));
+        }
+
+        inputf.close();
+        outputf.close();
+
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo", classLoader);
+        assertNotNull(FooClass);
     }
 
     @Test
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
-        _CodeItem codeItem = reader.getClassDataItem(reader.classDefItems[0]).directMethods[0].codeItem;
+        _CodeItem codeItem =
+                reader.getCodeItem(
+                        reader.getClassDataItem(reader.classDefItems[0]).directMethods[0]);
         assertEquals(1, codeItem.registersSize);
         assertEquals(3, codeItem.insnsSize);
 

@@ -26,6 +26,10 @@ public class AnnotationUtil {
                 ret.add(field);
             }
         }
+
+        if (ret.size() == 0) {
+            throw new RuntimeException("no annotated fields found for " + klass);
+        }
         return ret;
     }
 

@@ -2,19 +2,15 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import android.util.Log;
 import com.android.dex.Mutf8;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.dex.file.ItemType;
-import com.android.dx.rop.cst.CstString;
-import com.android.dx.rop.cst.CstType;
-import com.android.dx.rop.type.StdTypeList;
 import com.android.dx.rop.type.Type;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -127,6 +123,7 @@ public class DexFileReader {
             return;
         }
 
+        raf.seek(item.offset);
         codeItems = readArray(item.size, _CodeItem.class, this, raf);
     }
 
@@ -154,6 +151,11 @@ public class DexFileReader {
         int size;
         String decoded;
 
+        @Override
+        public boolean isAligned() {
+            return false;
+        }
+
         public _StringDataItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
@@ -163,6 +165,16 @@ public class DexFileReader {
             size = RafUtil.readULeb128(raf);
             char[] data = new char[size];
             decoded = Mutf8.decode(new MyByteInput(raf), data);
+        }
+
+        @Override
+        public void writeImpl(RandomAccessFile raf) throws IOException {
+            RafUtil.writeULeb128(raf, size);
+            byte[] output = Mutf8.encode(decoded);
+            raf.write(output, 0, output.length);
+
+            byte zero = '\0';
+            raf.write(zero);
         }
     }
 
@@ -187,15 +199,16 @@ public class DexFileReader {
 
     public void write(File output) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(output, "rw");
+        raf.seek(0);
         headerItem.write(raf);
-        mapList.write(raf);
 
         for (_MapItem item : mapList.list) {
             switch(item.getItemType()) {
             case TYPE_HEADER_ITEM:
                 continue;
             case TYPE_MAP_LIST:
-                continue;
+                mapList.write(raf);
+                break;
             case TYPE_STRING_ID_ITEM:
                 writeArray(stringIdItems, raf);
                 break;
@@ -227,6 +240,7 @@ public class DexFileReader {
                 throw new RuntimeException("unsupported type: " + item.getItemType().toString());
             }
         }
+        Log.i("DexFileReader", "Before closing position is: " + raf.getFilePointer());
         raf.close();
     }
 
@@ -263,9 +277,17 @@ public class DexFileReader {
         @F(idx=19) int methodIdsOff;
         @F(idx=20) int classDefsSize;
         @F(idx=21) int classDefsOff;
+        @F(idx=22) int dataSize;
+        @F(idx=23) int dataOff;
 
         public HeaderItem(DexFileReader dexFileReader) {
             super(dexFileReader);
+        }
+
+        @Override
+        public void readImpl(RandomAccessFile raf) throws IOException {
+            super.readImpl(raf);
+            Log.i("DexFileReader", "checksum is: " + checksum + " " + String.format("%8x", checksum));
         }
     }
 
@@ -308,15 +330,10 @@ public class DexFileReader {
     }
 
     static class _TypeIdItem extends Streamable {
-        int descriptorIdx; // a  pointer to string_ids
+        @F(idx=1) int descriptorIdx; // a  pointer to string_ids
 
         public _TypeIdItem(DexFileReader dexFileReader) {
             super(dexFileReader);
-        }
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            descriptorIdx = RafUtil.readUInt(raf);
         }
 
         public String getString() throws IOException{
@@ -328,6 +345,11 @@ public class DexFileReader {
         @F(idx=1, uleb=true) int fieldIdxDiff;
         @F(idx=2, uleb=true) int accessFlags;
 
+        @Override
+        public boolean isAligned() {
+            return false;
+        }
+
         public _EncodedField(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
@@ -338,22 +360,30 @@ public class DexFileReader {
         @F(idx=2, uleb=true) int accessFlags;
         @F(idx=3, uleb=true) int codeOff;
 
-        // substructures
-        _CodeItem codeItem;
+        @Override
+        public boolean isAligned() {
+            return false;
+        }
 
         public _EncodedMethod(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
+        @Override
         public void readImpl(RandomAccessFile raf) throws IOException {
-            readObject(raf);
-
-            long mark = raf.getFilePointer();
-            raf.seek(codeOff);
-            codeItem = new _CodeItem(dexFileReader);
-            codeItem.read(raf);
-            raf.seek(mark);
+            super.readImpl(raf);
+            Log.i("DexFileReader", "Read encoded method as: " + methodIdxDiff + " " + accessFlags + " " + codeOff);
         }
+    }
+
+    public _CodeItem getCodeItem(_EncodedMethod method) {
+        for (_CodeItem codeItem : codeItems) {
+            if (codeItem.getOrigOffset() == method.codeOff) {
+                return codeItem;
+            }
+        }
+
+        throw new RuntimeException("could not find codeItem");
     }
 
     static class _CodeItem extends Streamable {
@@ -364,8 +394,9 @@ public class DexFileReader {
         @F(idx=5) int debugInfoOff;
         @F(idx=6) int insnsSize;
         @F(idx=7, sizeIdx=6) short[] insns;
-        @F(idx=8) short padding;
 
+        // these are conditional
+        short padding = 0;
         _TryItem[] tryItems;
         _EncodedCatchHandlerList encodedCatchHandlerList = null;
 
@@ -376,12 +407,33 @@ public class DexFileReader {
         @Override
         public void readImpl(RandomAccessFile raf) throws IOException {
             readObject(raf);
-            padding = RafUtil.readUShort(raf);
-            tryItems = readArray(triesSize, _TryItem.class, dexFileReader, raf);
 
-            if (triesSize != 0) {
+            if (insnsSize % 2 != 0 && triesSize > 0) {
+                padding = RafUtil.readUShort(raf);
+            }
+
+            if (triesSize > 0) {
+                tryItems = readArray(triesSize, _TryItem.class, dexFileReader, raf);
                 encodedCatchHandlerList = new _EncodedCatchHandlerList(dexFileReader);
                 encodedCatchHandlerList.read(raf);
+            }
+        }
+
+        @Override
+        public void writeImpl(RandomAccessFile raf) throws IOException {
+            writeObject(raf);
+
+            if (insnsSize % 2 != 0) {
+
+                // acc. to the doc this should only be written if
+                // triesSize >0, but it should be safe to always write
+                // it, and dexmaker seems to be doing that too
+                RafUtil.writeUShort(raf, padding);
+            }
+
+            if (triesSize > 0) {
+                writeArray(tryItems, raf);
+                encodedCatchHandlerList.write(raf);
             }
         }
     }
@@ -448,6 +500,11 @@ public class DexFileReader {
         @F(idx=6, sizeIdx=2) _EncodedField[] instanceFields;
         @F(idx=7, sizeIdx=3) _EncodedMethod[] directMethods;
         @F(idx=8, sizeIdx=4) _EncodedMethod[] virtualMethods;
+
+        @Override
+        public boolean isAligned() {
+            return false;
+        }
 
         public _ClassDataItem(DexFileReader dexFileReader) {
             super(dexFileReader);
@@ -565,6 +622,11 @@ public class DexFileReader {
 
         public _DebugInfoItem(DexFileReader dexFileReader) {
             super(dexFileReader);
+        }
+
+        @Override
+        public boolean isAligned() {
+            return false;
         }
 
         @Override

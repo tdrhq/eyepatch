@@ -15,7 +15,7 @@ public abstract class Streamable {
         this.dexFileReader = dexFileReader;
     }
 
-    public void read(RandomAccessFile raf) throws IOException {
+    public final void read(RandomAccessFile raf) throws IOException {
         origOffset = raf.getFilePointer();
         readImpl(raf);
     }
@@ -24,8 +24,27 @@ public abstract class Streamable {
         return origOffset;
     }
 
+    public boolean isAligned() {
+        return true;
+    }
+
+    private void writeAlignment(RandomAccessFile output) throws IOException  {
+        long len = 4L - output.getFilePointer() % 4;
+        if (len == 4) {
+            return;
+        }
+        Log.i("DexFileReader", "writing alignment: " + len + " at " + output.getFilePointer());
+        byte[] out = new byte[(int) len];
+        output.write(out);
+    }
+
     public void write(RandomAccessFile output) throws IOException {
+        if (isAligned()) {
+            writeAlignment(output);
+        }
+
         writeOffset = output.getFilePointer();
+        Log.i("Streamable", "Writing " + this.toString() + " to " + writeOffset + " (original: " + origOffset + ")" );
         writeImpl(output);
     }
 
