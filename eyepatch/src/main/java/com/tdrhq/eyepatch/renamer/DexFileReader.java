@@ -4,7 +4,6 @@ package com.tdrhq.eyepatch.renamer;
 
 import com.android.dex.Leb128;
 import com.android.dex.Mutf8;
-import com.android.dex.util.ByteInput;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
@@ -395,22 +394,6 @@ public class DexFileReader {
         return Leb128.readSignedLeb128(new MyByteInput(raf));
     }
 
-
-    static class MyByteInput implements ByteInput {
-        RandomAccessFile raf;
-        public MyByteInput(RandomAccessFile raf) {
-            this.raf = raf;
-        }
-
-        @Override
-        public byte readByte() {
-            try {
-                return raf.readByte();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     public abstract class Streamable {
         private long origOffset = -1;
