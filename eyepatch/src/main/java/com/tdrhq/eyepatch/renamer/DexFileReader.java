@@ -276,6 +276,7 @@ public class DexFileReader {
         public void readImpl() throws IOException {
             size = readSLeb128();
 
+            // handle negative numbers here.
             if (size != 0) {
 
                 throw new RuntimeException("unexpected: " + size);
@@ -288,13 +289,8 @@ public class DexFileReader {
     }
 
     class _EncodedTypeAddrPair extends Streamable {
-        long typeIdx;
-        long addr;
-
-        public void readImpl() throws IOException {
-            typeIdx = readULeb128();
-            addr = readULeb128();
-        }
+        @F(idx=1, uleb=true) long typeIdx;
+        @F(idx=1, uleb=true) long addr;
     }
 
     class _ClassDataItem {
