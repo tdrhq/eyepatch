@@ -41,6 +41,10 @@ public class RafUtil {
         return Leb128.readSignedLeb128(new MyByteInput(raf));
     }
 
+    public static void writeSLeb128(RandomAccessFile raf, int val) throws IOException {
+        Leb128.writeSignedLeb128(new MyByteOutput(raf), val);
+    }
+
     public static short[] readShortArray(int size, RandomAccessFile raf) throws IOException {
         short[] ret = new short[size];
         for (int i = 0; i < size; i++) {

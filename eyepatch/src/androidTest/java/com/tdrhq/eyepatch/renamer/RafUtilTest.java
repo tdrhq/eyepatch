@@ -39,4 +39,13 @@ public class RafUtilTest {
         raf.seek(0);
         assertEquals(5256, RafUtil.readULeb128(raf));
     }
+
+    @Test
+    public void testInOutIntULebSigned() throws Throwable {
+        int a = -525600;
+        RandomAccessFile raf = new RandomAccessFile(tmpdir.newFile("foo"), "rw");
+        RafUtil.writeSLeb128(raf, a);
+        raf.seek(0);
+        assertEquals(-525600, RafUtil.readSLeb128(raf));
+    }
 }
