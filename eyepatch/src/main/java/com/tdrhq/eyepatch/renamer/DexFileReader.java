@@ -530,15 +530,9 @@ public class DexFileReader {
     }
 
     class _ProtoIdItem extends Streamable {
-        int shortyIdx;
-        int returnTypeIdx;
-        int parametersOff;
-
-        public void readImpl() throws IOException {
-            shortyIdx = readUInt();
-            returnTypeIdx = readUInt();
-            parametersOff = readUInt();
-        }
+        @F(idx=1) int shortyIdx;
+        @F(idx=2) int returnTypeIdx;
+        @F(idx=3) int parametersOff;
     }
 
     class _DebugInfoItem extends Streamable {
