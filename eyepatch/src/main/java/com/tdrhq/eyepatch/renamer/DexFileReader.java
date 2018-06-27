@@ -375,9 +375,7 @@ public class DexFileReader {
     }
 
     int readUInt() throws IOException {
-        int it = raf.readInt();
-        it = Integer.reverseBytes(it);
-        return it;
+        return RafUtil.readUInt(raf);
     }
 
     short readUShort() throws IOException {
