@@ -24,6 +24,11 @@ public class RafUtil {
         return it;
     }
 
+    public static void writeUShort(RandomAccessFile raf, short val) throws IOException {
+        val = Short.reverseBytes(val);
+        raf.writeShort(val);
+    }
+
     public static int readULeb128(RandomAccessFile raf) throws IOException {
         return Leb128.readUnsignedLeb128(new MyByteInput(raf));
     }

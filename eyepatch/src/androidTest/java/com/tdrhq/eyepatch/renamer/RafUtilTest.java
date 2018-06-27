@@ -22,6 +22,16 @@ public class RafUtilTest {
     }
 
     @Test
+    public void testShortInOutInt() throws Throwable {
+        short a = 5256;
+        RandomAccessFile raf = new RandomAccessFile(tmpdir.newFile("foo"), "rw");
+        RafUtil.writeUShort(raf, a);
+        raf.seek(0);
+        assertEquals(5256, RafUtil.readUShort(raf));
+    }
+
+
+    @Test
     public void testInOutIntULeb() throws Throwable {
         int a = 5256;
         RandomAccessFile raf = new RandomAccessFile(tmpdir.newFile("foo"), "rw");
