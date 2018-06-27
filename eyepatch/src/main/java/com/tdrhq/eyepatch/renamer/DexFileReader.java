@@ -85,6 +85,10 @@ public class DexFileReader {
         protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class);
 
         readDebugInfoItems();
+        readTypeList();
+        readAnnotationSetRefList();
+        readAnnotationSetItem();
+        readEncodedArrayItems();
     }
 
     private void readDebugInfoItems() throws IOException {
@@ -95,6 +99,42 @@ public class DexFileReader {
         raf.seek(item.offset);
         debugInfoItems = readArray(item.size, _DebugInfoItem.class);
     }
+
+    private void readTypeList() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_TYPE_LIST);
+        if (item == null) {
+            return;
+        }
+        raf.seek(item.offset);
+    }
+
+    private void readAnnotationSetRefList() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_REF_LIST);
+        if (item == null) {
+            return;
+        }
+
+        throw new UnsupportedOperationException();
+    }
+
+    private void readAnnotationSetItem() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_ITEM);
+        if (item == null) {
+            return;
+        }
+
+        throw new UnsupportedOperationException();
+    }
+
+    private void readEncodedArrayItems() throws IOException {
+        _MapItem item = getMapItem(ItemType.TYPE_ENCODED_ARRAY_ITEM);
+        if (item == null) {
+            return;
+        }
+
+        throw new UnsupportedOperationException();
+    }
+
 
     public void write(File output) throws IOException {
         FileOutputStream os = new FileOutputStream(output);
