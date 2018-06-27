@@ -8,21 +8,18 @@ import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
 import com.android.dx.dex.file.ClassDefItem;
-import com.android.dx.dex.file.DexFile;
+import com.android.dx.dex.file.ItemType;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
+import com.tdrhq.eyepatch.renamer.DexFileReader.*;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Modifier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import com.tdrhq.eyepatch.renamer.DexFileReader.*;
 
 public class DexFileReaderTest {
     @Rule
@@ -97,6 +94,22 @@ public class DexFileReaderTest {
         assertEquals("Ljava/lang/String;", reader.stringIdItems[4].getString());
         assertEquals("getBar", reader.stringIdItems[5].getString());
         assertEquals("zoidberg", reader.stringIdItems[6].getString());
+    }
+
+    @Test
+    public void testMapOff() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
+        reader.read();
+        _MapList  mapList = reader.mapList;
+        int off = -1;
+        int classDefsOff = -1;
+        for (int i = 0; i < mapList.size; i++) {
+            if (mapList.list[i].type == ItemType.TYPE_STRING_ID_ITEM.getMapValue()) {
+                off = mapList.list[i].offset;
+            }
+        }
+
+        assertEquals(0x70, off);
     }
 
     @Test
