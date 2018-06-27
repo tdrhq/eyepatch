@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 public @interface F {
     int idx();
     int sizeIdx() default -10;
+    boolean uleb() default false;
 }

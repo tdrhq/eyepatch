@@ -208,13 +208,8 @@ public class DexFileReader {
     }
 
     class _EncodedField extends Streamable {
-        long fieldIdxDiff;
-        long accessFlags;
-
-        public void readImpl() throws IOException {
-            fieldIdxDiff = readULeb128();
-            accessFlags =readULeb128();
-        }
+        @F(idx=1, uleb=true) long fieldIdxDiff;
+        @F(idx=2, uleb=true) long accessFlags;
     }
 
     class _EncodedMethod extends Streamable {
@@ -507,7 +502,11 @@ public class DexFileReader {
                 }
                 try {
                     if (f.getType() == int.class) {
-                        f.set(this, readUInt());
+                        if (f.getAnnotation(F.class).uleb()) {
+                            f.set(this, readULeb128());
+                        } else {
+                            f.set(this, readUInt());
+                        }
                     } else if (f.getType() == short.class) {
                         f.set(this, readUShort());
                     } else if (f.getType() == byte[].class) {
