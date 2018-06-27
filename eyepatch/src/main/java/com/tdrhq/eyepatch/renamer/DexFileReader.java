@@ -146,7 +146,7 @@ public class DexFileReader {
         return stringIdItems[(int) idx].getString();
     }
 
-    class HeaderItem implements Streamable {
+    class HeaderItem extends Streamable {
         byte[] magic;
         int checksum;
         byte[] signature;
@@ -169,7 +169,7 @@ public class DexFileReader {
         int methodIdsSize;
         int methodIdsOff;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             raf.seek(0);
             magic = new byte[8];
             raf.read(magic);
@@ -212,22 +212,22 @@ public class DexFileReader {
         return null;
     }
 
-    class _MapList implements Streamable {
+    class _MapList extends Streamable {
         int size;
         _MapItem[] list;
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             size = readUInt();
             list = readArray(size, _MapItem.class);
         }
     }
 
-    class _MapItem implements Streamable {
+    class _MapItem extends Streamable {
         short type;
         short unused;
         int size;
         int offset;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             type = readUShort();
             unused = readUShort();
             size = readUInt();
@@ -235,10 +235,10 @@ public class DexFileReader {
         }
     }
 
-    class _TypeIdItem implements Streamable {
+    class _TypeIdItem extends Streamable {
         int descriptorIdx; // a  pointer to string_ids
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             descriptorIdx = readUInt();
         }
 
@@ -247,17 +247,17 @@ public class DexFileReader {
         }
     }
 
-    class _EncodedField implements Streamable {
+    class _EncodedField extends Streamable {
         long fieldIdxDiff;
         long accessFlags;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             fieldIdxDiff = readULeb128();
             accessFlags =readULeb128();
         }
     }
 
-    class _EncodedMethod implements Streamable {
+    class _EncodedMethod extends Streamable {
         long methodIdxDiff;
         long accessFlags;
         long codeOff;
@@ -265,7 +265,7 @@ public class DexFileReader {
         // substructures
         _CodeItem codeItem;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             methodIdxDiff = readULeb128();
             accessFlags = readULeb128();
             codeOff = readULeb128();
@@ -278,7 +278,7 @@ public class DexFileReader {
         }
     }
 
-    class _CodeItem implements Streamable {
+    class _CodeItem extends Streamable {
         short registersSize;
         short insSize;
         short outsSize;
@@ -291,7 +291,7 @@ public class DexFileReader {
         _TryItem[] tryItems;
         _EncodedCatchHandlerList encodedCatchHandlerList = null;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             registersSize = readUShort();
             insSize = readUShort();
             outsSize = readUShort();
@@ -312,12 +312,12 @@ public class DexFileReader {
         }
     }
 
-    class _TryItem implements Streamable {
+    class _TryItem extends Streamable {
         int startAddr;
         short insnCount;
         short handlerOff;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             startAddr = readUInt();
             insnCount = readUShort();
             handlerOff = readUShort();
@@ -334,13 +334,13 @@ public class DexFileReader {
         }
     }
 
-    class _EncodedCatchHandler implements Streamable {
+    class _EncodedCatchHandler extends Streamable {
         long size;
         _EncodedTypeAddrPair[] handlers;
         long catchAllAddr;
 
         @Override
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             size = readSLeb128();
 
             if (size != 0) {
@@ -354,11 +354,11 @@ public class DexFileReader {
 
     }
 
-    class _EncodedTypeAddrPair implements Streamable {
+    class _EncodedTypeAddrPair extends Streamable {
         long typeIdx;
         long addr;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             typeIdx = readULeb128();
             addr = readULeb128();
         }
@@ -397,7 +397,7 @@ public class DexFileReader {
         }
     }
 
-    class _ClassDefItem implements Streamable {
+    class _ClassDefItem extends Streamable {
         int classIdx;
         int accessFlags;
         int superclassIdx;
@@ -411,7 +411,7 @@ public class DexFileReader {
         _ClassDataItem classDataItem;
 
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             classIdx = readUInt();
             accessFlags = readUInt();
             superclassIdx = readUInt();
@@ -461,10 +461,10 @@ public class DexFileReader {
         return ret;
     }
 
-    class StringIdItem implements Streamable {
+    class StringIdItem extends Streamable {
         long stringDataOff;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             stringDataOff = readUInt();
         }
 
@@ -513,52 +513,58 @@ public class DexFileReader {
         }
     }
 
-    public interface Streamable {
-        public void read() throws IOException;
+    public abstract class Streamable {
+        private long origOffset = -1;
+
+        public void read() throws IOException {
+            origOffset = raf.getFilePointer();
+            readImpl();
+        }
+        abstract void readImpl() throws IOException;
     }
 
-    class _FieldIdItem implements Streamable {
+    class _FieldIdItem extends Streamable {
         int classIdx;
         int typeIdx;
         int nameIdx;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             classIdx = readUShort();
             typeIdx = readUShort();
             nameIdx = readUInt();
         }
     }
 
-    class _MethodIdItem implements Streamable {
+    class _MethodIdItem extends Streamable {
         int classIdx;
         int protoIdx;
         int nameIdx;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             classIdx = readUShort();
             protoIdx = readUShort();
             nameIdx = readUInt();
         }
     }
 
-    class _ProtoIdItem implements Streamable {
+    class _ProtoIdItem extends Streamable {
         int shortyIdx;
         int returnTypeIdx;
         int parametersOff;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             shortyIdx = readUInt();
             returnTypeIdx = readUInt();
             parametersOff = readUInt();
         }
     }
 
-    class _DebugInfoItem implements Streamable {
+    class _DebugInfoItem extends Streamable {
         int lineStart;
         int parametersSize;
         int[] parameterNames;
 
-        public void read() throws IOException {
+        public void readImpl() throws IOException {
             lineStart = readULeb128();
             parametersSize = readULeb128();
             parameterNames = new int[parametersSize];
