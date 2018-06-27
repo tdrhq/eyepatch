@@ -52,4 +52,10 @@ public class RafUtil {
         }
         return ret;
     }
+
+    public static void writeShortArray(RandomAccessFile raf, short[] arr) throws IOException {
+        for (int i = 0; i < arr.length; i++) {
+            writeUShort(raf, arr[i]);
+        }
+    }
 }
