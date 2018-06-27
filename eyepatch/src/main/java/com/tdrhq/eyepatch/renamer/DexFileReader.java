@@ -44,6 +44,7 @@ public class DexFileReader {
     _FieldIdItem[] fieldIdItems = null;
     _MethodIdItem[] methodIdItems = null;
     _ProtoIdItem[] protoIdItems = null;
+    _MapList mapList = null;
 
     private DexFile dexFile;
     public void read() throws IOException {
@@ -52,6 +53,10 @@ public class DexFileReader {
         raf = new RandomAccessFile(file, "r");
         headerItem = new HeaderItem();
         headerItem.read();
+
+        mapList = new _MapList();
+        raf.seek(headerItem.mapOff);
+        mapList.read();
 
         raf.seek(headerItem.stringIdsOff);
         stringIdItems = readArray(
@@ -142,6 +147,29 @@ public class DexFileReader {
 
             classDefsSize = readUInt();
             classDefsOff = readUInt();
+        }
+    }
+
+    class _MapList implements Streamable {
+        int size;
+        _MapItem[] list;
+        public void read() throws IOException {
+            size = readUInt();
+            list = readArray(size, _MapItem.class);
+        }
+    }
+
+    class _MapItem implements Streamable {
+        short type;
+        short unused;
+        int size;
+        int offset;
+
+        public void read() throws IOException {
+            type = readUShort();
+            unused = readUShort();
+            size = readUInt();
+            offset = readUInt();
         }
     }
 
