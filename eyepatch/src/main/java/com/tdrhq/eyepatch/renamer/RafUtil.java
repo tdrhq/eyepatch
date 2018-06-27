@@ -13,6 +13,11 @@ public class RafUtil {
         return it;
     }
 
+    public static void writeUInt(RandomAccessFile raf, int it) throws IOException {
+        it = Integer.reverseBytes(it);
+        raf.writeInt(it);
+    }
+
     public static short readUShort(RandomAccessFile raf) throws IOException {
         short it = raf.readShort();
         it = Short.reverseBytes(it);
