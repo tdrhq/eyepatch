@@ -130,7 +130,7 @@ public class DexFileReaderTest {
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
-        _CodeItem codeItem = reader.classDefItems[0].classDataItem.directMethods[0].codeItem;
+        _CodeItem codeItem = reader.getClassDataItem(reader.classDefItems[0]).directMethods[0].codeItem;
         assertEquals(1, codeItem.registersSize);
         assertEquals(3, codeItem.insnsSize);
 

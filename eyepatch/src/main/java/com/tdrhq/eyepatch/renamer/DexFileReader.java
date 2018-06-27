@@ -400,6 +400,16 @@ public class DexFileReader {
         }
     }
 
+    public _ClassDataItem getClassDataItem(_ClassDefItem classDefItem) {
+        for (_ClassDataItem dataItem : classDataItems) {
+            if (dataItem.getOrigOffset() == classDefItem.classDataOff) {
+                return dataItem;
+            }
+        }
+
+        throw new RuntimeException("could not find data item");
+    }
+
     static class _ClassDefItem extends Streamable {
         @F(idx=1) int classIdx;
         @F(idx=2) int accessFlags;
@@ -410,9 +420,6 @@ public class DexFileReader {
         @F(idx=7) int classDataOff;
         @F(idx=8) int staticValuesOff;
 
-        // substructurs
-        _ClassDataItem classDataItem;
-
         public _ClassDefItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
@@ -421,13 +428,6 @@ public class DexFileReader {
         @Override
         public void readImpl(RandomAccessFile raf) throws IOException {
             readObject(raf);
-
-            long mark = raf.getFilePointer();
-            raf.seek(classDataOff);
-            classDataItem = new _ClassDataItem(dexFileReader);
-            classDataItem.read(raf);
-            raf.seek(mark);
-
         }
 
         public ClassDefItem toClassDefItem() throws IOException {
