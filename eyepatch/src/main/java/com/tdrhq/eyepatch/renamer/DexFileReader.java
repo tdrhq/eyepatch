@@ -88,7 +88,7 @@ public class DexFileReader {
         return stringIdItems[(int) idx].getString();
     }
 
-    class HeaderItem implements Readable {
+    class HeaderItem implements Streamable {
         long stringIdsSize;
         long stringIdsOff;
         long classDefsSize;
@@ -130,7 +130,7 @@ public class DexFileReader {
         }
     }
 
-    class _TypeIdItem implements Readable {
+    class _TypeIdItem implements Streamable {
         int descriptorIdx; // a  pointer to string_ids
 
         public void read() throws IOException {
@@ -142,7 +142,7 @@ public class DexFileReader {
         }
     }
 
-    class _EncodedField implements Readable {
+    class _EncodedField implements Streamable {
         long fieldIdxDiff;
         long accessFlags;
 
@@ -152,7 +152,7 @@ public class DexFileReader {
         }
     }
 
-    class _EncodedMethod implements Readable {
+    class _EncodedMethod implements Streamable {
         long methodIdxDiff;
         long accessFlags;
         long codeOff;
@@ -173,7 +173,7 @@ public class DexFileReader {
         }
     }
 
-    class _CodeItem implements Readable {
+    class _CodeItem implements Streamable {
         short registersSize;
         short insSize;
         short outsSize;
@@ -207,7 +207,7 @@ public class DexFileReader {
         }
     }
 
-    class _TryItem implements Readable {
+    class _TryItem implements Streamable {
         int startAddr;
         short insnCount;
         short handlerOff;
@@ -229,7 +229,7 @@ public class DexFileReader {
         }
     }
 
-    class _EncodedCatchHandler implements Readable {
+    class _EncodedCatchHandler implements Streamable {
         long size;
         _EncodedTypeAddrPair[] handlers;
         long catchAllAddr;
@@ -249,7 +249,7 @@ public class DexFileReader {
 
     }
 
-    class _EncodedTypeAddrPair implements Readable {
+    class _EncodedTypeAddrPair implements Streamable {
         long typeIdx;
         long addr;
 
@@ -292,7 +292,7 @@ public class DexFileReader {
         }
     }
 
-    class _ClassDefItem implements Readable {
+    class _ClassDefItem implements Streamable {
         int classIdx;
         int accessFlags;
         int superclassIdx;
@@ -336,7 +336,7 @@ public class DexFileReader {
         }
     }
 
-    private <T extends Readable> T[] readArray(int size, Class<T> klass) throws IOException {
+    private <T extends Streamable> T[] readArray(int size, Class<T> klass) throws IOException {
         T[] ret = (T[]) Array.newInstance(klass, size);
         for (int i = 0; i < size; i ++) {
             try {
@@ -356,7 +356,7 @@ public class DexFileReader {
         return ret;
     }
 
-    class StringIdItem implements Readable {
+    class StringIdItem implements Streamable {
         long stringDataOff;
 
         public void read() throws IOException {
@@ -408,11 +408,11 @@ public class DexFileReader {
         }
     }
 
-    public interface Readable {
+    public interface Streamable {
         public void read() throws IOException;
     }
 
-    class _FieldIdItem implements Readable {
+    class _FieldIdItem implements Streamable {
         int classIdx;
         int typeIdx;
         int nameIdx;
@@ -424,7 +424,7 @@ public class DexFileReader {
         }
     }
 
-    class _MethodIdItem implements Readable {
+    class _MethodIdItem implements Streamable {
         int classIdx;
         int protoIdx;
         int nameIdx;
@@ -436,7 +436,7 @@ public class DexFileReader {
         }
     }
 
-    class _ProtoIdItem implements Readable {
+    class _ProtoIdItem implements Streamable {
         int shortyIdx;
         int returnTypeIdx;
         int parametersOff;
