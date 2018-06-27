@@ -11,4 +11,10 @@ public class RafUtil {
         it = Integer.reverseBytes(it);
         return it;
     }
+
+    public static short readUShort(RandomAccessFile raf) throws IOException {
+        short it = raf.readShort();
+        it = Short.reverseBytes(it);
+        return it;
+    }
 }

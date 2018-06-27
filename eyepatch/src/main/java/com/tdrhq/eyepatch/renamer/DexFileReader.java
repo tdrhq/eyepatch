@@ -379,9 +379,7 @@ public class DexFileReader {
     }
 
     short readUShort() throws IOException {
-        short it = raf.readShort();
-        it = Short.reverseBytes(it);
-        return it;
+        return RafUtil.readUShort(raf);
     }
 
     int readULeb128() throws IOException {
