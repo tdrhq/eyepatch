@@ -363,11 +363,7 @@ public class DexFileReader {
     }
 
     class StringIdItem extends Streamable {
-        int stringDataOff;
-
-        public void readImpl() throws IOException {
-            stringDataOff = readUInt();
-        }
+        @F(idx=1) int stringDataOff;
 
         public String getString() throws IOException {
             raf.seek(stringDataOff);
