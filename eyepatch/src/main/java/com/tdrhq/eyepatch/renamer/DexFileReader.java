@@ -22,8 +22,10 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Reads a {@code DexFile} from the given file.
@@ -432,7 +434,7 @@ public class DexFileReader {
             return f.idx();
         }
 
-        Field[] getAnnotatedFields(Class klass) {
+        List<Field> getAnnotatedFields(Class klass) {
             Field[] fields = klass.getDeclaredFields();
             Arrays.sort(fields, new Comparator<Field>() {
                 @Override
@@ -443,7 +445,13 @@ public class DexFileReader {
                     return getIndex(field) - getIndex(t1);
                 }
             });
-            return fields;
+            List<Field> ret = new ArrayList<>();
+            for (Field field : fields) {
+                if (getIndex(field) >= 0) {
+                    ret.add(field);
+                }
+            }
+            return ret;
         }
 
         void readObject() throws IOException {
@@ -451,11 +459,8 @@ public class DexFileReader {
             if (klass == Streamable.class) {
                 throw new RuntimeException("unexpected");
             }
-            Field[] fields = getAnnotatedFields(klass);
+            List<Field> fields = getAnnotatedFields(klass);
             for (Field f : fields) {
-                if (f.getAnnotation(F.class) == null) {
-                    continue;
-                }
                 try {
                     if (f.getType() == int.class) {
                         if (f.getAnnotation(F.class).uleb()) {
@@ -490,7 +495,7 @@ public class DexFileReader {
             }
         }
 
-        private int getSizeFromSizeIdx(Field[] fields, Field f) throws IllegalAccessException {
+        private int getSizeFromSizeIdx(List<Field> fields, Field f) throws IllegalAccessException {
             int size = -1;
             int sizeIdx = f.getAnnotation(F.class).sizeIdx();
             for (Field sizeField : fields) {
