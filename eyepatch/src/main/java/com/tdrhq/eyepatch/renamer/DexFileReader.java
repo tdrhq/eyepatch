@@ -20,9 +20,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -199,7 +196,7 @@ public class DexFileReader {
         int descriptorIdx; // a  pointer to string_ids
 
         public void readImpl() throws IOException {
-            descriptorIdx = readUInt();
+            descriptorIdx = RafUtil.readUInt(raf);
         }
 
         public String getString() throws IOException{
@@ -246,7 +243,7 @@ public class DexFileReader {
 
         public void readImpl() throws IOException {
             readObject();
-            padding = readUShort();
+            padding = RafUtil.readUShort(raf);
             tryItems = readArray(triesSize, _TryItem.class);
 
             if (triesSize != 0) {
@@ -274,7 +271,7 @@ public class DexFileReader {
 
         @Override
         public void readImpl() throws IOException {
-            size = readSLeb128();
+            size = RafUtil.readSLeb128(raf);
 
             // handle negative numbers here.
             if (size != 0) {
@@ -283,7 +280,7 @@ public class DexFileReader {
             }
 
             handlers = readArray(Math.abs((int) size), _EncodedTypeAddrPair.class);
-            catchAllAddr = readULeb128();
+            catchAllAddr = RafUtil.readULeb128(raf);
         }
 
     }
@@ -367,26 +364,10 @@ public class DexFileReader {
 
         public String getString() throws IOException {
             raf.seek(stringDataOff);
-            long len = readULeb128();
+            long len = RafUtil.readULeb128(raf);
             char[] data = new char[(int) len];
             return Mutf8.decode(new MyByteInput(raf), data);
         }
-    }
-
-    int readUInt() throws IOException {
-        return RafUtil.readUInt(raf);
-    }
-
-    short readUShort() throws IOException {
-        return RafUtil.readUShort(raf);
-    }
-
-    int readULeb128() throws IOException {
-        return RafUtil.readULeb128(raf);
-    }
-
-    int readSLeb128() throws IOException {
-        return RafUtil.readSLeb128(raf);
     }
 
 
@@ -414,12 +395,12 @@ public class DexFileReader {
                 try {
                     if (f.getType() == int.class) {
                         if (f.getAnnotation(F.class).uleb()) {
-                            f.set(this, readULeb128());
+                            f.set(this, RafUtil.readULeb128(raf));
                         } else {
-                            f.set(this, readUInt());
+                            f.set(this, RafUtil.readUInt(raf));
                         }
                     } else if (f.getType() == short.class) {
-                        f.set(this, readUShort());
+                        f.set(this, RafUtil.readUShort(raf));
                     } else if (f.getType() == byte[].class) {
                         byte[] arr = (byte[]) f.get(this);
                         if (arr == null) {
@@ -457,7 +438,7 @@ public class DexFileReader {
     private short[] readShortArray(int size) throws IOException {
         short[] ret = new short[size];
         for (int i = 0; i < size; i++) {
-            ret[i] = readUShort();
+            ret[i] = RafUtil.readUShort(raf);
         }
         return ret;
     }
@@ -486,11 +467,11 @@ public class DexFileReader {
         int[] parameterNames;
 
         public void readImpl() throws IOException {
-            lineStart = readULeb128();
-            parametersSize = readULeb128();
+            lineStart = RafUtil.readULeb128(raf);
+            parametersSize = RafUtil.readULeb128(raf);
             parameterNames = new int[parametersSize];
             for (int i = 0; i < parametersSize; i++) {
-                parameterNames[i] = readULeb128();
+                parameterNames[i] = RafUtil.readULeb128(raf);
             }
         }
     }
