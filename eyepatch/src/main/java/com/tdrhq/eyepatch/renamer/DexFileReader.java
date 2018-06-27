@@ -151,57 +151,27 @@ public class DexFileReader {
     }
 
     class HeaderItem extends Streamable {
-        byte[] magic = new byte[8];
-        int checksum;
-        byte[] signature = new byte[20];
-        int fileSize;
-        int headerSize;
-        int endianTag;
-        int linkSize;
-        int linkOff;
-        int mapOff;
-        int stringIdsSize;
-        int stringIdsOff;
-        int classDefsSize;
-        int classDefsOff;
-        int typeIdsSize;
-        int typeIdsOff;
-        int protoIdsSize;
-        int protoIdsOff;
-        int fieldIdsSize;
-        int fieldIdsOff;
-        int methodIdsSize;
-        int methodIdsOff;
-
-        public void readImpl() throws IOException {
-            raf.read(magic);
-            checksum = readUInt();
-            raf.read(signature);
-            fileSize = readUInt();
-            headerSize = readUInt();
-            endianTag = readUInt();
-            linkSize = readUInt();
-            linkOff = readUInt();
-            mapOff = readUInt();
-
-            stringIdsSize = readUInt();
-            stringIdsOff = readUInt();
-
-            typeIdsSize = readUInt();
-            typeIdsOff = readUInt();
-
-            protoIdsSize = readUInt();
-            protoIdsOff = readUInt();
-
-            fieldIdsSize = readUInt();
-            fieldIdsOff = readUInt();
-
-            methodIdsSize = readUInt();
-            methodIdsOff = readUInt();
-
-            classDefsSize = readUInt();
-            classDefsOff = readUInt();
-        }
+        @F(idx=1) byte[] magic = new byte[8];
+        @F(idx=2) int checksum;
+        @F(idx=3) byte[] signature = new byte[20];
+        @F(idx=4) int fileSize;
+        @F(idx=5) int headerSize;
+        @F(idx=6) int endianTag;
+        @F(idx=7) int linkSize;
+        @F(idx=8) int linkOff;
+        @F(idx=9) int mapOff;
+        @F(idx=10) int stringIdsSize;
+        @F(idx=11) int stringIdsOff;
+        @F(idx=12) int typeIdsSize;
+        @F(idx=13) int typeIdsOff;
+        @F(idx=14) int protoIdsSize;
+        @F(idx=15) int protoIdsOff;
+        @F(idx=16) int fieldIdsSize;
+        @F(idx=17) int fieldIdsOff;
+        @F(idx=18) int methodIdsSize;
+        @F(idx=19) int methodIdsOff;
+        @F(idx=20) int classDefsSize;
+        @F(idx=21) int classDefsOff;
     }
 
     _MapItem getMapItem(ItemType itemType) {
@@ -546,19 +516,27 @@ public class DexFileReader {
                 if (f.getAnnotation(F.class) == null) {
                     continue;
                 }
-                if (f.getType() == int.class) {
-                    try {
+                try {
+                    if (f.getType() == int.class) {
                         f.set(this, readUInt());
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                    } else if (f.getType() == byte[].class) {
+                        byte[] arr = (byte[]) f.get(this);
+                        if (arr == null) {
+                            throw new NullPointerException();
+                        }
+                        raf.read(arr);
+                    } else {
+                        throw new UnsupportedOperationException();
                     }
-                } else {
-                    throw new UnsupportedOperationException();
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
 
-        abstract void readImpl() throws IOException;
+        protected void readImpl() throws IOException {
+            readObject();
+        }
 
         public void writeImpl() throws IOException {
             throw new UnsupportedOperationException();
