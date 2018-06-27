@@ -2,7 +2,6 @@
 
 package com.tdrhq.eyepatch.renamer;
 
-import com.android.dex.Leb128;
 import com.android.dex.Mutf8;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.ClassDefItem;
@@ -383,11 +382,11 @@ public class DexFileReader {
     }
 
     int readULeb128() throws IOException {
-        return Leb128.readUnsignedLeb128(new MyByteInput(raf));
+        return RafUtil.readULeb128(raf);
     }
 
     int readSLeb128() throws IOException {
-        return Leb128.readSignedLeb128(new MyByteInput(raf));
+        return RafUtil.readSLeb128(raf);
     }
 
 

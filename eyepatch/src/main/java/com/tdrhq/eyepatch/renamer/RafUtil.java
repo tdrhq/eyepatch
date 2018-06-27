@@ -4,6 +4,7 @@ package com.tdrhq.eyepatch.renamer;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import com.android.dex.Leb128;
 
 public class RafUtil {
     public static int readUInt(RandomAccessFile raf) throws IOException {
@@ -16,5 +17,13 @@ public class RafUtil {
         short it = raf.readShort();
         it = Short.reverseBytes(it);
         return it;
+    }
+
+    public static int readULeb128(RandomAccessFile raf) throws IOException {
+        return Leb128.readUnsignedLeb128(new MyByteInput(raf));
+    }
+
+    public static int readSLeb128(RandomAccessFile raf) throws IOException {
+        return Leb128.readSignedLeb128(new MyByteInput(raf));
     }
 }
