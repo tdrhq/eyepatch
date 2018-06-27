@@ -232,29 +232,20 @@ public class DexFileReader {
     }
 
     class _CodeItem extends Streamable {
-        short registersSize;
-        short insSize;
-        short outsSize;
-        short triesSize;
-        int debugInfoOff;
-        int insnsSize;
-        short[] insns;
-        short padding;
+        @F(idx=1) short registersSize;
+        @F(idx=2) short insSize;
+        @F(idx=3) short outsSize;
+        @F(idx=4) short triesSize;
+        @F(idx=5) int debugInfoOff;
+        @F(idx=6) int insnsSize;
+        @F(idx=7, sizeIdx=6) short[] insns;
+        @F(idx=8) short padding;
 
         _TryItem[] tryItems;
         _EncodedCatchHandlerList encodedCatchHandlerList = null;
 
         public void readImpl() throws IOException {
-            registersSize = readUShort();
-            insSize = readUShort();
-            outsSize = readUShort();
-            triesSize = readUShort();
-            debugInfoOff = readUInt();
-            insnsSize = readUInt();
-            insns = new short[insnsSize];
-            for (int i = 0 ; i < insnsSize; i ++) {
-                insns[i] = readUShort();
-            }
+            readObject();
             padding = readUShort();
             tryItems = readArray(triesSize, _TryItem.class);
 
@@ -516,20 +507,14 @@ public class DexFileReader {
                             throw new NullPointerException();
                         }
                         raf.read(arr);
+                    } else if (f.getType() == short[].class) {
+                        int size = getSizeFromSizeIdx(fields, f);
+                        f.set(this, readShortArray(size));
                     } else if (f.getType().isArray()) {
                         Class type = f.getType();
                         Class<? extends Streamable> componentType =
                                 (Class<? extends Streamable>) type.getComponentType();
-                        int size = -1;
-                        int sizeIdx = f.getAnnotation(F.class).sizeIdx();
-                        for (Field sizeField : fields) {
-                            if (getIndex(sizeField) == sizeIdx) {
-                                size = (int) sizeField.get(this);
-                            }
-                        }
-                        if (size == -1) {
-                            throw new RuntimeException("could not find index: " + sizeIdx);
-                        }
+                        int size = getSizeFromSizeIdx(fields, f);
                         f.set(this, readArray(size, componentType));
                     }
                     else {
@@ -541,6 +526,20 @@ public class DexFileReader {
             }
         }
 
+        private int getSizeFromSizeIdx(Field[] fields, Field f) throws IllegalAccessException {
+            int size = -1;
+            int sizeIdx = f.getAnnotation(F.class).sizeIdx();
+            for (Field sizeField : fields) {
+                if (getIndex(sizeField) == sizeIdx) {
+                    size = (int) sizeField.get(this);
+                }
+            }
+            if (size == -1) {
+                throw new RuntimeException("could not find index: " + sizeIdx);
+            }
+            return size;
+        }
+
         protected void readImpl() throws IOException {
             readObject();
         }
@@ -548,6 +547,14 @@ public class DexFileReader {
         public void writeImpl() throws IOException {
             throw new UnsupportedOperationException();
         }
+    }
+
+    private short[] readShortArray(int size) throws IOException {
+        short[] ret = new short[size];
+        for (int i = 0; i < size; i++) {
+            ret[i] = readUShort();
+        }
+        return ret;
     }
 
     class _FieldIdItem extends Streamable {
