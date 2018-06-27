@@ -409,7 +409,7 @@ public class DexFileReader {
                         raf.read(arr);
                     } else if (f.getType() == short[].class) {
                         int size = AnnotationUtil.getSizeFromSizeIdx(this, f);
-                        f.set(this, readShortArray(size));
+                        f.set(this, RafUtil.readShortArray(size, raf));
                     } else if (f.getType().isArray()) {
                         Class type = f.getType();
                         Class<? extends Streamable> componentType =
@@ -433,14 +433,6 @@ public class DexFileReader {
         public void writeImpl() throws IOException {
             throw new UnsupportedOperationException();
         }
-    }
-
-    private short[] readShortArray(int size) throws IOException {
-        short[] ret = new short[size];
-        for (int i = 0; i < size; i++) {
-            ret[i] = RafUtil.readUShort(raf);
-        }
-        return ret;
     }
 
     class _FieldIdItem extends Streamable {
