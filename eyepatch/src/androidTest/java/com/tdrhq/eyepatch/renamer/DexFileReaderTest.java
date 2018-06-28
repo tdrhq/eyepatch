@@ -193,12 +193,12 @@ public class DexFileReaderTest {
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
 
-    //@Test
-    public void testConstStringBecomesJumbo() throws Throwable {
+    @Test
+    public void testAddingABunchOfStrings() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         output = tmpdir.newFile("output.dex");
         reader.read();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             reader.addString("z" + i);
         }
         reader.write(output);
