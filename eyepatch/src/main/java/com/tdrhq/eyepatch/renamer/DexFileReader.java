@@ -13,15 +13,15 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.UTFDataFormatException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.Adler32;
 
@@ -82,6 +82,10 @@ public class DexFileReader {
                         StringIdItem.class,
                         this,
                         raf);
+
+                for (int i = 0; i < stringIdItems.length; i++) {
+                    stringIdItems[i].originalIndex = i;
+                }
                 break;
             case TYPE_TYPE_ID_ITEM:
                 typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class, this, raf);
@@ -123,6 +127,16 @@ public class DexFileReader {
         readEncodedArrayItems();
     }
 
+    int getUpdatedStringIndex(int originalIndex) {
+        for (int i = 0; i < stringIdItems.length; i++) {
+            if (originalIndex == stringIdItems[i].originalIndex) {
+                return i;
+            }
+        }
+
+        throw new RuntimeException("no such id");
+    }
+
     public void addString(String val) {
         stringDataItems = Arrays.copyOf(stringDataItems, stringDataItems.length + 1);
 
@@ -149,9 +163,11 @@ public class DexFileReader {
         stringIdItems[stringIdItems.length - 1] = newItem;
         for (int i = stringIdItems.length - 1; i > insertPos; i--) {
             stringIdItems[i].stringDataOff = stringIdItems[i - 1].stringDataOff;
+            stringIdItems[i].originalIndex = stringIdItems[i - 1].originalIndex;
         }
 
         stringIdItems[insertPos].stringDataOff = (int) newDataItem.getOrigOffset();
+        stringIdItems[insertPos].originalIndex = -1;
 
         headerItem.stringIdsSize ++;
 
@@ -252,6 +268,7 @@ public class DexFileReader {
 
 
     public void write(File output) throws IOException {
+        updateStringIds();
         RandomAccessFile raf = new RandomAccessFile(output, "rw");
         writeAll(raf);
 
@@ -267,6 +284,60 @@ public class DexFileReader {
         headerItem.write(raf);
         Log.i("DexFileReader", "Before closing position is: " + raf.getFilePointer());
         raf.close();
+    }
+
+    private void updateStringIds() {
+        if (fieldIdItems != null) {
+            for (_FieldIdItem fieldIdItem : fieldIdItems) {
+                fieldIdItem.nameIdx = getUpdatedStringIndex(fieldIdItem.nameIdx);
+            }
+        }
+
+        if (methodIdItems != null) {
+            for (_MethodIdItem methodIdItem : methodIdItems) {
+                methodIdItem.nameIdx = getUpdatedStringIndex(methodIdItem.nameIdx);
+            }
+        }
+
+        if (typeIdItems != null) {
+            for (_TypeIdItem typeIdItem : typeIdItems) {
+                typeIdItem.descriptorIdx = getUpdatedStringIndex(typeIdItem.descriptorIdx);
+            }
+        }
+
+        if (codeItems != null) {
+            for (_CodeItem codeItem : codeItems) {
+                updateStringIdsInCodeItem(codeItem);
+            }
+        }
+    }
+
+    private void updateStringIdsInCodeItem(_CodeItem codeItem) {
+        List<Short> newInsns = new ArrayList<>();
+
+        for (int i = 0; i < codeItem.insnsSize; ) {
+            int insn = codeItem.insns[i];
+            int opcode = insn & 0xff;
+            int insnLen = InsnFormat.getLength(opcode);
+
+            if (opcode == 0x1a /* const-string */) {
+                // For easier implementation we'll always change to const-string/jumbo
+                newInsns.add((short) 0x1b);
+                int newIdx = getUpdatedStringIndex(codeItem.insns[i+1]);
+                codeItem.insns[i+1] = (short) newIdx;
+            }
+            else if (opcode == 0x1b /* const-string/jumbo */) {
+                throw new UnsupportedOperationException("TODO: big dex file, amiright?");
+            } else {
+                // copy whole instruction as is
+                for (int j = 0; j < insnLen; j++) {
+                    newInsns.add(codeItem.insns[i + j]);
+                }
+            }
+
+            i += insnLen;
+        }
+
     }
 
     private void writeAll(RandomAccessFile raf) throws IOException {
@@ -710,6 +781,7 @@ public class DexFileReader {
 
     static class StringIdItem extends Streamable {
         @F(idx=1) @Offset int stringDataOff;
+        int originalIndex = -1;
 
         public StringIdItem(DexFileReader reader) {
             super(reader);

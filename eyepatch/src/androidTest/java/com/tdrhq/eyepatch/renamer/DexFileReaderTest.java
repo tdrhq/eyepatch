@@ -159,6 +159,23 @@ public class DexFileReaderTest {
     }
 
     @Test
+    public void testAddANewStringThatMovesEverythingAround() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
+        output = tmpdir.newFile("output.dex");
+        reader.read();
+        reader.addString("aaaabf"); // should be at the end and not affect indices
+        reader.write(output);
+
+        HexDump.hexDump(output);
+
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo", classLoader);
+        assertNotNull(FooClass);
+
+        assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+    }
+
+    @Test
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
