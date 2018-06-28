@@ -418,15 +418,17 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         headerItem.checksum = (int) checksum.getValue();
     }
 
+    Map<Long, String> cachedOrigDataOff = null;
     String getString(long idx)  {
-        long off = stringIdItems.get((int) idx).stringDataOff;
-        for (_StringDataItem  dataItem : stringDataItems) {
-            if (dataItem.getOrigOffset() == off) {
-                return dataItem.decoded;
+
+        if (cachedOrigDataOff == null) {
+            cachedOrigDataOff = new HashMap<>();
+            for (_StringDataItem  dataItem : stringDataItems) {
+                cachedOrigDataOff.put(dataItem.getOrigOffset(), dataItem.decoded);
             }
         }
-
-        throw new RuntimeException("could not find data for this string");
+        long off = stringIdItems.get((int) idx).stringDataOff;
+        return cachedOrigDataOff.get(off);
     }
 
     MapItem getMapItem(ItemType itemType) {
