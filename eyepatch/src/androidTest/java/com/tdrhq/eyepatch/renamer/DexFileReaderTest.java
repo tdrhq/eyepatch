@@ -142,31 +142,6 @@ public class DexFileReaderTest {
         assertNotNull(FooClass);
     }
 
-    //    @Test
-    public void testReadWriteIsSameForLargeDexFile() throws Throwable {
-        assertEquals(new ArrayList<String>(), ClassLoaderIntrospector.getOriginalDexPath(
-                             getClass().getClassLoader()));
-        String dexPath = ClassLoaderIntrospector.getOriginalDexPath(
-                getClass().getClassLoader()).get(1);
-        DexFileReader reader = new DexFileReader(new File(dexPath), nameProvider);
-        output = tmpdir.newFile("output.dex");
-        reader.read();
-        reader.write(output);
-
-        // Now we verify each and every byte:
-        RandomAccessFile inputf = new RandomAccessFile(new File(dexPath), "r");
-        RandomAccessFile outputf = new RandomAccessFile(output, "r");
-
-        for (int i = 0; i < 452; i++) {
-            assertEquals("at byte " + i,
-                         String.format("%2x", inputf.readByte()),
-                         String.format("%2x", outputf.readByte()));
-        }
-
-        inputf.close();
-        outputf.close();
-    }
-
     @Test
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
