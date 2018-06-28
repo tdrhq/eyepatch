@@ -2,13 +2,9 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.util.Checks;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class DefaultInvocationHandler implements StaticInvocationHandlerInterface {
+public class DefaultInvocationHandler implements StaticInvocationHandler {
 
     private List<? extends ClassHandler> prebuiltHandlers;
 

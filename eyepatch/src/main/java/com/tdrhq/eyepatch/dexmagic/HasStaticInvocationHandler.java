@@ -3,5 +3,5 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 public interface HasStaticInvocationHandler {
-    StaticInvocationHandlerInterface getStaticInvocationHandler();
+    StaticInvocationHandler getStaticInvocationHandler();
 }
