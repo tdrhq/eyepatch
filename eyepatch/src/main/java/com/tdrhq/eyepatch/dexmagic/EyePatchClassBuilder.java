@@ -1,7 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import com.android.dx.*;
 import com.tdrhq.eyepatch.util.Checks;
 import dalvik.system.DexFile;
@@ -267,7 +266,6 @@ public class EyePatchClassBuilder {
             Local<Object> tmp,
             Class[] parameterTypes, Code code) {
         code.newArray(callerArgs, parameterLength);
-        Log.i("EyePatchClassBuilder", "class: " + Arrays.toString(parameterTypes));
         for (int i = parameterTypes.length - 1; i>= 0; i--) {
             code.loadConstant(parameterLength, i);
             if (Primitives.isPrimitive(parameterTypes[i])) {
