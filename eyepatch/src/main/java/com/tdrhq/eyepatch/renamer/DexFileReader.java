@@ -7,7 +7,6 @@ import com.android.dex.Mutf8;
 import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.dex.file.ItemType;
-
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +16,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.Adler32;
 
@@ -51,7 +52,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     MethodIdItem[] methodIdItems = null;
     ProtoIdItem[] protoIdItems = null;
     DebugInfoItem[] debugInfoItems;
-    _StringDataItem[] stringDataItems;
+    ArrayList<_StringDataItem> stringDataItems = null;
     ClassDataItem[] classDataItems;
     CodeItem[] codeItems;
 
@@ -102,7 +103,11 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 break;
 
             case TYPE_STRING_DATA_ITEM:
-                stringDataItems = readArray(item.size, _StringDataItem.class, this, raf);
+                _StringDataItem[] items = readArray(item.size, _StringDataItem.class, this, raf);
+                stringDataItems = new ArrayList<_StringDataItem>();
+                for (_StringDataItem dataItem : items) {
+                    stringDataItems.add(dataItem);
+                }
                 break;
 
             case TYPE_CLASS_DATA_ITEM:
@@ -136,11 +141,9 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     public void addString(String val) {
-        stringDataItems = Arrays.copyOf(stringDataItems, stringDataItems.length + 1);
-
         _StringDataItem newDataItem = new _StringDataItem(this);
         newDataItem.decoded = val;
-        stringDataItems[stringDataItems.length - 1] = newDataItem;
+        stringDataItems.add(newDataItem);
 
         int newOffset = (insertedOffsets --);
         newDataItem.setOrigOffset(newOffset);
@@ -343,7 +346,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 writeArray(codeItems, raf);
                 break;
             case TYPE_STRING_DATA_ITEM:
-                writeArray(stringDataItems, raf);
+                writeArray(stringDataItems.toArray(new _StringDataItem[1]), raf);
                 break;
             case TYPE_CLASS_DATA_ITEM:
                 writeArray(classDataItems, raf);
@@ -368,7 +371,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         updateOffsets(methodIdItems);
         updateOffsets(protoIdItems);
         updateOffsets(debugInfoItems);
-        updateOffsets(stringDataItems);
+        updateOffsets(stringDataItems.toArray(new _StringDataItem[1]));
         updateOffsets(classDataItems);
         updateOffsets(codeItems);
 
