@@ -44,7 +44,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     HeaderItem headerItem = null;
     MapList mapList = null;
 
-    StringIdItem[] stringIdItems = null;
+    List<StringIdItem> stringIdItems = null;
     private RandomAccessFile raf;
     ClassDefItem[] classDefItems = null;
     TypeIdItem[] typeIdItems = null;
@@ -75,14 +75,14 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
             case TYPE_HEADER_ITEM:
                 break;
             case TYPE_STRING_ID_ITEM:
-                stringIdItems = readArray(
+                stringIdItems = newList(readArray(
                         (int) headerItem.stringIdsSize,
                         StringIdItem.class,
                         this,
-                        raf);
+                        raf));
 
-                for (int i = 0; i < stringIdItems.length; i++) {
-                    stringIdItems[i].originalIndex = i;
+                for (int i = 0; i < stringIdItems.size(); i++) {
+                    stringIdItems.get(i).originalIndex = i;
                 }
                 break;
             case TYPE_TYPE_ID_ITEM:
@@ -135,8 +135,8 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
     @Override
     public int getUpdatedStringIndex(int originalIndex) {
-        for (int i = 0; i < stringIdItems.length; i++) {
-            if (originalIndex == stringIdItems[i].originalIndex) {
+        for (int i = 0; i < stringIdItems.size(); i++) {
+            if (originalIndex == stringIdItems.get(i).originalIndex) {
                 return i;
             }
         }
@@ -154,7 +154,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
         // now to figure out where to insert the idItem.
         int insertPos = 0;
-        for (; insertPos < stringIdItems.length; insertPos++) {
+        for (; insertPos < stringIdItems.size(); insertPos++) {
             if (compareStrings(
                         val,
                         getString(insertPos))) {
@@ -163,16 +163,11 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
         }
 
-        stringIdItems = Arrays.copyOf(stringIdItems, stringIdItems.length + 1);
         StringIdItem newItem =  new StringIdItem(this);
-        stringIdItems[stringIdItems.length - 1] = newItem;
-        for (int i = stringIdItems.length - 1; i > insertPos; i--) {
-            stringIdItems[i].stringDataOff = stringIdItems[i - 1].stringDataOff;
-            stringIdItems[i].originalIndex = stringIdItems[i - 1].originalIndex;
-        }
+        newItem.stringDataOff = (int) newDataItem.getOrigOffset();
+        newItem.originalIndex = -1;
 
-        stringIdItems[insertPos].stringDataOff = (int) newDataItem.getOrigOffset();
-        stringIdItems[insertPos].originalIndex = -1;
+        stringIdItems.add(insertPos, newItem);
 
         headerItem.stringIdsSize ++;
 
@@ -329,7 +324,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 mapList.write(raf);
                 break;
             case TYPE_STRING_ID_ITEM:
-                writeArray(stringIdItems, raf);
+                writeArray(stringIdItems.toArray(new StringIdItem[1]), raf);
                 break;
             case TYPE_TYPE_ID_ITEM:
                 writeArray(typeIdItems, raf);
@@ -368,7 +363,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         headerItem.updateOffsets();
         mapList.updateOffsets();
 
-        updateOffsets(stringIdItems);
+        updateOffsets(stringIdItems.toArray(new StringIdItem[0]));
         updateOffsets(classDefItems);
         updateOffsets(typeIdItems);
         updateOffsets(fieldIdItems);
@@ -424,7 +419,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     String getString(long idx)  {
-        long off = stringIdItems[(int) idx].stringDataOff;
+        long off = stringIdItems.get((int) idx).stringDataOff;
         for (_StringDataItem  dataItem : stringDataItems) {
             if (dataItem.getOrigOffset() == off) {
                 return dataItem.decoded;

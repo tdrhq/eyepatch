@@ -87,7 +87,7 @@ public class DexFileReaderTest {
     public void testStringIdItem() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
-        assertEquals(0xe4, reader.stringIdItems[0].stringDataOff);
+        assertEquals(0xe4, reader.stringIdItems.get(0).stringDataOff);
         assertEquals("Foo.generated", reader.getString(0));
         assertEquals("L", reader.getString(1));
         assertEquals("Lcom/foo/Foo;", reader.getString(2));
