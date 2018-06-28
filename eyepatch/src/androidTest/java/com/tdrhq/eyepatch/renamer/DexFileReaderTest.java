@@ -212,6 +212,24 @@ public class DexFileReaderTest {
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
 
+    @Test
+    public void testJumboConstString() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
+        output = tmpdir.newFile("output.dex");
+        reader.read();
+        for (int i = 0; i < 80000; i++) {
+            reader.addString("z" + i);
+        }
+        reader.write(output);
+
+        HexDump.hexDump(output);
+
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo", classLoader);
+        assertNotNull(FooClass);
+
+        assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+    }
 
     @Test
     public void testCodeItemBasics() throws Throwable {

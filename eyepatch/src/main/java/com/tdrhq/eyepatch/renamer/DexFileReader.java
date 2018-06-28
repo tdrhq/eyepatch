@@ -434,14 +434,15 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
     private void updateMessageDigest(RandomAccessFile raf) throws IOException {
         raf.seek(8 + 4 + 20);
+        byte[] data = new byte[1024 * 1024];
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             while (true) {
-                try {
-                    md.update(raf.readByte());
-                } catch (EOFException e) {
+                int read = raf.read(data);
+                if (read < 0) {
                     break;
                 }
+                md.update(data, 0, read);
             }
             headerItem.signature = md.digest();
         } catch (NoSuchAlgorithmException e) {
