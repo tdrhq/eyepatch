@@ -265,6 +265,41 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
         headerItem.fileSize = (int) raf.getFilePointer();
         updateOffsets();
+
+        headerItem.dataOff = (int) mapList.getWriteOffset();
+        if (classDataItems != null) {
+            headerItem.dataOff =
+                    Math.min(
+                            headerItem.dataOff,
+                            (int) classDataItems[0].getWriteOffset());
+
+        }
+
+        if (stringDataItems != null) {
+            headerItem.dataOff =
+                    Math.min(
+                            headerItem.dataOff,
+                            (int) stringDataItems.get(0).getWriteOffset());
+        }
+
+        if (debugInfoItems != null) {
+            headerItem.dataOff =
+                    Math.min(
+                            headerItem.dataOff,
+                            (int) debugInfoItems[0].getWriteOffset());
+        }
+
+        if (codeItems != null) {
+            headerItem.dataOff =
+                    Math.min(
+                            headerItem.dataOff,
+                            (int) codeItems[0].getWriteOffset());
+        }
+
+
+        // TODO: annotation_item, encoded_array_item, annotations_directory_item
+
+        headerItem.dataSize = headerItem.fileSize - headerItem.dataOff;
         writeAll(raf);
 
         updateMessageDigest(raf);

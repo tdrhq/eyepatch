@@ -24,6 +24,10 @@ public abstract class Streamable {
         return origOffset;
     }
 
+    public long getWriteOffset() {
+        return writeOffset;
+    }
+
     public void setOrigOffset(long _origOffset) {
         this.origOffset = _origOffset;
     }
