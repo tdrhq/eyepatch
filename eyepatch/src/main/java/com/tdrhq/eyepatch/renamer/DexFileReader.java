@@ -32,6 +32,8 @@ public class DexFileReader {
     }
 
     HeaderItem headerItem = null;
+    _MapList mapList = null;
+
     StringIdItem[] stringIdItems = null;
     private RandomAccessFile raf;
     _ClassDefItem[] classDefItems = null;
@@ -39,7 +41,6 @@ public class DexFileReader {
     _FieldIdItem[] fieldIdItems = null;
     _MethodIdItem[] methodIdItems = null;
     _ProtoIdItem[] protoIdItems = null;
-    _MapList mapList = null;
     _DebugInfoItem[] debugInfoItems;
     _StringDataItem[] stringDataItems;
     _ClassDataItem[] classDataItems;
@@ -58,37 +59,56 @@ public class DexFileReader {
         raf.seek(headerItem.mapOff);
         mapList.read(raf);
 
-        raf.seek(headerItem.stringIdsOff);
-        stringIdItems = readArray(
-                (int) headerItem.stringIdsSize,
-                StringIdItem.class,
-                this,
-                raf);
-        readStringDataItems();
+        for (_MapItem item : mapList.list) {
+            raf.seek(item.offset);
+            switch (item.getItemType()) {
+            case TYPE_HEADER_ITEM:
+                break;
+            case TYPE_STRING_ID_ITEM:
+                stringIdItems = readArray(
+                        (int) headerItem.stringIdsSize,
+                        StringIdItem.class,
+                        this,
+                        raf);
+                break;
+            case TYPE_TYPE_ID_ITEM:
+                typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class, this, raf);
+                break;
 
-        raf.seek(headerItem.typeIdsOff);
-        typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class, this, raf);
+            case TYPE_PROTO_ID_ITEM:
+                protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class, this, raf);
+                break;
+            case TYPE_METHOD_ID_ITEM:
+                methodIdItems = readArray(headerItem.methodIdsSize, _MethodIdItem.class, this, raf);
+                break;
+            case TYPE_CLASS_DEF_ITEM:
+                classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class, this, raf);
+                break;
+            case TYPE_CODE_ITEM:
+                codeItems = readArray(item.size, _CodeItem.class, this, raf);
+                break;
 
-        raf.seek(headerItem.classDefsOff);
-        classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class, this, raf);
+            case TYPE_STRING_DATA_ITEM:
+                stringDataItems = readArray(item.size, _StringDataItem.class, this, raf);
+                break;
 
-        readClassDataItems();
+            case TYPE_CLASS_DATA_ITEM:
+                classDataItems = readArray(item.size, _ClassDataItem.class, this, raf);
+                break;
+            case TYPE_MAP_LIST:
+                break;
 
-        raf.seek(headerItem.fieldIdsOff);
-        fieldIdItems = readArray(headerItem.fieldIdsSize, _FieldIdItem.class, this, raf);
+            default:
+                throw new UnsupportedOperationException("unexpected type: " + item.getItemType());
+            }
+        }
 
-        raf.seek(headerItem.methodIdsOff);
-        methodIdItems = readArray(headerItem.methodIdsSize, _MethodIdItem.class, this, raf);
-
-        raf.seek(headerItem.protoIdsOff);
-        protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class, this, raf);
 
         readDebugInfoItems();
         readTypeList();
         readAnnotationSetRefList();
         readAnnotationSetItem();
         readEncodedArrayItems();
-        readCodeItems();
     }
 
     private void readDebugInfoItems() throws IOException {
@@ -115,36 +135,6 @@ public class DexFileReader {
         }
 
         throw new UnsupportedOperationException();
-    }
-
-    private void readCodeItems() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_CODE_ITEM);
-        if (item == null) {
-            return;
-        }
-
-        raf.seek(item.offset);
-        codeItems = readArray(item.size, _CodeItem.class, this, raf);
-    }
-
-    private void readStringDataItems() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_STRING_DATA_ITEM);
-        if (item == null) {
-            throw new RuntimeException("could not find data items");
-        }
-
-        raf.seek(item.offset);
-        stringDataItems = readArray(item.size, _StringDataItem.class, this, raf);
-    }
-
-    private void readClassDataItems() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_CLASS_DATA_ITEM);
-        if (item == null) {
-            throw new RuntimeException("could not find data items");
-        }
-
-        raf.seek(item.offset);
-        classDataItems = readArray(item.size, _ClassDataItem.class, this, raf);
     }
 
     static class _StringDataItem extends Streamable {

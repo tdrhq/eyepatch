@@ -12,11 +12,13 @@ import com.android.dx.dex.file.ItemType;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
 import com.tdrhq.eyepatch.renamer.DexFileReader.*;
+import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -138,6 +140,31 @@ public class DexFileReaderTest {
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
+    }
+
+    //    @Test
+    public void testReadWriteIsSameForLargeDexFile() throws Throwable {
+        assertEquals(new ArrayList<String>(), ClassLoaderIntrospector.getOriginalDexPath(
+                             getClass().getClassLoader()));
+        String dexPath = ClassLoaderIntrospector.getOriginalDexPath(
+                getClass().getClassLoader()).get(1);
+        DexFileReader reader = new DexFileReader(new File(dexPath), nameProvider);
+        output = tmpdir.newFile("output.dex");
+        reader.read();
+        reader.write(output);
+
+        // Now we verify each and every byte:
+        RandomAccessFile inputf = new RandomAccessFile(new File(dexPath), "r");
+        RandomAccessFile outputf = new RandomAccessFile(output, "r");
+
+        for (int i = 0; i < 452; i++) {
+            assertEquals("at byte " + i,
+                         String.format("%2x", inputf.readByte()),
+                         String.format("%2x", outputf.readByte()));
+        }
+
+        inputf.close();
+        outputf.close();
     }
 
     @Test
