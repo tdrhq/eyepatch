@@ -42,7 +42,10 @@ public class Whitebox {
             method.setAccessible(true);
             return method.invoke(instance, getValues(args));
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                    "No such method, shoud be one of: " +
+                    getMethodList(instance.getClass()),
+                    e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -56,7 +59,10 @@ public class Whitebox {
             method.setAccessible(true);
             return method.invoke(null, getValues(args));
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                    "No such method, shoud be one of: " +
+                    getMethodList(klass),
+                    e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -88,6 +94,14 @@ public class Whitebox {
         return ret;
     }
 
+    private static String getMethodList(Class type) {
+        Method[] methods = type.getDeclaredMethods();
+        String ret = "";
+        for (Method f: methods) {
+            ret += f.getName() + "; ";
+        }
+        return ret;
+    }
 
     public static Object getField(Object instance, String fieldName) {
         return getField(instance, instance.getClass(), fieldName);
