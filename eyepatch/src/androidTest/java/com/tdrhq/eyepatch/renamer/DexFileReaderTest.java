@@ -7,7 +7,6 @@ import com.android.dx.DexMaker;
 import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
-import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.ItemType;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;

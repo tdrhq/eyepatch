@@ -5,10 +5,9 @@ package com.tdrhq.eyepatch.renamer;
 import android.util.Log;
 import com.android.dex.Mutf8;
 import com.android.dx.dex.DexOptions;
-import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.dex.file.ItemType;
-import com.android.dx.rop.type.Type;
+
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -18,10 +17,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.Adler32;
 
@@ -31,7 +28,7 @@ import java.util.zip.Adler32;
  * This lets us modifiy the structures of the DexFile in order to
  * rewrite it as something else.
  */
-public class DexFileReader {
+public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     private File file;
     private NameProvider nameProvider;
     private int insertedOffsets = -100;
@@ -127,7 +124,8 @@ public class DexFileReader {
         readEncodedArrayItems();
     }
 
-    int getUpdatedStringIndex(int originalIndex) {
+    @Override
+    public int getUpdatedStringIndex(int originalIndex) {
         for (int i = 0; i < stringIdItems.length; i++) {
             if (originalIndex == stringIdItems[i].originalIndex) {
                 return i;
@@ -307,37 +305,9 @@ public class DexFileReader {
 
         if (codeItems != null) {
             for (_CodeItem codeItem : codeItems) {
-                updateStringIdsInCodeItem(codeItem);
+                CodeItemRewriter.updateStringIdsInCodeItem(this, codeItem);
             }
         }
-    }
-
-    private void updateStringIdsInCodeItem(_CodeItem codeItem) {
-        List<Short> newInsns = new ArrayList<>();
-
-        for (int i = 0; i < codeItem.insnsSize; ) {
-            int insn = codeItem.insns[i];
-            int opcode = insn & 0xff;
-            int insnLen = InsnFormat.getLength(opcode);
-
-            if (opcode == 0x1a /* const-string */) {
-                // For easier implementation we'll always change to const-string/jumbo
-                newInsns.add((short) 0x1b);
-                int newIdx = getUpdatedStringIndex(codeItem.insns[i+1]);
-                codeItem.insns[i+1] = (short) newIdx;
-            }
-            else if (opcode == 0x1b /* const-string/jumbo */) {
-                throw new UnsupportedOperationException("TODO: big dex file, amiright?");
-            } else {
-                // copy whole instruction as is
-                for (int j = 0; j < insnLen; j++) {
-                    newInsns.add(codeItem.insns[i + j]);
-                }
-            }
-
-            i += insnLen;
-        }
-
     }
 
     private void writeAll(RandomAccessFile raf) throws IOException {
@@ -586,58 +556,6 @@ public class DexFileReader {
         }
 
         throw new RuntimeException("could not find codeItem");
-    }
-
-    static class _CodeItem extends Streamable {
-        @F(idx=1) short registersSize;
-        @F(idx=2) short insSize;
-        @F(idx=3) short outsSize;
-        @F(idx=4) short triesSize;
-        @F(idx=5) @Offset int debugInfoOff;
-        @F(idx=6) int insnsSize;
-        @F(idx=7, sizeIdx=6) short[] insns;
-
-        // these are conditional
-        short padding = 0;
-        _TryItem[] tryItems;
-        _EncodedCatchHandlerList encodedCatchHandlerList = null;
-
-        public _CodeItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            readObject(raf);
-
-            if (insnsSize % 2 != 0 && triesSize > 0) {
-                padding = RafUtil.readUShort(raf);
-            }
-
-            if (triesSize > 0) {
-                tryItems = readArray(triesSize, _TryItem.class, dexFileReader, raf);
-                encodedCatchHandlerList = new _EncodedCatchHandlerList(dexFileReader);
-                encodedCatchHandlerList.read(raf);
-            }
-        }
-
-        @Override
-        public void writeImpl(RandomAccessFile raf) throws IOException {
-            writeObject(raf);
-
-            if (insnsSize % 2 != 0) {
-
-                // acc. to the doc this should only be written if
-                // triesSize >0, but it should be safe to always write
-                // it, and dexmaker seems to be doing that too
-                RafUtil.writeUShort(raf, padding);
-            }
-
-            if (triesSize > 0) {
-                writeArray(tryItems, raf);
-                encodedCatchHandlerList.write(raf);
-            }
-        }
     }
 
     static class _TryItem extends Streamable {
