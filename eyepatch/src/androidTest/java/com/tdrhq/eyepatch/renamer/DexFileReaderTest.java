@@ -184,8 +184,6 @@ public class DexFileReaderTest {
         }
         reader.write(output);
 
-        HexDump.hexDump(output);
-
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
@@ -202,8 +200,6 @@ public class DexFileReaderTest {
             reader.addString("z" + i);
         }
         reader.write(output);
-
-        HexDump.hexDump(output);
 
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
