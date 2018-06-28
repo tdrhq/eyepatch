@@ -54,15 +54,12 @@ public class EyePatchClassBuilderTest {
 
     @After
     public void after() throws Throwable {
-        for (String s : tmpdir.getRoot().list()) {
-            Log.i("EyePatchClassBuilderTest", "After: " + s);
-        }
         StaticInvocationHandler.setDefaultHandler();
     }
 
     @Test
     public void testWrapping() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Invocation expectedInvocation = new Invocation(
@@ -81,7 +78,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testHandlerArgs() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
 
@@ -113,7 +110,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testNonStatic() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
@@ -135,7 +132,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testFinalMethod() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
@@ -157,7 +154,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testOtherReturnType() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
@@ -179,7 +176,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testPrimitiveReturnType() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "primitiveReturnType";
@@ -202,7 +199,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testFloatType() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "floatType";
@@ -225,7 +222,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testVoidReturn() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "doSomething";
@@ -289,7 +286,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testSingleArg() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "doSomething";
@@ -319,7 +316,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testTwoArgs() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "doSomething";
@@ -350,7 +347,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testPrimitiveArg() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "doSomething";
@@ -380,7 +377,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testTwoArgsWithPrim() throws Exception {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         String functionName = "doSomething";
@@ -410,7 +407,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testCallsConstructorWithoutArgs() throws Throwable {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo.class, classLoader);
@@ -439,7 +436,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testCallsConstructorWithArgs() throws Throwable {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader);
@@ -476,7 +473,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testVerifyClassAndClassLoaderInInvocation() throws Throwable {
         final Class[] klass = new Class[1];
-        StaticInvocationHandler handler = new StaticInvocationHandler() {
+        StaticInvocationHandlerInterface handler = new StaticInvocationHandlerInterface() {
                 @Override
                 public Object handleInvocation(Invocation invocation) {
                     klass[0] = invocation.getInstanceClass();
@@ -521,7 +518,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testMethodPolymorph() throws Throwable {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         StaticInvocationHandler.setHandler(handler);
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo3.class, classLoader);
         Invocation expectedInvocation = new Invocation(

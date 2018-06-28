@@ -9,12 +9,12 @@ import static org.mockito.Mockito.*;
 
 public class DelegatingInvocationHandlerTest {
     private DelegatingInvocationHandler mHandler;
-    private StaticInvocationHandler staticHandler;
+    private StaticInvocationHandlerInterface staticHandler;
 
     @Before
     public void before() throws Throwable {
         mHandler = new DelegatingInvocationHandler();
-        staticHandler = mock(StaticInvocationHandler.class);
+        staticHandler = mock(StaticInvocationHandlerInterface.class);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class DelegatingInvocationHandlerTest {
         }
 
         @Override
-        public StaticInvocationHandler getStaticInvocationHandler() {
+        public StaticInvocationHandlerInterface getStaticInvocationHandler() {
             return staticHandler;
         }
     }

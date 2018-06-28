@@ -5,6 +5,7 @@ import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.Invocation;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
+import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandlerInterface;
 import dalvik.system.PathClassLoader;
 import org.junit.After;
 import org.junit.Test;
@@ -108,7 +109,7 @@ public class EyePatchTestRunnerTest {
 
     @Test
     public void testCallsToStaticHandler() throws Throwable {
-        StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
+        StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
         Mockito.when(handler.handleInvocation(
                              Mockito.any(Invocation.class))).thenReturn("blah");
         StaticInvocationHandler.setHandler(handler);

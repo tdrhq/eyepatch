@@ -6,7 +6,7 @@ package com.tdrhq.eyepatch.dexmagic;
  * A StaticInvocationHandler that delegates to the
  * StaticInvocationHandler provided by the ClassLoader.
  */
-public class DelegatingInvocationHandler extends StaticInvocationHandler {
+public class DelegatingInvocationHandler implements StaticInvocationHandlerInterface {
     @Override
     public Object handleInvocation(Invocation invocation) {
         ClassLoader classLoader = invocation.getInstanceClass().getClassLoader();

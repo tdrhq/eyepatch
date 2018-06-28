@@ -5,16 +5,15 @@ package com.tdrhq.eyepatch.classloader;
 import android.util.Log;
 import com.tdrhq.eyepatch.dexmagic.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
-import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
+import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandlerInterface;
 import com.tdrhq.eyepatch.dexmagic.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +29,7 @@ import java.util.Set;
 public class EyePatchClassLoader extends ClassLoader
     implements HasStaticInvocationHandler, StaticVerificationHandler {
     private PathClassLoader parent;
-    private StaticInvocationHandler mStaticInvocationHandler;
+    private StaticInvocationHandlerInterface mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
     List<ClassHandler> classHandlers;
@@ -152,7 +151,7 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     @Override
-    public StaticInvocationHandler getStaticInvocationHandler() {
+    public StaticInvocationHandlerInterface getStaticInvocationHandler() {
         return Checks.notNull(mStaticInvocationHandler);
     }
 

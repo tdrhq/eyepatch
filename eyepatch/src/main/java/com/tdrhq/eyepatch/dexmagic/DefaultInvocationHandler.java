@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultInvocationHandler extends StaticInvocationHandler {
+public class DefaultInvocationHandler implements StaticInvocationHandlerInterface {
 
     private List<? extends ClassHandler> prebuiltHandlers;
 

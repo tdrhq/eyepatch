@@ -13,22 +13,20 @@ import com.tdrhq.eyepatch.util.Checks;
  */
 public abstract class StaticInvocationHandler {
 
-    private static StaticInvocationHandler DEFAULT_HANDLER = new DelegatingInvocationHandler();
+    private static StaticInvocationHandlerInterface DEFAULT_HANDLER = new DelegatingInvocationHandler();
 
-    private static StaticInvocationHandler sHandler = DEFAULT_HANDLER;
+    private static StaticInvocationHandlerInterface sHandler = DEFAULT_HANDLER;
 
     public static void setDefaultHandler() {
         sHandler = DEFAULT_HANDLER;
     }
 
-    public static void setHandler(StaticInvocationHandler handler) {
+    public static void setHandler(StaticInvocationHandlerInterface handler) {
         sHandler = Checks.notNull(handler);
     }
 
     public StaticInvocationHandler() {
     }
-
-    public abstract Object handleInvocation(Invocation invocation);
 
     public static Object invokeStatic(
             Class klass,
