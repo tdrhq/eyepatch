@@ -427,42 +427,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         throw new RuntimeException("could not find data for this string");
     }
 
-    static class HeaderItem extends Streamable {
-        @F(idx=1) byte[] magic = new byte[8];
-        @F(idx=2) int checksum;
-        @F(idx=3) byte[] signature = new byte[20];
-        @F(idx=4) int fileSize;
-        @F(idx=5) int headerSize;
-        @F(idx=6) int endianTag;
-        @F(idx=7) int linkSize;
-        @F(idx=8) @Offset int linkOff;
-        @F(idx=9) @Offset int mapOff;
-        @F(idx=10) int stringIdsSize;
-        @F(idx=11) @Offset int stringIdsOff;
-        @F(idx=12) int typeIdsSize;
-        @F(idx=13) @Offset int typeIdsOff;
-        @F(idx=14) int protoIdsSize;
-        @F(idx=15) @Offset int protoIdsOff;
-        @F(idx=16) int fieldIdsSize;
-        @F(idx=17) @Offset int fieldIdsOff;
-        @F(idx=18) int methodIdsSize;
-        @F(idx=19) @Offset int methodIdsOff;
-        @F(idx=20) int classDefsSize;
-        @F(idx=21) @Offset int classDefsOff;
-        @F(idx=22) int dataSize;
-        @F(idx=23) @Offset int dataOff;
-
-        public HeaderItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            super.readImpl(raf);
-            Log.i("DexFileReader", "checksum is: " + checksum + " " + String.format("%8x", checksum));
-        }
-    }
-
     MapItem getMapItem(ItemType itemType) {
         for (int i = 0; i < mapList.size; i++) {
             if (mapList.list[i].type == itemType.getMapValue()) {
@@ -470,82 +434,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
             }
         }
         return null;
-    }
-
-    static class MapList extends Streamable {
-        @F(idx=1) int size;
-        @F(idx=2, sizeIdx=1) MapItem[] list;
-
-        public MapList(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class MapItem extends Streamable {
-        @F(idx=1) short type;
-        @F(idx=2) short unused;
-        @F(idx=3) int size;
-        @F(idx=4) @Offset int offset;
-
-        public MapItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        public ItemType getItemType() {
-            for (ItemType _type : ItemType.values()) {
-                if (_type.getMapValue() == type) {
-                    return _type;
-                }
-            }
-            throw new RuntimeException("unknown type");
-        }
-    }
-
-    static class TypeIdItem extends Streamable {
-        @F(idx=1) int descriptorIdx; // a  pointer to string_ids
-
-        public TypeIdItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        public String getString() throws IOException{
-            return dexFileReader.getString(descriptorIdx);
-        }
-    }
-
-    static class EncodedField extends Streamable {
-        @F(idx=1, uleb=true) int fieldIdxDiff;
-        @F(idx=2, uleb=true) int accessFlags;
-
-        @Override
-        public boolean isAligned() {
-            return false;
-        }
-
-        public EncodedField(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class EncodedMethod extends Streamable {
-        @F(idx=1, uleb=true) int methodIdxDiff;
-        @F(idx=2, uleb=true) int accessFlags;
-        @F(idx=3, uleb=true) @Offset int codeOff;
-
-        @Override
-        public boolean isAligned() {
-            return false;
-        }
-
-        public EncodedMethod(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            super.readImpl(raf);
-            Log.i("DexFileReader", "Read encoded method as: " + methodIdxDiff + " " + accessFlags + " " + codeOff);
-        }
     }
 
     public CodeItem getCodeItem(EncodedMethod method) {
@@ -558,79 +446,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         throw new RuntimeException("could not find codeItem");
     }
 
-    static class TryItem extends Streamable {
-        @F(idx=1) int startAddr;
-        @F(idx=2) short insnCount;
-        @F(idx=3) @Offset short handlerOff;
-        public TryItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class EncodedCatchHandlerList extends Streamable {
-        @F(idx=1, uleb=true) int size;
-        @F(idx=2, sizeIdx=1) EncodedCatchHandler[] list;
-
-        public EncodedCatchHandlerList(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class EncodedCatchHandler extends Streamable {
-        long size;
-        EncodedTypeAddrPair[] handlers;
-        long catchAllAddr;
-
-        public EncodedCatchHandler(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            size = RafUtil.readSLeb128(raf);
-
-            // handle negative numbers here.
-            if (size != 0) {
-
-                throw new RuntimeException("unexpected: " + size);
-            }
-
-            handlers = readArray(Math.abs((int) size), EncodedTypeAddrPair.class, this, raf);
-            catchAllAddr = RafUtil.readULeb128(raf);
-        }
-
-    }
-
-    static class EncodedTypeAddrPair extends Streamable {
-        @F(idx=1, uleb=true) long typeIdx;
-        @F(idx=1, uleb=true) long addr;
-
-        public EncodedTypeAddrPair(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class ClassDataItem extends Streamable {
-        @F(idx=1, uleb=true) int staticFieldsSize;
-        @F(idx=2, uleb=true) int instanceFieldsSize;
-        @F(idx=3, uleb=true) int directMethodsSize;
-        @F(idx=4, uleb=true) int virtualMethodsSize;
-
-        @F(idx=5, sizeIdx=1) EncodedField[] staticFields;
-        @F(idx=6, sizeIdx=2) EncodedField[] instanceFields;
-        @F(idx=7, sizeIdx=3) EncodedMethod[] directMethods;
-        @F(idx=8, sizeIdx=4) EncodedMethod[] virtualMethods;
-
-        @Override
-        public boolean isAligned() {
-            return false;
-        }
-
-        public ClassDataItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
     public ClassDataItem getClassDataItem(ClassDefItem classDefItem) {
         for (ClassDataItem dataItem : classDataItems) {
             if (dataItem.getOrigOffset() == classDefItem.classDataOff) {
@@ -639,28 +454,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
 
         throw new RuntimeException("could not find data item");
-    }
-
-    static class ClassDefItem extends Streamable {
-        @F(idx=1) int classIdx;
-        @F(idx=2) int accessFlags;
-        @F(idx=3) int superclassIdx;
-        @F(idx=4) @Offset int interfacesOff;
-        @F(idx=5) int sourceFileIdx;
-        @F(idx=6) @Offset int annotationsOff;
-        @F(idx=7) @Offset int classDataOff;
-        @F(idx=8) @Offset int staticValuesOff;
-
-        public ClassDefItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            readObject(raf);
-        }
-
     }
 
     static <T extends Streamable> T[] readArray(int size, Class<T> klass, Object parent, RandomAccessFile raf) throws IOException {
@@ -694,35 +487,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     static <T extends Streamable> void writeArray(T[] ts, RandomAccessFile raf) throws IOException  {
         for (int i = 0; i < ts.length; i++) {
             ts[i].write(raf);
-        }
-    }
-
-    static class StringIdItem extends Streamable {
-        @F(idx=1) @Offset int stringDataOff;
-        int originalIndex = -1;
-
-        public StringIdItem(DexFileReader reader) {
-            super(reader);
-        }
-    }
-
-    static class FieldIdItem extends Streamable {
-        @F(idx=1) short classIdx;
-        @F(idx=2) short typeIdx;
-        @F(idx=3) int nameIdx;
-
-        public FieldIdItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class MethodIdItem extends Streamable {
-        @F(idx=1) short classIdx;
-        @F(idx=2) short protoIdx;
-        @F(idx=3) int nameIdx;
-
-        public MethodIdItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
         }
     }
 

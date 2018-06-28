@@ -14,8 +14,8 @@ class CodeItem extends Streamable {
 
     // these are conditional
     short padding = 0;
-    DexFileReader.TryItem[] tryItems;
-    DexFileReader.EncodedCatchHandlerList encodedCatchHandlerList = null;
+    TryItem[] tryItems;
+    EncodedCatchHandlerList encodedCatchHandlerList = null;
 
     public CodeItem(DexFileReader dexFileReader) {
         super(dexFileReader);
@@ -30,8 +30,8 @@ class CodeItem extends Streamable {
         }
 
         if (triesSize > 0) {
-            tryItems = DexFileReader.readArray(triesSize, DexFileReader.TryItem.class, dexFileReader, raf);
-            encodedCatchHandlerList = new DexFileReader.EncodedCatchHandlerList(dexFileReader);
+            tryItems = DexFileReader.readArray(triesSize, TryItem.class, dexFileReader, raf);
+            encodedCatchHandlerList = new EncodedCatchHandlerList(dexFileReader);
             encodedCatchHandlerList.read(raf);
         }
     }
