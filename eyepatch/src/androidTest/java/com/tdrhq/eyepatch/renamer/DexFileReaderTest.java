@@ -175,11 +175,30 @@ public class DexFileReaderTest {
     }
 
     @Test
-    public void testConstStringBecomesJumbo() throws Throwable {
+    public void testInsertingMultipleStrings() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         output = tmpdir.newFile("output.dex");
         reader.read();
         for (int i = 0; i < 8; i++) {
+            reader.addString("z" + i);
+        }
+        reader.write(output);
+
+        HexDump.hexDump(output);
+
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo", classLoader);
+        assertNotNull(FooClass);
+
+        assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
+    }
+
+    //@Test
+    public void testConstStringBecomesJumbo() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
+        output = tmpdir.newFile("output.dex");
+        reader.read();
+        for (int i = 0; i < 100; i++) {
             reader.addString("z" + i);
         }
         reader.write(output);

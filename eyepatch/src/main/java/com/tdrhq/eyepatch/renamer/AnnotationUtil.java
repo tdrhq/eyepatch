@@ -6,10 +6,24 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AnnotationUtil {
+    static Map<Class, List<Field>> annotationFieldsCache = new HashMap<>();
+
     public static List<Field> getAnnotatedFields(Class klass) {
+        if (annotationFieldsCache.containsKey(klass)) {
+            return annotationFieldsCache.get(klass);
+        }
+
+        List<Field> ret = getAnnotatedFieldsUncached(klass);
+        annotationFieldsCache.put(klass, ret);
+        return ret;
+    }
+
+    private static List<Field> getAnnotatedFieldsUncached(Class klass) {
         Field[] fields = klass.getDeclaredFields();
         Arrays.sort(fields, new Comparator<Field>() {
                 @Override

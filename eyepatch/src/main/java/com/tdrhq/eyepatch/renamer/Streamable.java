@@ -37,7 +37,6 @@ public abstract class Streamable {
         if (len == 4) {
             return;
         }
-        Log.i("DexFileReader", "writing alignment: " + len + " at " + output.getFilePointer());
         byte[] out = new byte[(int) len];
         output.write(out);
     }
@@ -49,7 +48,6 @@ public abstract class Streamable {
 
         writeOffset = output.getFilePointer();
         dexFileReader.offsetMap.put((int) origOffset, (int) writeOffset);
-        Log.i("Streamable", "Writing " + this.toString() + " to " + writeOffset + " (original: " + origOffset + ")" );
         writeImpl(output);
     }
 
@@ -95,7 +93,6 @@ public abstract class Streamable {
     }
 
     final protected void writeObject(RandomAccessFile raf) throws IOException {
-        Log.i("Streamable", "Writing object: " + this.toString());
         Class klass = this.getClass();
         List<Field> fields = AnnotationUtil.getAnnotatedFields(klass);
 
@@ -148,7 +145,6 @@ public abstract class Streamable {
     }
 
     public void updateOffsetsImpl() throws IllegalAccessException {
-        Log.i("Streamable", "updating offsets for " + this);
         for (Field f : AnnotationUtil.getAnnotatedFields(this.getClass())) {
             if (f.getAnnotation(Offset.class) != null) {
                 try {
