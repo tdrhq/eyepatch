@@ -103,11 +103,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 break;
 
             case TYPE_STRING_DATA_ITEM:
-                _StringDataItem[] items = readArray(item.size, _StringDataItem.class, this, raf);
-                stringDataItems = new ArrayList<_StringDataItem>();
-                for (_StringDataItem dataItem : items) {
-                    stringDataItems.add(dataItem);
-                }
+                stringDataItems = newList(readArray(item.size, _StringDataItem.class, this, raf));
                 break;
 
             case TYPE_CLASS_DATA_ITEM:
@@ -127,6 +123,14 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         readAnnotationSetRefList();
         readAnnotationSetItem();
         readEncodedArrayItems();
+    }
+
+    private <T> ArrayList<T> newList(T[] ts) {
+        ArrayList<T> ret = new ArrayList<T>();
+        for (T t : ts) {
+            ret.add(t);
+        }
+        return ret;
     }
 
     @Override
