@@ -17,7 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,15 +154,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         newDataItem.setOrigOffset(newOffset);
 
         // now to figure out where to insert the idItem.
-        int insertPos = 0;
-        for (; insertPos < stringIdItems.size(); insertPos++) {
-            if (compareStrings(
-                        val,
-                        getString(insertPos))) {
-                break;
-            }
-
-        }
+        int insertPos = stringIdItems.size();
 
         StringIdItem newItem =  new StringIdItem(this);
         newItem.stringDataOff = (int) newDataItem.getOrigOffset();
@@ -182,12 +175,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
             }
         }
 
-        // update the offsets cache
-        cachedOrigDataOff.put((long) newOffset, val);
-    }
-
-    static boolean compareStrings(String one, String two) {
-        return one.compareTo(two) < 0;
+        cachedOrigDataOff = null;
     }
 
     private void readDebugInfoItems() throws IOException {
@@ -289,7 +277,25 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         raf.close();
     }
 
+    private void sortStrings() {
+        Collections.sort(
+                stringIdItems,
+                new Comparator<StringIdItem>() {
+                    @Override
+                    public int compare(StringIdItem one, StringIdItem two) {
+                        return getString(one).compareTo(getString(two));
+                    }
+                });
+
+    }
+
+    private String getString(StringIdItem stringIdItem) {
+        long offset = stringIdItem.stringDataOff;
+        return getStringFromDataOffset(offset);
+    }
+
     private void updateStringIds() {
+        sortStrings();
         if (fieldIdItems != null) {
             for (FieldIdItem fieldIdItem : fieldIdItems) {
                 fieldIdItem.nameIdx = getUpdatedStringIndex(fieldIdItem.nameIdx);
@@ -423,15 +429,28 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
     Map<Long, String> cachedOrigDataOff = null;
     String getString(long idx)  {
+        long off = stringIdItems.get((int) idx).stringDataOff;
+        return getStringFromDataOffset(off);
+    }
 
+    String getStringFromDataOffset(long offset) {
         if (cachedOrigDataOff == null) {
             cachedOrigDataOff = new HashMap<>();
             for (_StringDataItem  dataItem : stringDataItems) {
+                if (cachedOrigDataOff.containsKey(dataItem.getOrigOffset())) {
+                    throw new IllegalStateException("multiple items has offset: " + dataItem.getOrigOffset());
+                }
+                Log.i("DexFileReader", "Putting: " + dataItem.getOrigOffset() + ": " + dataItem.decoded);
                 cachedOrigDataOff.put(dataItem.getOrigOffset(), dataItem.decoded);
             }
         }
-        long off = stringIdItems.get((int) idx).stringDataOff;
-        return cachedOrigDataOff.get(off);
+        String ret = cachedOrigDataOff.get(offset);
+
+        if (ret == null) {
+            throw new RuntimeException("no string for offset: " + offset);
+        }
+
+        return ret;
     }
 
     MapItem getMapItem(ItemType itemType) {

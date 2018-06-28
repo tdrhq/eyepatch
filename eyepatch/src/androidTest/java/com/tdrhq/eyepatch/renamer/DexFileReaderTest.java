@@ -223,17 +223,4 @@ public class DexFileReaderTest {
 
     }
 
-    @Test
-    public void testCompareString() throws Throwable {
-        assertTrue(DexFileReader.compareStrings("aaa", "abc"));
-        assertFalse(DexFileReader.compareStrings("abc", "aaa"));
-        assertTrue(DexFileReader.compareStrings("aaa", "aaab"));
-        assertFalse(DexFileReader.compareStrings("aaab", "aaaa"));
-        assertFalse(DexFileReader.compareStrings("aaa", "aaa"));
-        assertFalse(DexFileReader.compareStrings("zoidbera", "L"));
-        assertTrue(DexFileReader.compareStrings("Aoo.generated", "Foo.generated"));
-        assertFalse(DexFileReader.compareStrings("zoidbera", "Foo.generated"));
-        assertFalse(DexFileReader.compareStrings("Zoidbera", "Foo.generated"));
-
-    }
 }
