@@ -490,41 +490,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    static class ProtoIdItem extends Streamable {
-        @F(idx=1) int shortyIdx;
-        @F(idx=2) int returnTypeIdx;
-        @F(idx=3) @Offset int parametersOff;
-
-        public ProtoIdItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-    }
-
-    static class DebugInfoItem extends Streamable {
-        int lineStart;
-        int parametersSize;
-        int[] parameterNames;
-
-        public DebugInfoItem(DexFileReader dexFileReader) {
-            super(dexFileReader);
-        }
-
-        @Override
-        public boolean isAligned() {
-            return false;
-        }
-
-        @Override
-        public void readImpl(RandomAccessFile raf) throws IOException {
-            lineStart = RafUtil.readULeb128(raf);
-            parametersSize = RafUtil.readULeb128(raf);
-            parameterNames = new int[parametersSize];
-            for (int i = 0; i < parametersSize; i++) {
-                parameterNames[i] = RafUtil.readULeb128(raf);
-            }
-        }
-    }
-
     interface NameProvider {
         public String rename(String input);
     }
