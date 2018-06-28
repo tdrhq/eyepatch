@@ -142,7 +142,6 @@ public class DexFileReader {
     }
 
     static class _StringDataItem extends Streamable {
-        int size;
         String decoded;
 
         @Override
@@ -156,14 +155,14 @@ public class DexFileReader {
 
         @Override
         public void readImpl(RandomAccessFile raf) throws IOException {
-            size = RafUtil.readULeb128(raf);
+            int size = RafUtil.readULeb128(raf);
             char[] data = new char[size];
             decoded = Mutf8.decode(new MyByteInput(raf), data);
         }
 
         @Override
         public void writeImpl(RandomAccessFile raf) throws IOException {
-            RafUtil.writeULeb128(raf, size);
+            RafUtil.writeULeb128(raf, decoded.length());
             byte[] output = Mutf8.encode(decoded);
             raf.write(output, 0, output.length);
 
