@@ -23,7 +23,13 @@ class CodeItemRewriter {
                 codeItem.insns[i+1] = (short) newIdx;
             }
             else if (opcode == 0x1b /* const-string/jumbo */) {
-                throw new UnsupportedOperationException("TODO: big dex file, amiright?");
+                int n1 = codeItem.insns[i+1];
+                int n2 = codeItem.insns[i+2];
+
+                int index = n1 | ( n2 << 16 );
+                int newIdx = dexFileReader.getUpdatedStringIndex(index);
+                codeItem.insns[i+1] = (short) (newIdx & 0xffff);
+                codeItem.insns[i+2] = (short) (newIdx >> 16);
             } else {
                 // copy whole instruction as is
                 for (int j = 0; j < insnLen; j++) {

@@ -2,17 +2,23 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import android.util.Log;
+import com.tdrhq.eyepatch.renamer.CodeItemRewriter.StringIdProvider;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import com.tdrhq.eyepatch.renamer.CodeItemRewriter.StringIdProvider;
 
 public class CodeItemRewriterTest {
 
     StringIdProvider stringIdProvider = new StringIdProvider() {
             @Override
             public int getUpdatedStringIndex(int orig) {
+                Log.i("CodeItemRewriterTest", "getting index for: " + String.format("%8x", orig));
                 if (orig == 0x002a) {
                     return 0x003a;
+                }
+
+                if (orig == 0x103a0004) {
+                    return 0x003a0003;
                 }
                 return orig;
             }
@@ -34,6 +40,15 @@ public class CodeItemRewriterTest {
         setInsn(codeItem, insn);
         CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
         assertEquals("0000 001a 003a 000e", formatIns(codeItem.insns));
+    }
+
+    @Test
+    public void testJumboString() throws Throwable {
+        String insn = "0000 001b 0004 103a 000e";
+        CodeItem codeItem = new CodeItem(null);
+        setInsn(codeItem, insn);
+        CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
+        assertEquals("0000 001b 0003 003a 000e", formatIns(codeItem.insns));
     }
 
     private void setInsn(CodeItem codeItem, String insn) {
