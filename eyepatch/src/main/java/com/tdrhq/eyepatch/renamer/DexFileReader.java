@@ -41,18 +41,18 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     HeaderItem headerItem = null;
-    _MapList mapList = null;
+    MapList mapList = null;
 
     StringIdItem[] stringIdItems = null;
     private RandomAccessFile raf;
-    _ClassDefItem[] classDefItems = null;
-    _TypeIdItem[] typeIdItems = null;
-    _FieldIdItem[] fieldIdItems = null;
-    _MethodIdItem[] methodIdItems = null;
-    _ProtoIdItem[] protoIdItems = null;
-    _DebugInfoItem[] debugInfoItems;
+    ClassDefItem[] classDefItems = null;
+    TypeIdItem[] typeIdItems = null;
+    FieldIdItem[] fieldIdItems = null;
+    MethodIdItem[] methodIdItems = null;
+    ProtoIdItem[] protoIdItems = null;
+    DebugInfoItem[] debugInfoItems;
     _StringDataItem[] stringDataItems;
-    _ClassDataItem[] classDataItems;
+    ClassDataItem[] classDataItems;
     CodeItem[] codeItems;
 
     private DexFile dexFile;
@@ -64,11 +64,11 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         raf.seek(0);
         headerItem.read(raf);
 
-        mapList = new _MapList(this);
+        mapList = new MapList(this);
         raf.seek(headerItem.mapOff);
         mapList.read(raf);
 
-        for (_MapItem item : mapList.list) {
+        for (MapItem item : mapList.list) {
             raf.seek(item.offset);
             switch (item.getItemType()) {
             case TYPE_HEADER_ITEM:
@@ -85,17 +85,17 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 }
                 break;
             case TYPE_TYPE_ID_ITEM:
-                typeIdItems = readArray(headerItem.typeIdsSize, _TypeIdItem.class, this, raf);
+                typeIdItems = readArray(headerItem.typeIdsSize, TypeIdItem.class, this, raf);
                 break;
 
             case TYPE_PROTO_ID_ITEM:
-                protoIdItems = readArray(headerItem.protoIdsSize, _ProtoIdItem.class, this, raf);
+                protoIdItems = readArray(headerItem.protoIdsSize, ProtoIdItem.class, this, raf);
                 break;
             case TYPE_METHOD_ID_ITEM:
-                methodIdItems = readArray(headerItem.methodIdsSize, _MethodIdItem.class, this, raf);
+                methodIdItems = readArray(headerItem.methodIdsSize, MethodIdItem.class, this, raf);
                 break;
             case TYPE_CLASS_DEF_ITEM:
-                classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class, this, raf);
+                classDefItems = readArray((int) headerItem.classDefsSize, ClassDefItem.class, this, raf);
                 break;
             case TYPE_CODE_ITEM:
                 codeItems = readArray(item.size, CodeItem.class, this, raf);
@@ -106,7 +106,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 break;
 
             case TYPE_CLASS_DATA_ITEM:
-                classDataItems = readArray(item.size, _ClassDataItem.class, this, raf);
+                classDataItems = readArray(item.size, ClassDataItem.class, this, raf);
                 break;
             case TYPE_MAP_LIST:
                 break;
@@ -169,7 +169,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
         headerItem.stringIdsSize ++;
 
-        for (_MapItem item : mapList.list) {
+        for (MapItem item : mapList.list) {
             switch (item.getItemType()) {
             case TYPE_STRING_ID_ITEM:
                 item.size ++;
@@ -186,16 +186,16 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     private void readDebugInfoItems() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_DEBUG_INFO_ITEM);
+        MapItem item = getMapItem(ItemType.TYPE_DEBUG_INFO_ITEM);
         if (item == null) {
             return;
         }
         raf.seek(item.offset);
-        debugInfoItems = readArray(item.size, _DebugInfoItem.class, this, raf);
+        debugInfoItems = readArray(item.size, DebugInfoItem.class, this, raf);
     }
 
     private void readTypeList() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_TYPE_LIST);
+        MapItem item = getMapItem(ItemType.TYPE_TYPE_LIST);
         if (item == null) {
             return;
         }
@@ -203,7 +203,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     private void readAnnotationSetRefList() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_REF_LIST);
+        MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_REF_LIST);
         if (item == null) {
             return;
         }
@@ -247,7 +247,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     private void readAnnotationSetItem() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_ITEM);
+        MapItem item = getMapItem(ItemType.TYPE_ANNOTATION_SET_ITEM);
         if (item == null) {
             return;
         }
@@ -256,7 +256,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     }
 
     private void readEncodedArrayItems() throws IOException {
-        _MapItem item = getMapItem(ItemType.TYPE_ENCODED_ARRAY_ITEM);
+        MapItem item = getMapItem(ItemType.TYPE_ENCODED_ARRAY_ITEM);
         if (item == null) {
             return;
         }
@@ -286,19 +286,19 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
 
     private void updateStringIds() {
         if (fieldIdItems != null) {
-            for (_FieldIdItem fieldIdItem : fieldIdItems) {
+            for (FieldIdItem fieldIdItem : fieldIdItems) {
                 fieldIdItem.nameIdx = getUpdatedStringIndex(fieldIdItem.nameIdx);
             }
         }
 
         if (methodIdItems != null) {
-            for (_MethodIdItem methodIdItem : methodIdItems) {
+            for (MethodIdItem methodIdItem : methodIdItems) {
                 methodIdItem.nameIdx = getUpdatedStringIndex(methodIdItem.nameIdx);
             }
         }
 
         if (typeIdItems != null) {
-            for (_TypeIdItem typeIdItem : typeIdItems) {
+            for (TypeIdItem typeIdItem : typeIdItems) {
                 typeIdItem.descriptorIdx = getUpdatedStringIndex(typeIdItem.descriptorIdx);
             }
         }
@@ -314,7 +314,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         raf.seek(0);
         headerItem.write(raf);
 
-        for (_MapItem item : mapList.list) {
+        for (MapItem item : mapList.list) {
             switch(item.getItemType()) {
             case TYPE_HEADER_ITEM:
                 continue;
@@ -463,7 +463,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    _MapItem getMapItem(ItemType itemType) {
+    MapItem getMapItem(ItemType itemType) {
         for (int i = 0; i < mapList.size; i++) {
             if (mapList.list[i].type == itemType.getMapValue()) {
                 return mapList.list[i];
@@ -472,22 +472,22 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         return null;
     }
 
-    static class _MapList extends Streamable {
+    static class MapList extends Streamable {
         @F(idx=1) int size;
-        @F(idx=2, sizeIdx=1) _MapItem[] list;
+        @F(idx=2, sizeIdx=1) MapItem[] list;
 
-        public _MapList(DexFileReader dexFileReader) {
+        public MapList(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _MapItem extends Streamable {
+    static class MapItem extends Streamable {
         @F(idx=1) short type;
         @F(idx=2) short unused;
         @F(idx=3) int size;
         @F(idx=4) @Offset int offset;
 
-        public _MapItem(DexFileReader dexFileReader) {
+        public MapItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
@@ -501,10 +501,10 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    static class _TypeIdItem extends Streamable {
+    static class TypeIdItem extends Streamable {
         @F(idx=1) int descriptorIdx; // a  pointer to string_ids
 
-        public _TypeIdItem(DexFileReader dexFileReader) {
+        public TypeIdItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
@@ -513,7 +513,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    static class _EncodedField extends Streamable {
+    static class EncodedField extends Streamable {
         @F(idx=1, uleb=true) int fieldIdxDiff;
         @F(idx=2, uleb=true) int accessFlags;
 
@@ -522,12 +522,12 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
             return false;
         }
 
-        public _EncodedField(DexFileReader dexFileReader) {
+        public EncodedField(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _EncodedMethod extends Streamable {
+    static class EncodedMethod extends Streamable {
         @F(idx=1, uleb=true) int methodIdxDiff;
         @F(idx=2, uleb=true) int accessFlags;
         @F(idx=3, uleb=true) @Offset int codeOff;
@@ -537,7 +537,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
             return false;
         }
 
-        public _EncodedMethod(DexFileReader dexFileReader) {
+        public EncodedMethod(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
@@ -548,7 +548,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    public CodeItem getCodeItem(_EncodedMethod method) {
+    public CodeItem getCodeItem(EncodedMethod method) {
         for (CodeItem codeItem : codeItems) {
             if (codeItem.getOrigOffset() == method.codeOff) {
                 return codeItem;
@@ -558,30 +558,30 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         throw new RuntimeException("could not find codeItem");
     }
 
-    static class _TryItem extends Streamable {
+    static class TryItem extends Streamable {
         @F(idx=1) int startAddr;
         @F(idx=2) short insnCount;
         @F(idx=3) @Offset short handlerOff;
-        public _TryItem(DexFileReader dexFileReader) {
+        public TryItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _EncodedCatchHandlerList extends Streamable {
+    static class EncodedCatchHandlerList extends Streamable {
         @F(idx=1, uleb=true) int size;
-        @F(idx=2, sizeIdx=1) _EncodedCatchHandler[] list;
+        @F(idx=2, sizeIdx=1) EncodedCatchHandler[] list;
 
-        public _EncodedCatchHandlerList(DexFileReader dexFileReader) {
+        public EncodedCatchHandlerList(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _EncodedCatchHandler extends Streamable {
+    static class EncodedCatchHandler extends Streamable {
         long size;
-        _EncodedTypeAddrPair[] handlers;
+        EncodedTypeAddrPair[] handlers;
         long catchAllAddr;
 
-        public _EncodedCatchHandler(DexFileReader dexFileReader) {
+        public EncodedCatchHandler(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
@@ -595,44 +595,44 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 throw new RuntimeException("unexpected: " + size);
             }
 
-            handlers = readArray(Math.abs((int) size), _EncodedTypeAddrPair.class, this, raf);
+            handlers = readArray(Math.abs((int) size), EncodedTypeAddrPair.class, this, raf);
             catchAllAddr = RafUtil.readULeb128(raf);
         }
 
     }
 
-    static class _EncodedTypeAddrPair extends Streamable {
+    static class EncodedTypeAddrPair extends Streamable {
         @F(idx=1, uleb=true) long typeIdx;
         @F(idx=1, uleb=true) long addr;
 
-        public _EncodedTypeAddrPair(DexFileReader dexFileReader) {
+        public EncodedTypeAddrPair(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _ClassDataItem extends Streamable {
+    static class ClassDataItem extends Streamable {
         @F(idx=1, uleb=true) int staticFieldsSize;
         @F(idx=2, uleb=true) int instanceFieldsSize;
         @F(idx=3, uleb=true) int directMethodsSize;
         @F(idx=4, uleb=true) int virtualMethodsSize;
 
-        @F(idx=5, sizeIdx=1) _EncodedField[] staticFields;
-        @F(idx=6, sizeIdx=2) _EncodedField[] instanceFields;
-        @F(idx=7, sizeIdx=3) _EncodedMethod[] directMethods;
-        @F(idx=8, sizeIdx=4) _EncodedMethod[] virtualMethods;
+        @F(idx=5, sizeIdx=1) EncodedField[] staticFields;
+        @F(idx=6, sizeIdx=2) EncodedField[] instanceFields;
+        @F(idx=7, sizeIdx=3) EncodedMethod[] directMethods;
+        @F(idx=8, sizeIdx=4) EncodedMethod[] virtualMethods;
 
         @Override
         public boolean isAligned() {
             return false;
         }
 
-        public _ClassDataItem(DexFileReader dexFileReader) {
+        public ClassDataItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    public _ClassDataItem getClassDataItem(_ClassDefItem classDefItem) {
-        for (_ClassDataItem dataItem : classDataItems) {
+    public ClassDataItem getClassDataItem(ClassDefItem classDefItem) {
+        for (ClassDataItem dataItem : classDataItems) {
             if (dataItem.getOrigOffset() == classDefItem.classDataOff) {
                 return dataItem;
             }
@@ -641,7 +641,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         throw new RuntimeException("could not find data item");
     }
 
-    static class _ClassDefItem extends Streamable {
+    static class ClassDefItem extends Streamable {
         @F(idx=1) int classIdx;
         @F(idx=2) int accessFlags;
         @F(idx=3) int superclassIdx;
@@ -651,7 +651,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         @F(idx=7) @Offset int classDataOff;
         @F(idx=8) @Offset int staticValuesOff;
 
-        public _ClassDefItem(DexFileReader dexFileReader) {
+        public ClassDefItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
@@ -706,42 +706,42 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    static class _FieldIdItem extends Streamable {
+    static class FieldIdItem extends Streamable {
         @F(idx=1) short classIdx;
         @F(idx=2) short typeIdx;
         @F(idx=3) int nameIdx;
 
-        public _FieldIdItem(DexFileReader dexFileReader) {
+        public FieldIdItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _MethodIdItem extends Streamable {
+    static class MethodIdItem extends Streamable {
         @F(idx=1) short classIdx;
         @F(idx=2) short protoIdx;
         @F(idx=3) int nameIdx;
 
-        public _MethodIdItem(DexFileReader dexFileReader) {
+        public MethodIdItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _ProtoIdItem extends Streamable {
+    static class ProtoIdItem extends Streamable {
         @F(idx=1) int shortyIdx;
         @F(idx=2) int returnTypeIdx;
         @F(idx=3) @Offset int parametersOff;
 
-        public _ProtoIdItem(DexFileReader dexFileReader) {
+        public ProtoIdItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
     }
 
-    static class _DebugInfoItem extends Streamable {
+    static class DebugInfoItem extends Streamable {
         int lineStart;
         int parametersSize;
         int[] parameterNames;
 
-        public _DebugInfoItem(DexFileReader dexFileReader) {
+        public DebugInfoItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
 
