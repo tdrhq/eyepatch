@@ -181,6 +181,9 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 break;
             }
         }
+
+        // update the offsets cache
+        cachedOrigDataOff.put((long) newOffset, val);
     }
 
     static boolean compareStrings(String one, String two) {

@@ -19,6 +19,10 @@ public class CodeItemRewriterTest {
                 if (orig == 0x103a0004) {
                     return 0x003a0003;
                 }
+
+                if (orig == 0x002b) {
+                    return 0x003a0003;
+                }
                 return orig;
             }
         };
@@ -44,6 +48,15 @@ public class CodeItemRewriterTest {
     @Test
     public void testJumboString() throws Throwable {
         String insn = "0000 001b 0004 103a 000e";
+        CodeItem codeItem = new CodeItem(null);
+        setInsn(codeItem, insn);
+        CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
+        assertEquals("0000 001b 0003 003a 000e", formatIns(codeItem.insns));
+    }
+
+    @Test
+    public void testRegularBecomesJumbo() throws Throwable {
+        String insn = "0000 001a 002b 000e";
         CodeItem codeItem = new CodeItem(null);
         setInsn(codeItem, insn);
         CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
