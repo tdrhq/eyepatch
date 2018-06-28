@@ -9,12 +9,16 @@ import com.android.dx.dex.file.ClassDefItem;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.dex.file.ItemType;
 import com.android.dx.rop.type.Type;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.zip.Adler32;
 
 /**
  * Reads a {@code DexFile} from the given file.
@@ -230,8 +234,45 @@ public class DexFileReader {
                 throw new RuntimeException("unsupported type: " + item.getItemType().toString());
             }
         }
+
+        updateMessageDigest(raf);
+        raf.seek(0);
+        headerItem.write(raf);
+        updateChecksum(raf);
+        raf.seek(0);
+        headerItem.write(raf);
         Log.i("DexFileReader", "Before closing position is: " + raf.getFilePointer());
         raf.close();
+    }
+
+    private void updateMessageDigest(RandomAccessFile raf) throws IOException {
+        raf.seek(8 + 4 + 20);
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            while (true) {
+                try {
+                    md.update(raf.readByte());
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+            headerItem.signature = md.digest();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updateChecksum(RandomAccessFile raf) throws IOException {
+        raf.seek(8 + 4);
+        Adler32 checksum = new Adler32();
+        while (true) {
+            try {
+                checksum.update(raf.readByte());
+            } catch (EOFException e) {
+                break;
+            }
+        }
+        headerItem.checksum = (int) checksum.getValue();
     }
 
     String getString(long idx) throws IOException {
