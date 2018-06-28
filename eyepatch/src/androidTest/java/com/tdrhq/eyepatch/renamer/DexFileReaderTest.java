@@ -12,13 +12,12 @@ import com.android.dx.dex.file.ItemType;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
 import com.tdrhq.eyepatch.renamer.DexFileReader.*;
-import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.HexDump;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -147,8 +146,10 @@ public class DexFileReaderTest {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         output = tmpdir.newFile("output.dex");
         reader.read();
-        reader.addString("aaaBlahBlah");
+        reader.addString("Zoidbera"); // should be at the end and not affect indices
         reader.write(output);
+
+        HexDump.hexDump(output);
 
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
@@ -177,11 +178,24 @@ public class DexFileReaderTest {
     }
 
     @Test
+    public void testCharAssumptions() throws Throwable {
+        assertTrue('Z' > 'F');
+        assertTrue('z' > 'F');
+        assertTrue('A' < 'F');
+
+    }
+
+    @Test
     public void testCompareString() throws Throwable {
         assertTrue(DexFileReader.compareStrings("aaa", "abc"));
         assertFalse(DexFileReader.compareStrings("abc", "aaa"));
         assertTrue(DexFileReader.compareStrings("aaa", "aaab"));
         assertFalse(DexFileReader.compareStrings("aaab", "aaaa"));
         assertFalse(DexFileReader.compareStrings("aaa", "aaa"));
+        assertFalse(DexFileReader.compareStrings("zoidbera", "L"));
+        assertTrue(DexFileReader.compareStrings("Aoo.generated", "Foo.generated"));
+        assertFalse(DexFileReader.compareStrings("zoidbera", "Foo.generated"));
+        assertFalse(DexFileReader.compareStrings("Zoidbera", "Foo.generated"));
+
     }
 }

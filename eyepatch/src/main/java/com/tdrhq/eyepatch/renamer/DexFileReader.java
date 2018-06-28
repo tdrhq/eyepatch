@@ -17,8 +17,12 @@ import java.io.UTFDataFormatException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.Adler32;
 
 /**
@@ -30,6 +34,9 @@ import java.util.zip.Adler32;
 public class DexFileReader {
     private File file;
     private NameProvider nameProvider;
+    private int insertedOffsets = -100;
+
+    Map<Integer, Integer> offsetMap = new HashMap<>();
 
     public DexFileReader(File file, NameProvider nameProvider) {
         this.file = file;
@@ -117,31 +124,55 @@ public class DexFileReader {
     }
 
     public void addString(String val) {
+        stringDataItems = Arrays.copyOf(stringDataItems, stringDataItems.length + 1);
 
+        _StringDataItem newDataItem = new _StringDataItem(this);
+        newDataItem.decoded = val;
+        stringDataItems[stringDataItems.length - 1] = newDataItem;
+
+        int newOffset = (insertedOffsets --);
+        newDataItem.setOrigOffset(newOffset);
+
+        // now to figure out where to insert the idItem.
+        int insertPos = 0;
+        for (; insertPos < stringIdItems.length; insertPos++) {
+            if (compareStrings(
+                        val,
+                        getString(insertPos))) {
+                break;
+            }
+
+        }
+
+        Log.i("DexFileReader", "inserting at pos " + insertPos);
+        Log.i("DexFileReader", "previous: " + getString(insertPos));
+
+
+        stringIdItems = Arrays.copyOf(stringIdItems, stringIdItems.length + 1);
+        StringIdItem newItem =  new StringIdItem(this);
+        stringIdItems[stringIdItems.length - 1] = newItem;
+        for (int i = stringIdItems.length - 1; i > insertPos; i--) {
+            stringIdItems[i].stringDataOff = stringIdItems[i - 1].stringDataOff;
+        }
+
+        stringIdItems[insertPos].stringDataOff = (int) newDataItem.getOrigOffset();
+
+        headerItem.stringIdsSize ++;
+
+        for (_MapItem item : mapList.list) {
+            switch (item.getItemType()) {
+            case TYPE_STRING_ID_ITEM:
+                item.size ++;
+                break;
+            case TYPE_STRING_DATA_ITEM:
+                item.size++;
+                break;
+            }
+        }
     }
 
     static boolean compareStrings(String one, String two) {
-        try {
-            byte[] oneByte = Mutf8.encode(one);
-            byte[] twoByte = Mutf8.encode(two);
-            int imax = Math.max(oneByte.length, twoByte.length);
-            for (int i = 0; i < imax; i++) {
-                if (i >= twoByte.length) {
-                    return false;
-                }
-                if (i >= oneByte.length) {
-                    return true;
-                }
-                if (oneByte[i] < twoByte[i]) {
-                    return true;
-                }
-            }
-
-            // equal
-            return false;
-        } catch (UTFDataFormatException e) {
-            throw new RuntimeException(e);
-        }
+        return one.compareTo(two) < 0;
     }
 
     private void readDebugInfoItems() throws IOException {
@@ -198,6 +229,11 @@ public class DexFileReader {
             byte zero = '\0';
             raf.write(zero);
         }
+
+        @Override
+        public void updateOffsetsImpl() {
+            // do nothing
+        }
     }
 
     private void readAnnotationSetItem() throws IOException {
@@ -221,6 +257,23 @@ public class DexFileReader {
 
     public void write(File output) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(output, "rw");
+        writeAll(raf);
+
+        headerItem.fileSize = (int) raf.getFilePointer();
+        updateOffsets();
+        writeAll(raf);
+
+        updateMessageDigest(raf);
+        raf.seek(0);
+        headerItem.write(raf);
+        updateChecksum(raf);
+        raf.seek(0);
+        headerItem.write(raf);
+        Log.i("DexFileReader", "Before closing position is: " + raf.getFilePointer());
+        raf.close();
+    }
+
+    private void writeAll(RandomAccessFile raf) throws IOException {
         raf.seek(0);
         headerItem.write(raf);
 
@@ -262,15 +315,38 @@ public class DexFileReader {
                 throw new RuntimeException("unsupported type: " + item.getItemType().toString());
             }
         }
+    }
 
-        updateMessageDigest(raf);
-        raf.seek(0);
-        headerItem.write(raf);
-        updateChecksum(raf);
-        raf.seek(0);
-        headerItem.write(raf);
-        Log.i("DexFileReader", "Before closing position is: " + raf.getFilePointer());
-        raf.close();
+    private void updateOffsets() {
+        if (headerItem.stringIdsOff != 0x70) {
+            throw new RuntimeException("baa");
+        }
+        headerItem.updateOffsets();
+        mapList.updateOffsets();
+
+        updateOffsets(stringIdItems);
+        updateOffsets(classDefItems);
+        updateOffsets(typeIdItems);
+        updateOffsets(fieldIdItems);
+        updateOffsets(methodIdItems);
+        updateOffsets(protoIdItems);
+        updateOffsets(debugInfoItems);
+        updateOffsets(stringDataItems);
+        updateOffsets(classDataItems);
+        updateOffsets(codeItems);
+
+        if (headerItem.stringIdsOff != 0x70) {
+            throw new RuntimeException("boo");
+        }
+    }
+
+    private <T extends Streamable> void updateOffsets(T[] array) {
+        if (array == null) {
+            return;
+        }
+        for (T s : array) {
+            s.updateOffsets();
+        }
     }
 
     private void updateMessageDigest(RandomAccessFile raf) throws IOException {
@@ -303,7 +379,7 @@ public class DexFileReader {
         headerItem.checksum = (int) checksum.getValue();
     }
 
-    String getString(long idx) throws IOException {
+    String getString(long idx)  {
         long off = stringIdItems[(int) idx].stringDataOff;
         for (_StringDataItem  dataItem : stringDataItems) {
             if (dataItem.getOrigOffset() == off) {
@@ -322,22 +398,22 @@ public class DexFileReader {
         @F(idx=5) int headerSize;
         @F(idx=6) int endianTag;
         @F(idx=7) int linkSize;
-        @F(idx=8) int linkOff;
-        @F(idx=9) int mapOff;
+        @F(idx=8) @Offset int linkOff;
+        @F(idx=9) @Offset int mapOff;
         @F(idx=10) int stringIdsSize;
-        @F(idx=11) int stringIdsOff;
+        @F(idx=11) @Offset int stringIdsOff;
         @F(idx=12) int typeIdsSize;
-        @F(idx=13) int typeIdsOff;
+        @F(idx=13) @Offset int typeIdsOff;
         @F(idx=14) int protoIdsSize;
-        @F(idx=15) int protoIdsOff;
+        @F(idx=15) @Offset int protoIdsOff;
         @F(idx=16) int fieldIdsSize;
-        @F(idx=17) int fieldIdsOff;
+        @F(idx=17) @Offset int fieldIdsOff;
         @F(idx=18) int methodIdsSize;
-        @F(idx=19) int methodIdsOff;
+        @F(idx=19) @Offset int methodIdsOff;
         @F(idx=20) int classDefsSize;
-        @F(idx=21) int classDefsOff;
+        @F(idx=21) @Offset int classDefsOff;
         @F(idx=22) int dataSize;
-        @F(idx=23) int dataOff;
+        @F(idx=23) @Offset int dataOff;
 
         public HeaderItem(DexFileReader dexFileReader) {
             super(dexFileReader);
@@ -372,7 +448,7 @@ public class DexFileReader {
         @F(idx=1) short type;
         @F(idx=2) short unused;
         @F(idx=3) int size;
-        @F(idx=4) int offset;
+        @F(idx=4) @Offset int offset;
 
         public _MapItem(DexFileReader dexFileReader) {
             super(dexFileReader);
@@ -417,7 +493,7 @@ public class DexFileReader {
     static class _EncodedMethod extends Streamable {
         @F(idx=1, uleb=true) int methodIdxDiff;
         @F(idx=2, uleb=true) int accessFlags;
-        @F(idx=3, uleb=true) int codeOff;
+        @F(idx=3, uleb=true) @Offset int codeOff;
 
         @Override
         public boolean isAligned() {
@@ -450,7 +526,7 @@ public class DexFileReader {
         @F(idx=2) short insSize;
         @F(idx=3) short outsSize;
         @F(idx=4) short triesSize;
-        @F(idx=5) int debugInfoOff;
+        @F(idx=5) @Offset int debugInfoOff;
         @F(idx=6) int insnsSize;
         @F(idx=7, sizeIdx=6) short[] insns;
 
@@ -500,7 +576,7 @@ public class DexFileReader {
     static class _TryItem extends Streamable {
         @F(idx=1) int startAddr;
         @F(idx=2) short insnCount;
-        @F(idx=3) short handlerOff;
+        @F(idx=3) @Offset short handlerOff;
         public _TryItem(DexFileReader dexFileReader) {
             super(dexFileReader);
         }
@@ -584,11 +660,11 @@ public class DexFileReader {
         @F(idx=1) int classIdx;
         @F(idx=2) int accessFlags;
         @F(idx=3) int superclassIdx;
-        @F(idx=4) int interfacesOff;
+        @F(idx=4) @Offset int interfacesOff;
         @F(idx=5) int sourceFileIdx;
-        @F(idx=6) int annotationsOff;
-        @F(idx=7) int classDataOff;
-        @F(idx=8) int staticValuesOff;
+        @F(idx=6) @Offset int annotationsOff;
+        @F(idx=7) @Offset int classDataOff;
+        @F(idx=8) @Offset int staticValuesOff;
 
         public _ClassDefItem(DexFileReader dexFileReader) {
             super(dexFileReader);
@@ -637,7 +713,7 @@ public class DexFileReader {
     }
 
     static class StringIdItem extends Streamable {
-        @F(idx=1) int stringDataOff;
+        @F(idx=1) @Offset int stringDataOff;
 
         public StringIdItem(DexFileReader reader) {
             super(reader);
@@ -667,7 +743,7 @@ public class DexFileReader {
     static class _ProtoIdItem extends Streamable {
         @F(idx=1) int shortyIdx;
         @F(idx=2) int returnTypeIdx;
-        @F(idx=3) int parametersOff;
+        @F(idx=3) @Offset int parametersOff;
 
         public _ProtoIdItem(DexFileReader dexFileReader) {
             super(dexFileReader);

@@ -24,6 +24,10 @@ public abstract class Streamable {
         return origOffset;
     }
 
+    public void setOrigOffset(long _origOffset) {
+        this.origOffset = _origOffset;
+    }
+
     public boolean isAligned() {
         return true;
     }
@@ -44,6 +48,7 @@ public abstract class Streamable {
         }
 
         writeOffset = output.getFilePointer();
+        dexFileReader.offsetMap.put((int) origOffset, (int) writeOffset);
         Log.i("Streamable", "Writing " + this.toString() + " to " + writeOffset + " (original: " + origOffset + ")" );
         writeImpl(output);
     }
@@ -130,6 +135,44 @@ public abstract class Streamable {
 
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public final void updateOffsets() {
+        try {
+            updateOffsetsImpl();
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateOffsetsImpl() throws IllegalAccessException {
+        Log.i("Streamable", "updating offsets for " + this);
+        for (Field f : AnnotationUtil.getAnnotatedFields(this.getClass())) {
+            if (f.getAnnotation(Offset.class) != null) {
+                try {
+                    f.set(this,
+                          dexFileReader.offsetMap.get(f.get(this)));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if (f.getType().isArray()) {
+                Class type = f.getType();
+                Class componentType = type.getComponentType();
+
+                if (Streamable.class.isAssignableFrom(componentType)) {
+                    Streamable[] streamables = (Streamable[]) f.get(this);
+                    for (Streamable streamable : streamables) {
+                        streamable.updateOffsets();
+                    }
+                }
+            }
+
+            if (Streamable.class.isAssignableFrom(f.getType())) {
+                ((Streamable) f.get(this)).updateOffsets();
             }
         }
     }
