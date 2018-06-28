@@ -1,11 +1,9 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import android.util.Log;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
-import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
@@ -18,7 +16,7 @@ import static org.mockito.Mockito.*;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder mEyePatchClassBuilder;
-    private StaticInvocationHandler oldHandler;
+    private Dispatcher oldHandler;
     private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
 
     @Rule
@@ -54,13 +52,13 @@ public class EyePatchClassBuilderTest {
 
     @After
     public void after() throws Throwable {
-        StaticInvocationHandler.setDefaultHandler();
+        Dispatcher.setDefaultHandler();
     }
 
     @Test
     public void testWrapping() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
@@ -79,7 +77,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testHandlerArgs() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
@@ -111,7 +109,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testNonStatic() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
@@ -133,7 +131,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testFinalMethod() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
@@ -155,7 +153,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testOtherReturnType() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
@@ -177,7 +175,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testPrimitiveReturnType() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "primitiveReturnType";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithPrimitive.class, classLoader);
@@ -200,7 +198,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testFloatType() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "floatType";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithfloat.class, classLoader);
@@ -223,7 +221,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testVoidReturn() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithVoid.class, classLoader);
@@ -287,7 +285,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testSingleArg() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithArgument.class, classLoader);
@@ -317,7 +315,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testTwoArgs() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithTwoArgument.class, classLoader);
@@ -348,7 +346,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testPrimitiveArg() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithPrimitiveArgument.class, classLoader);
@@ -378,7 +376,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testTwoArgsWithPrim() throws Exception {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
         Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithTwoArgumentWithPrim.class, classLoader);
@@ -408,7 +406,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testCallsConstructorWithoutArgs() throws Throwable {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo.class, classLoader);
         Object instance = barWrapped.newInstance();
@@ -437,7 +435,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testCallsConstructorWithArgs() throws Throwable {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader);
         Constructor constructor = barWrapped.getConstructor(int.class);
@@ -481,7 +479,7 @@ public class EyePatchClassBuilderTest {
                 }
             };
 
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
 
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
         Method method = barWrapped.getMethod("foo");
@@ -519,7 +517,7 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testMethodPolymorph() throws Throwable {
         StaticInvocationHandlerInterface handler = mock(StaticInvocationHandlerInterface.class);
-        StaticInvocationHandler.setHandler(handler);
+        Dispatcher.setHandler(handler);
         Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo3.class, classLoader);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,

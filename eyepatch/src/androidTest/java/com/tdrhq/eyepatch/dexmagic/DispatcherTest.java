@@ -2,7 +2,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import org.junit.Test;
 
-public class StaticInvocationHandlerTest {
+public class DispatcherTest {
     @Test
     public void testNoInvocationHandler() throws Exception {
 

@@ -3,8 +3,8 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 /**
- * A StaticInvocationHandler that delegates to the
- * StaticInvocationHandler provided by the ClassLoader.
+ * A Dispatcher that delegates to the
+ * Dispatcher provided by the ClassLoader.
  */
 public class DelegatingInvocationHandler implements StaticInvocationHandlerInterface {
     @Override

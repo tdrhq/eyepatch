@@ -153,7 +153,7 @@ public class EyePatchClassBuilder {
     }
 
     private static void generateInvokeWithoutReturn(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
-        TypeId staticInvoker = TypeId.get(StaticInvocationHandler.class);
+        TypeId staticInvoker = TypeId.get(Dispatcher.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
         TypeId objectType = TypeId.get(Object.class);
