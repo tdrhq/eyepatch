@@ -144,10 +144,6 @@ public class DexFileReader {
 
         }
 
-        Log.i("DexFileReader", "inserting at pos " + insertPos);
-        Log.i("DexFileReader", "previous: " + getString(insertPos));
-
-
         stringIdItems = Arrays.copyOf(stringIdItems, stringIdItems.length + 1);
         StringIdItem newItem =  new StringIdItem(this);
         stringIdItems[stringIdItems.length - 1] = newItem;

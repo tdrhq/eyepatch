@@ -146,7 +146,7 @@ public class DexFileReaderTest {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         output = tmpdir.newFile("output.dex");
         reader.read();
-        reader.addString("Zoidbera"); // should be at the end and not affect indices
+        reader.addString("zoidberga"); // should be at the end and not affect indices
         reader.write(output);
 
         HexDump.hexDump(output);
@@ -154,6 +154,8 @@ public class DexFileReaderTest {
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
+
+        assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
 
     @Test
