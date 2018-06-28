@@ -4,15 +4,23 @@ package com.tdrhq.eyepatch.renamer;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import com.tdrhq.eyepatch.renamer.CodeItemRewriter.StringIdProvider;
 
 public class CodeItemRewriterTest {
+
+    StringIdProvider stringIdProvider = new StringIdProvider() {
+            @Override
+            public int getUpdatedStringIndex(int orig) {
+                return orig;
+            }
+        };
 
     @Test
     public void testWithoutConstStringIsUnchanged() throws Throwable {
         String insn = "0000 000e";
         CodeItem codeItem = new CodeItem(null);
         setInsn(codeItem, insn);
-        CodeItemRewriter.updateStringIdsInCodeItem(null, codeItem);
+        CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
         assertEquals(insn, formatIns(codeItem.insns));
     }
 
