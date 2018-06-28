@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class AnnotationUtil {
     static Map<Class, List<Field>> annotationFieldsCache = new HashMap<>();
+    static Map<Field, Boolean> isUleb = new HashMap<>();
 
     public static List<Field> getAnnotatedFields(Class klass) {
         if (annotationFieldsCache.containsKey(klass)) {
@@ -24,7 +25,12 @@ public class AnnotationUtil {
     }
 
     public static boolean isUleb(Field field) {
-        return field.getAnnotation(F.class).uleb();
+        Boolean old = isUleb.get(field);
+        if (old == null) {
+            old = field.getAnnotation(F.class).uleb();
+            isUleb.put(field, old);
+        }
+        return old;
     }
 
     private static List<Field> getAnnotatedFieldsUncached(Class klass) {
