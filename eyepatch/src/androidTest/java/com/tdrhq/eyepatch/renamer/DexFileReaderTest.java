@@ -143,6 +143,19 @@ public class DexFileReaderTest {
     }
 
     @Test
+    public void testAddANewString() throws Throwable {
+        DexFileReader reader = new DexFileReader(staticInput, nameProvider);
+        output = tmpdir.newFile("output.dex");
+        reader.read();
+        reader.addString("aaaBlahBlah");
+        reader.write(output);
+
+        Class FooClass = Util.loadDexFile(output)
+                .loadClass("com.foo.Foo", classLoader);
+        assertNotNull(FooClass);
+    }
+
+    @Test
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
@@ -161,5 +174,14 @@ public class DexFileReaderTest {
 
         // return-object, register 0 insn
         assertEquals(0x0011, codeItem.insns[2]);
+    }
+
+    @Test
+    public void testCompareString() throws Throwable {
+        assertTrue(DexFileReader.compareStrings("aaa", "abc"));
+        assertFalse(DexFileReader.compareStrings("abc", "aaa"));
+        assertTrue(DexFileReader.compareStrings("aaa", "aaab"));
+        assertFalse(DexFileReader.compareStrings("aaab", "aaaa"));
+        assertFalse(DexFileReader.compareStrings("aaa", "aaa"));
     }
 }

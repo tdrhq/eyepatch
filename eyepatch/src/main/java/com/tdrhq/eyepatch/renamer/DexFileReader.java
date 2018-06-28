@@ -13,6 +13,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UTFDataFormatException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -113,6 +114,34 @@ public class DexFileReader {
         readAnnotationSetRefList();
         readAnnotationSetItem();
         readEncodedArrayItems();
+    }
+
+    public void addString(String val) {
+
+    }
+
+    static boolean compareStrings(String one, String two) {
+        try {
+            byte[] oneByte = Mutf8.encode(one);
+            byte[] twoByte = Mutf8.encode(two);
+            int imax = Math.max(oneByte.length, twoByte.length);
+            for (int i = 0; i < imax; i++) {
+                if (i >= twoByte.length) {
+                    return false;
+                }
+                if (i >= oneByte.length) {
+                    return true;
+                }
+                if (oneByte[i] < twoByte[i]) {
+                    return true;
+                }
+            }
+
+            // equal
+            return false;
+        } catch (UTFDataFormatException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void readDebugInfoItems() throws IOException {
