@@ -12,7 +12,6 @@ public class CodeItemRewriterTest {
     StringIdProvider stringIdProvider = new StringIdProvider() {
             @Override
             public int getUpdatedStringIndex(int orig) {
-                Log.i("CodeItemRewriterTest", "getting index for: " + String.format("%8x", orig));
                 if (orig == 0x002a) {
                     return 0x003a;
                 }
