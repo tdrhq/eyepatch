@@ -62,7 +62,6 @@ public class SuperInvocation {
         if (oldId == null) {
             oldId = idMap.size() + 1;
             idMap.put(key, oldId);
-            Log.i("SuperInvocation", String.format("%s is getting: %d", key, oldId));
         }
 
         return oldId;
@@ -74,7 +73,6 @@ public class SuperInvocation {
         }
 
         int ret = superInvocation.getConsId();
-        Log.i("SuperInvocation", "Looked up: " + Arrays.toString(superInvocation.getArgTypes()) + " and got " + ret);
         return ret;
     }
 

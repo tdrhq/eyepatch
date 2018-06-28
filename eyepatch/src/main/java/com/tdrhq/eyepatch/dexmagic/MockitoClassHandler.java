@@ -77,7 +77,6 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     public void verifyStatic() {
-        Log.i("MockitoClassHandler", "Verifying: " + klass.toString());
         Object result = verify(companionMock);
         if (result != companionMock) {
             throw new UnsupportedOperationException(
@@ -86,7 +85,6 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     public void resetStatic() {
-        Log.i("MockitoClassHandler", "Resetting: " + klass.toString());
         companionMock = mock(companionClass);
     }
 

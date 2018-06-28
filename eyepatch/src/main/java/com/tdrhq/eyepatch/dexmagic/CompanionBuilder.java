@@ -56,7 +56,6 @@ public class CompanionBuilder {
 
         for (Method methodTemplate : original.getDeclaredMethods()) {
             if (Modifier.isStatic(methodTemplate.getModifiers())) {
-                Log.i("CompanionBuilder", "static method: " + methodTemplate.getName());
                 generateMethod(dexmaker, methodTemplate, typeId, original);
             }
         }
