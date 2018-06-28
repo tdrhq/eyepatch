@@ -64,7 +64,7 @@ public abstract class Streamable {
         for (Field f : fields) {
             try {
                 if (f.getType() == int.class) {
-                    if (f.getAnnotation(F.class).uleb()) {
+                    if (AnnotationUtil.isUleb(f)) {
                         f.set(this, RafUtil.readULeb128(raf));
                     } else {
                         f.set(this, RafUtil.readUInt(raf));
@@ -103,7 +103,7 @@ public abstract class Streamable {
         for (Field f : fields) {
             try {
                 if (f.getType() == int.class) {
-                    if (f.getAnnotation(F.class).uleb()) {
+                    if (AnnotationUtil.isUleb(f)) {
                         RafUtil.writeULeb128(raf, (int) f.get(this));
                     } else {
                         RafUtil.writeUInt(raf, (int) f.get(this));

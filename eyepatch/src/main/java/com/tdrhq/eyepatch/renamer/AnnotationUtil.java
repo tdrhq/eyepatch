@@ -23,6 +23,10 @@ public class AnnotationUtil {
         return ret;
     }
 
+    public static boolean isUleb(Field field) {
+        return field.getAnnotation(F.class).uleb();
+    }
+
     private static List<Field> getAnnotatedFieldsUncached(Class klass) {
         Field[] fields = klass.getDeclaredFields();
         Arrays.sort(fields, new Comparator<Field>() {
