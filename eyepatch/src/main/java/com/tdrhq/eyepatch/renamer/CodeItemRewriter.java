@@ -8,7 +8,7 @@ class CodeItemRewriter {
         int getUpdatedStringIndex(int originalIndex);
     }
 
-    static void updateStringIdsInCodeItem(StringIdProvider dexFileReader, _CodeItem codeItem) {
+    static void updateStringIdsInCodeItem(StringIdProvider dexFileReader, CodeItem codeItem) {
         List<Short> newInsns = new ArrayList<>();
 
         for (int i = 0; i < codeItem.insnsSize; ) {

@@ -178,7 +178,7 @@ public class DexFileReaderTest {
     public void testCodeItemBasics() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         reader.read();
-        _CodeItem codeItem =
+        CodeItem codeItem =
                 reader.getCodeItem(
                         reader.getClassDataItem(reader.classDefItems[0]).directMethods[0]);
         assertEquals(1, codeItem.registersSize);

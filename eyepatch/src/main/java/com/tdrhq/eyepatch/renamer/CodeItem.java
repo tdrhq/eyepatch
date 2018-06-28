@@ -3,7 +3,7 @@ package com.tdrhq.eyepatch.renamer;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-class _CodeItem extends Streamable {
+class CodeItem extends Streamable {
     @F(idx=1) short registersSize;
     @F(idx=2) short insSize;
     @F(idx=3) short outsSize;
@@ -17,7 +17,7 @@ class _CodeItem extends Streamable {
     DexFileReader._TryItem[] tryItems;
     DexFileReader._EncodedCatchHandlerList encodedCatchHandlerList = null;
 
-    public _CodeItem(DexFileReader dexFileReader) {
+    public CodeItem(DexFileReader dexFileReader) {
         super(dexFileReader);
     }
 

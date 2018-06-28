@@ -53,7 +53,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
     _DebugInfoItem[] debugInfoItems;
     _StringDataItem[] stringDataItems;
     _ClassDataItem[] classDataItems;
-    _CodeItem[] codeItems;
+    CodeItem[] codeItems;
 
     private DexFile dexFile;
     public void read() throws IOException {
@@ -98,7 +98,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 classDefItems = readArray((int) headerItem.classDefsSize, _ClassDefItem.class, this, raf);
                 break;
             case TYPE_CODE_ITEM:
-                codeItems = readArray(item.size, _CodeItem.class, this, raf);
+                codeItems = readArray(item.size, CodeItem.class, this, raf);
                 break;
 
             case TYPE_STRING_DATA_ITEM:
@@ -304,7 +304,7 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
 
         if (codeItems != null) {
-            for (_CodeItem codeItem : codeItems) {
+            for (CodeItem codeItem : codeItems) {
                 CodeItemRewriter.updateStringIdsInCodeItem(this, codeItem);
             }
         }
@@ -548,8 +548,8 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         }
     }
 
-    public _CodeItem getCodeItem(_EncodedMethod method) {
-        for (_CodeItem codeItem : codeItems) {
+    public CodeItem getCodeItem(_EncodedMethod method) {
+        for (CodeItem codeItem : codeItems) {
             if (codeItem.getOrigOffset() == method.codeOff) {
                 return codeItem;
             }
