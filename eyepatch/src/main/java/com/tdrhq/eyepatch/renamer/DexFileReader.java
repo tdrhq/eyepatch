@@ -308,7 +308,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
         updateChecksum(raf);
         raf.seek(0);
         headerItem.write(raf);
-        Log.i("DexFileReader", "Before closing position is: " + raf.getFilePointer());
         raf.close();
     }
 
@@ -476,7 +475,6 @@ public class DexFileReader implements CodeItemRewriter.StringIdProvider {
                 if (cachedOrigDataOff.containsKey(dataItem.getOrigOffset())) {
                     throw new IllegalStateException("multiple items has offset: " + dataItem.getOrigOffset());
                 }
-                Log.i("DexFileReader", "Putting: " + dataItem.getOrigOffset() + ": " + dataItem.decoded);
                 cachedOrigDataOff.put(dataItem.getOrigOffset(), dataItem.decoded);
             }
         }

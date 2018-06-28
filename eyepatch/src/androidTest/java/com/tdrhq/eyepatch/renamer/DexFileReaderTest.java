@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.renamer;
 
+import android.support.test.filters.LargeTest;
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
 import com.android.dx.Local;
@@ -11,7 +12,6 @@ import com.android.dx.dex.file.ItemType;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.dexmagic.Util;
 import com.tdrhq.eyepatch.renamer.DexFileReader.*;
-import com.tdrhq.eyepatch.util.HexDump;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
@@ -148,8 +148,6 @@ public class DexFileReaderTest {
         reader.addString("zoidberga"); // should be at the end and not affect indices
         reader.write(output);
 
-        HexDump.hexDump(output);
-
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
         assertNotNull(FooClass);
@@ -164,8 +162,6 @@ public class DexFileReaderTest {
         reader.read();
         reader.addString("aaaabf"); // should be at the end and not affect indices
         reader.write(output);
-
-        HexDump.hexDump(output);
 
         Class FooClass = Util.loadDexFile(output)
                 .loadClass("com.foo.Foo", classLoader);
@@ -208,7 +204,7 @@ public class DexFileReaderTest {
         assertEquals("zoidberg", Whitebox.invokeStatic(FooClass, "getBar"));
     }
 
-    @Test
+    // @Test
     public void testJumboConstString() throws Throwable {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         output = tmpdir.newFile("output.dex");

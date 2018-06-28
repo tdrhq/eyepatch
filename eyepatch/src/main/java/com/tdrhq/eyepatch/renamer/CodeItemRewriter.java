@@ -29,7 +29,6 @@ class CodeItemRewriter {
                     newInsns.add((short) ((insn & 0xff00) | 0x1b));
                     newInsns.add((short) (newIdx & 0xffff));
                     newInsns.add((short) (newIdx >> 16));
-
                 } else {
                     newInsns.add((short) (insn));
                     newInsns.add((short) newIdx);
