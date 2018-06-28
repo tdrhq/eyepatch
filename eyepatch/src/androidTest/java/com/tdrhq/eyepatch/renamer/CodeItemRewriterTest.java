@@ -11,6 +11,9 @@ public class CodeItemRewriterTest {
     StringIdProvider stringIdProvider = new StringIdProvider() {
             @Override
             public int getUpdatedStringIndex(int orig) {
+                if (orig == 0x002a) {
+                    return 0x003a;
+                }
                 return orig;
             }
         };
@@ -22,6 +25,15 @@ public class CodeItemRewriterTest {
         setInsn(codeItem, insn);
         CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
         assertEquals(insn, formatIns(codeItem.insns));
+    }
+
+    @Test
+    public void testConstStringIsRewritten() throws Throwable {
+        String insn = "0000 001a 002a 000e";
+        CodeItem codeItem = new CodeItem(null);
+        setInsn(codeItem, insn);
+        CodeItemRewriter.updateStringIdsInCodeItem(stringIdProvider, codeItem);
+        assertEquals("0000 001a 003a 000e", formatIns(codeItem.insns));
     }
 
     private void setInsn(CodeItem codeItem, String insn) {
