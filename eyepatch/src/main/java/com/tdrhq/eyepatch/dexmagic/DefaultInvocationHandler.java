@@ -2,15 +2,24 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultInvocationHandler implements StaticInvocationHandler {
 
     private List<? extends ClassHandler> prebuiltHandlers;
+    private final Map<Class, ClassHandler> classHandlerMap = new HashMap<>();
 
     DefaultInvocationHandler(
             List<? extends ClassHandler> prebuiltHandlers) {
         this.prebuiltHandlers = prebuiltHandlers;
+
+        for (ClassHandler classHandler : prebuiltHandlers) {
+            classHandlerMap.put(
+                    classHandler.getResponsibility(),
+                    classHandler);
+        }
     }
 
     @Override
@@ -19,14 +28,14 @@ public class DefaultInvocationHandler implements StaticInvocationHandler {
                 .handleInvocation(invocation);
     }
 
-    ClassHandler getClassHandler(Class klass) {
-        for (ClassHandler handler : prebuiltHandlers) {
-            if (handler.getResponsibility() == klass) {
-                return handler;
-            }
+    final ClassHandler getClassHandler(Class klass) {
+        ClassHandler ret = classHandlerMap.get(klass);
+
+        if (ret == null) {
+            throw new RuntimeException("No class handler for class: " + klass.getName());
         }
 
-        throw new RuntimeException("No class handler for class: " + klass.getName());
+        return ret;
     }
 
     public static DefaultInvocationHandler newInstance(List<? extends ClassHandler> handlers) {
