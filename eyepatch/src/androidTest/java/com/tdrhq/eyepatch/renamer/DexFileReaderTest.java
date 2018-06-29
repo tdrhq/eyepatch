@@ -192,7 +192,7 @@ public class DexFileReaderTest {
         DexFileReader reader = new DexFileReader(staticInput, nameProvider);
         output = tmpdir.newFile("output.dex");
         reader.read();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100; i++) {
             reader.addString("z" + i);
         }
         reader.write(output);
