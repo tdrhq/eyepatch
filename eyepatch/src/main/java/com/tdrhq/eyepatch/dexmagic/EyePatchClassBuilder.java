@@ -40,7 +40,7 @@ public class EyePatchClassBuilder {
     }
 
     @NonNull
-    public DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
+    private DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
         Key key = new Key(realClass, classLoader);
         if (cache.containsKey(key)) {
             return cache.get(key);
