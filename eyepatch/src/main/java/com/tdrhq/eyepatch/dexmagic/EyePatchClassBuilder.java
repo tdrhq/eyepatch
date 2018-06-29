@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EyePatchClassBuilder implements DispatchingClassBuilder {
+public class EyePatchClassBuilder {
     public static final String PRE_CONSTRUCT = "__pre_construct__";
     public static final String CONSTRUCT = "__construct__";
     private Map<Key, DexFile> cache = new HashMap<>();
@@ -28,7 +28,6 @@ public class EyePatchClassBuilder implements DispatchingClassBuilder {
      * Wraps realClass, to generate a patchable class and loads it
      * into the ClassLoader.
      */
-    @Override
     public Class wrapClass(Class realClass, ClassLoader classLoader) {
         if (realClass.getClassLoader() == classLoader) {
             throw new IllegalArgumentException(
