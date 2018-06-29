@@ -17,13 +17,28 @@ public class DefaultInvocationHandlerTest {
 
     @Before
     public void before() throws Throwable {
-        CompanionBuilder companionBuilder = new CompanionBuilder(
-                tmpdir.getRoot());
-
         List<ClassHandler> handlers = new ArrayList<>();
-        handlers.add(new MockitoClassHandler(Foo.class, companionBuilder));
-        handlers.add(new MockitoClassHandler(Bar.class, companionBuilder));
+        handlers.add(new SimpleClassHandler(Foo.class));
+        handlers.add(new SimpleClassHandler(Bar.class));
         handler = new DefaultInvocationHandler(handlers);
+    }
+
+    static class SimpleClassHandler implements ClassHandler {
+        Class klass;
+
+        public SimpleClassHandler(Class klass) {
+            this.klass = klass;
+        }
+
+        @Override
+        public Object handleInvocation(Invocation invocation) {
+            return null;
+        }
+
+        @Override
+        public Class getResponsibility() {
+            return klass;
+        }
     }
 
     @Test
