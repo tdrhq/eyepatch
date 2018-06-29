@@ -42,7 +42,7 @@ public class EyePatchClassBuilder {
     }
 
     @NonNull
-    DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
+    public DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
         Key key = new Key(realClass, classLoader);
         if (cache.containsKey(key)) {
             return cache.get(key);
@@ -54,7 +54,7 @@ public class EyePatchClassBuilder {
     }
 
     @NonNull
-    DexFile generateDexFileUncached(Class realClass) {
+    private DexFile generateDexFileUncached(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             File of = new File(mDataDir, "EPG" + (++counter) + ".dex");
@@ -281,10 +281,7 @@ public class EyePatchClassBuilder {
         }
     }
 
-    public static void invokeHelper(Class klass, String name) {
-    }
-
-    public static class Key {
+    private static class Key {
         Class klass;
         ClassLoader classLoader;
 
