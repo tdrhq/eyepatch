@@ -3,11 +3,10 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import org.junit.Before;
-import static org.junit.Assert.*;
 
 public class EyePatchClassBuilderTest extends AbstractDispatchableClassBuilderTest {
     @Before
     public void before() throws Exception {
-        mEyePatchClassBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
+        classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
     }
 }

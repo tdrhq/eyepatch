@@ -5,7 +5,7 @@ import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
-import dalvik.system.DexFile;
+
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public abstract class AbstractDispatchableClassBuilderTest {
-    protected DispatchingClassBuilder mEyePatchClassBuilder;
+    protected DispatchingClassBuilder classBuilder;
     private Dispatcher oldHandler;
     private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
 
@@ -54,7 +54,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
     public void testWrapping() throws Exception {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Bar.class, classLoader);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
                 null,
@@ -75,7 +75,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Bar.class, classLoader);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
                 null,
@@ -106,7 +106,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -128,7 +128,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -150,7 +150,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Bar.class, classLoader);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -173,7 +173,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "primitiveReturnType";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithPrimitive.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithPrimitive.class, classLoader);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -196,7 +196,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "floatType";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithfloat.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithfloat.class, classLoader);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -219,7 +219,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithVoid.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithVoid.class, classLoader);
         Object instance = barWrapped.newInstance();
 
 
@@ -283,7 +283,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithArgument.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithArgument.class, classLoader);
         Object instance = barWrapped.newInstance();
 
 
@@ -313,7 +313,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithTwoArgument.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithTwoArgument.class, classLoader);
         Object instance = barWrapped.newInstance();
 
 
@@ -344,7 +344,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithPrimitiveArgument.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithPrimitiveArgument.class, classLoader);
         Object instance = barWrapped.newInstance();
 
 
@@ -374,7 +374,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(BarWithTwoArgumentWithPrim.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(BarWithTwoArgumentWithPrim.class, classLoader);
         Object instance = barWrapped.newInstance();
 
 
@@ -403,7 +403,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Foo.class, classLoader);
         Object instance = barWrapped.newInstance();
 
         Invocation preInvocation = new Invocation(
@@ -432,7 +432,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(FooWithArg.class, classLoader);
         Constructor constructor = barWrapped.getConstructor(int.class);
         Object instance = constructor.newInstance(20);
 
@@ -449,8 +449,8 @@ public abstract class AbstractDispatchableClassBuilderTest {
     @Test
     public void testWrappingTheSameClassTwiceIsFine() throws Throwable {
         ClassLoader classLoader2 = new PathClassLoader("", null, getClass().getClassLoader());
-        Class barWrapped1 = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader);
-        Class barWrapped2 = mEyePatchClassBuilder.wrapClass(FooWithArg.class, classLoader2);
+        Class barWrapped1 = classBuilder.wrapClass(FooWithArg.class, classLoader);
+        Class barWrapped2 = classBuilder.wrapClass(FooWithArg.class, classLoader2);
         assertNotNull(barWrapped2);
         assertNotNull(barWrapped1);
         assertNotSame(barWrapped1, barWrapped2);
@@ -469,7 +469,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
 
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Bar.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Bar.class, classLoader);
         Method method = barWrapped.getMethod("foo");
         method.invoke(null);
         assertEquals(barWrapped.getName(), klass[0].getName());
@@ -484,7 +484,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
     @Test
     public void testCantUseSameClassLoader() throws Throwable {
         try {
-            mEyePatchClassBuilder.wrapClass(Bar.class, Bar.class.getClassLoader());
+            classBuilder.wrapClass(Bar.class, Bar.class.getClassLoader());
             fail("expected exception");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), Matchers.containsString("different"));
@@ -493,7 +493,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
 
     @Test
     public void testClassExtension() throws Throwable {
-        Class fooWrapped = mEyePatchClassBuilder.wrapClass(Foo2.class, classLoader);
+        Class fooWrapped = classBuilder.wrapClass(Foo2.class, classLoader);
         assertNotNull(fooWrapped);
 
         assertSame(Foo.class, fooWrapped.getSuperclass());
@@ -506,7 +506,7 @@ public abstract class AbstractDispatchableClassBuilderTest {
     public void testMethodPolymorph() throws Throwable {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-        Class barWrapped = mEyePatchClassBuilder.wrapClass(Foo3.class, classLoader);
+        Class barWrapped = classBuilder.wrapClass(Foo3.class, classLoader);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
                 null,
