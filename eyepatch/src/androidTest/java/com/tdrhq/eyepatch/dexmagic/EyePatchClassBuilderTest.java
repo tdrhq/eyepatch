@@ -5,7 +5,8 @@ import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
-
+import com.tdrhq.eyepatch.util.Whitebox;
+import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -70,8 +71,7 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("foo2");
 
-        Method method = barWrapped.getMethod("foo");
-        assertEquals("foo2", method.invoke(null));
+        assertEquals("foo2", Whitebox.invokeStatic(barWrapped, "foo"));
     }
 
     @Test
@@ -99,11 +99,8 @@ public class EyePatchClassBuilderTest {
                 new Object[] {});
         when(handler.handleInvocation(expectedCarInvocation))
                 .thenReturn("car3");
-        Method method = barWrapped.getMethod("foo");
-        assertEquals("foo3", method.invoke(null));
-
-        method = barWrapped.getMethod("car");
-        assertEquals("car3", method.invoke(null));
+        assertEquals("foo3", Whitebox.invokeStatic(barWrapped, "foo"));
+        assertEquals("car3", Whitebox.invokeStatic(barWrapped, "car"));
     }
 
     @Test
@@ -125,7 +122,7 @@ public class EyePatchClassBuilderTest {
                 .thenReturn("foo3");
 
         Method method = barWrapped.getMethod("nonStatic");
-        assertEquals("foo3", method.invoke(instance));
+        assertEquals("foo3", Whitebox.invoke(instance, "nonStatic"));
     }
 
     @Test
@@ -146,8 +143,7 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
 
-        Method method = barWrapped.getMethod("finalMethod");
-        assertEquals("foo3", method.invoke(instance));
+        assertEquals("foo3", Whitebox.invoke(instance, "finalMethod"));
     }
 
     @Test
@@ -168,8 +164,7 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
 
-        Method method = barWrapped.getMethod("otherReturnType");
-        assertEquals(Integer.valueOf(30), method.invoke(instance));
+        assertEquals(Integer.valueOf(30), Whitebox.invoke(instance, "otherReturnType"));
     }
 
     @Test
@@ -191,8 +186,7 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
 
-        Method method = barWrapped.getMethod(functionName);
-        assertEquals(30, method.invoke(instance));
+        assertEquals(30, Whitebox.invoke(instance, functionName));
     }
 
     @Test
@@ -214,8 +208,7 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(invocation))
                 .thenReturn(Float.valueOf(30.0f));
 
-        Method method = barWrapped.getMethod(functionName);
-        assertEquals(30.0f, method.invoke(instance));
+        assertEquals(30.0f, Whitebox.invoke(instance, functionName));
     }
 
     @Test
@@ -228,8 +221,7 @@ public class EyePatchClassBuilderTest {
         Object instance = barWrapped.newInstance();
 
 
-        Method method = barWrapped.getMethod(functionName);
-        method.invoke(instance);
+        Whitebox.invoke(instance, functionName);
         Invocation invocation = new Invocation(
                 barWrapped,
                 instance,
@@ -291,9 +283,8 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = wrapClass(BarWithArgument.class);
         Object instance = barWrapped.newInstance();
 
-
-        Method method = barWrapped.getDeclaredMethod(functionName, String.class);
-        method.invoke(instance, "foo");
+        Whitebox.invoke(instance, functionName,
+                        arg(String.class, "foo"));
 
         Invocation invocation = new Invocation(
                 barWrapped,
@@ -321,9 +312,7 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = wrapClass(BarWithTwoArgument.class);
         Object instance = barWrapped.newInstance();
 
-
-        Method method = barWrapped.getDeclaredMethod(functionName, String.class, Integer.class);
-        method.invoke(instance, "foo", new Integer(20));
+        Whitebox.invoke(instance, functionName, arg(String.class, "foo"), arg(Integer.class, 20));
 
         Invocation invocation = new Invocation(
                 barWrapped,
@@ -352,9 +341,7 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = wrapClass(BarWithPrimitiveArgument.class);
         Object instance = barWrapped.newInstance();
 
-
-        Method method = barWrapped.getDeclaredMethod(functionName, int.class);
-        method.invoke(instance, 20);
+        Whitebox.invoke(instance, functionName, arg(int.class, 20));
 
         Invocation invocation = new Invocation(
                 barWrapped,
@@ -382,9 +369,10 @@ public class EyePatchClassBuilderTest {
         Class barWrapped = wrapClass(BarWithTwoArgumentWithPrim.class);
         Object instance = barWrapped.newInstance();
 
-
-        Method method = barWrapped.getDeclaredMethod(functionName, String.class, int.class);
-        method.invoke(instance, "foo", 20);
+        Whitebox.invoke(instance,
+                        functionName,
+                        arg(String.class, "foo"),
+                        arg(int.class, 20));
 
         Invocation invocation = new Invocation(
                 barWrapped,
@@ -486,8 +474,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         Class barWrapped = wrapClass(Bar.class);
-        Method method = barWrapped.getMethod("foo");
-        method.invoke(null);
+        Whitebox.invokeStatic(barWrapped, "foo");
         assertEquals(barWrapped.getName(), klass[0].getName());
         assertSame(classLoader, klass[0].getClassLoader());
     }
@@ -547,11 +534,8 @@ public class EyePatchClassBuilderTest {
                 .thenReturn("String1");
 
 
-        Method method = barWrapped.getMethod("bar", int.class);
-        assertEquals("int1", method.invoke(null, 2));
-
-        Method method2 = barWrapped.getMethod("bar", String.class);
-        assertEquals("String1", method2.invoke(null, "two"));
+        assertEquals("int1", Whitebox.invokeStatic(barWrapped, "bar", arg(int.class, 2)));
+        assertEquals("String1", Whitebox.invokeStatic(barWrapped, "bar", arg(String.class, "two")));
     }
 
     public static class Foo3 {
