@@ -267,12 +267,11 @@ public class EyePatchClassBuilderTest {
 
         Whitebox.invoke(instance, functionName, arg(String.class, "foo"), arg(Integer.class, 20));
 
-        Invocation invocation = new Invocation(
-                wrappedClass,
+        Invocation invocation = newInvocation(
                 instance,
                 functionName,
-                new Class[] {String.class, Integer.class},
-                new Object[] {"foo", 20 });
+                arg(String.class, "foo"),
+                arg(Integer.class, 20));
 
         verify(handler).handleInvocation(invocation);
 
@@ -321,12 +320,11 @@ public class EyePatchClassBuilderTest {
                         arg(String.class, "foo"),
                         arg(int.class, 20));
 
-        Invocation invocation = new Invocation(
-                wrappedClass,
+        Invocation invocation = newInvocation(
                 instance,
                 functionName,
-                new Class[] { String.class, int.class },
-                new Object[] {"foo", new Integer(20)});
+                arg(String.class, "foo"),
+                arg(int.class, 20));
 
         verify(handler).handleInvocation(invocation);
 
@@ -363,12 +361,10 @@ public class EyePatchClassBuilderTest {
         Constructor constructor = wrappedClass.getConstructor(int.class);
         Object instance = constructor.newInstance(20);
 
-        Invocation invocation = new Invocation(
-                wrappedClass,
+        Invocation invocation = newInvocation(
                 instance,
                 "__construct__",
-                new Class[] { int.class },
-                new Object[] {20});
+                arg(int.class, 20));
 
         verify(handler).handleInvocation(invocation);
     }
@@ -444,22 +440,18 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testMethodPolymorph() throws Throwable {
         wrappedClass = wrapClass(Foo3.class);
-        Invocation expectedInvocation = new Invocation(
-                wrappedClass,
+        Invocation expectedInvocation = newInvocation(
                 null,
                 "bar",
-                new Class[] { int.class },
-                new Object[] { new Integer(2)});
+                arg(int.class, 2));
 
         when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("int1");
 
-        Invocation expectedInvocation2 = new Invocation(
-                wrappedClass,
+        Invocation expectedInvocation2 = newInvocation(
                 null,
                 "bar",
-                new Class[] { String.class },
-                new Object[] { "two" });
+                arg(String.class, "two"));
 
         when(handler.handleInvocation(expectedInvocation2))
                 .thenReturn("String1");
