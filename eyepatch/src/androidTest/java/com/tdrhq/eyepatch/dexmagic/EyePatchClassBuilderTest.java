@@ -1,17 +1,19 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.support.annotation.NonNull;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Whitebox;
-import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.*;
+import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -19,6 +21,7 @@ public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder classBuilder;
     private Dispatcher oldHandler;
     private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
+    private Class wrappedClass;
 
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
@@ -61,56 +64,56 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testWrapping() throws Exception {
-        Class barWrapped = wrapClass(Bar.class);
-        Invocation expectedInvocation = new Invocation(
-                barWrapped,
-                null,
-                "foo",
-                new Class[] {},
-                new Object[] {});
+        wrappedClass = wrapClass(Bar.class);
+        Object instance = null;
+        String functionName = "foo";
+        Invocation expectedInvocation = newInvocation(instance, functionName);
 
         when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("foo2");
 
-        assertEquals("foo2", Whitebox.invokeStatic(barWrapped, "foo"));
+        assertEquals("foo2", Whitebox.invokeStatic(wrappedClass, functionName));
+    }
+
+    @NonNull
+    private Invocation newInvocation(Object instance, String functionName, Whitebox.Arg... args) {
+        List<Class> types = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+
+        for (Whitebox.Arg arg : args) {
+            types.add(arg.type);
+            values.add(arg.value);
+        }
+
+        return new Invocation(
+                wrappedClass,
+                instance,
+                functionName,
+                types.toArray(new Class[] {}),
+                values.toArray(new Object[] {}));
     }
 
     @Test
     public void testHandlerArgs() throws Exception {
-        Class barWrapped = wrapClass(Bar.class);
-        Invocation expectedInvocation = new Invocation(
-                barWrapped,
-                null,
-                "foo",
-                new Class[] {},
-                new Object[] {});
+        wrappedClass = wrapClass(Bar.class);
+        Invocation expectedInvocation = newInvocation(null, "foo");
 
         when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("foo3");
 
-        Invocation expectedCarInvocation = new Invocation(
-                barWrapped,
-                null,
-                "car",
-                new Class[] {},
-                new Object[] {});
+        Invocation expectedCarInvocation = newInvocation(null, "car");
         when(handler.handleInvocation(expectedCarInvocation))
                 .thenReturn("car3");
-        assertEquals("foo3", Whitebox.invokeStatic(barWrapped, "foo"));
-        assertEquals("car3", Whitebox.invokeStatic(barWrapped, "car"));
+        assertEquals("foo3", Whitebox.invokeStatic(wrappedClass, "foo"));
+        assertEquals("car3", Whitebox.invokeStatic(wrappedClass, "car"));
     }
 
     @Test
     public void testNonStatic() throws Exception {
-        Class barWrapped = wrapClass(Bar.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(Bar.class);
+        Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                "nonStatic",
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, "nonStatic");
 
         when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
@@ -120,15 +123,10 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testFinalMethod() throws Exception {
-        Class barWrapped = wrapClass(Bar.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(Bar.class);
+        Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                "finalMethod",
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, "finalMethod");
 
         when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
@@ -138,15 +136,10 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testOtherReturnType() throws Exception {
-        Class barWrapped = wrapClass(Bar.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(Bar.class);
+        Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                "otherReturnType",
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, "otherReturnType");
 
         when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
@@ -158,15 +151,10 @@ public class EyePatchClassBuilderTest {
     public void testPrimitiveReturnType() throws Exception {
 
         String functionName = "primitiveReturnType";
-        Class barWrapped = wrapClass(BarWithPrimitive.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithPrimitive.class);
+        Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                functionName,
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, functionName);
 
         when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
@@ -178,15 +166,10 @@ public class EyePatchClassBuilderTest {
     public void testFloatType() throws Exception {
 
         String functionName = "floatType";
-        Class barWrapped = wrapClass(BarWithfloat.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithfloat.class);
+        Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                functionName,
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, functionName);
 
         when(handler.handleInvocation(invocation))
                 .thenReturn(Float.valueOf(30.0f));
@@ -198,17 +181,12 @@ public class EyePatchClassBuilderTest {
     public void testVoidReturn() throws Exception {
 
         String functionName = "doSomething";
-        Class barWrapped = wrapClass(BarWithVoid.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithVoid.class);
+        Object instance = wrappedClass.newInstance();
 
 
         Whitebox.invoke(instance, functionName);
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                functionName,
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, functionName);
 
         verify(handler).handleInvocation(invocation);
 
@@ -259,18 +237,16 @@ public class EyePatchClassBuilderTest {
     public void testSingleArg() throws Exception {
 
         String functionName = "doSomething";
-        Class barWrapped = wrapClass(BarWithArgument.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithArgument.class);
+        Object instance = wrappedClass.newInstance();
 
         Whitebox.invoke(instance, functionName,
                         arg(String.class, "foo"));
 
-        Invocation invocation = new Invocation(
-                barWrapped,
+        Invocation invocation = newInvocation(
                 instance,
                 functionName,
-                new Class[] { String.class },
-                new Object[] {"foo"});
+                arg(String.class, "foo"));
 
         verify(handler).handleInvocation(invocation);
 
@@ -286,17 +262,17 @@ public class EyePatchClassBuilderTest {
     public void testTwoArgs() throws Exception {
 
         String functionName = "doSomething";
-        Class barWrapped = wrapClass(BarWithTwoArgument.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithTwoArgument.class);
+        Object instance = wrappedClass.newInstance();
 
         Whitebox.invoke(instance, functionName, arg(String.class, "foo"), arg(Integer.class, 20));
 
         Invocation invocation = new Invocation(
-                barWrapped,
+                wrappedClass,
                 instance,
                 functionName,
-                new Class[] { String.class, Integer.class },
-                new Object[] {"foo", new Integer(20) });
+                new Class[] {String.class, Integer.class},
+                new Object[] {"foo", 20 });
 
         verify(handler).handleInvocation(invocation);
 
@@ -313,17 +289,15 @@ public class EyePatchClassBuilderTest {
     public void testPrimitiveArg() throws Exception {
 
         String functionName = "doSomething";
-        Class barWrapped = wrapClass(BarWithPrimitiveArgument.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithPrimitiveArgument.class);
+        Object instance = wrappedClass.newInstance();
 
         Whitebox.invoke(instance, functionName, arg(int.class, 20));
 
-        Invocation invocation = new Invocation(
-                barWrapped,
+        Invocation invocation = newInvocation(
                 instance,
                 functionName,
-                new Class[] { int.class },
-                new Integer[] {20});
+                arg(int.class, 20));
 
         verify(handler).handleInvocation(invocation);
 
@@ -339,8 +313,8 @@ public class EyePatchClassBuilderTest {
     public void testTwoArgsWithPrim() throws Exception {
 
         String functionName = "doSomething";
-        Class barWrapped = wrapClass(BarWithTwoArgumentWithPrim.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(BarWithTwoArgumentWithPrim.class);
+        Object instance = wrappedClass.newInstance();
 
         Whitebox.invoke(instance,
                         functionName,
@@ -348,7 +322,7 @@ public class EyePatchClassBuilderTest {
                         arg(int.class, 20));
 
         Invocation invocation = new Invocation(
-                barWrapped,
+                wrappedClass,
                 instance,
                 functionName,
                 new Class[] { String.class, int.class },
@@ -367,22 +341,12 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testCallsConstructorWithoutArgs() throws Throwable {
 
-        Class barWrapped = wrapClass(Foo.class);
-        Object instance = barWrapped.newInstance();
+        wrappedClass = wrapClass(Foo.class);
+        Object instance = wrappedClass.newInstance();
 
-        Invocation preInvocation = new Invocation(
-                barWrapped,
-                null,
-                "__pre_construct__",
-                new Class[] {},
-                new Object[] {});
+        Invocation preInvocation = newInvocation(null, "__pre_construct__");
 
-        Invocation invocation = new Invocation(
-                barWrapped,
-                instance,
-                "__construct__",
-                new Class[] {},
-                new Object[] {});
+        Invocation invocation = newInvocation(instance, "__construct__");
 
         verify(handler).handleInvocation(preInvocation);
         verify(handler).handleInvocation(invocation);
@@ -395,12 +359,12 @@ public class EyePatchClassBuilderTest {
     public void testCallsConstructorWithArgs() throws Throwable {
 
         Class<?> classArg = FooWithArg.class;
-        Class barWrapped = wrapClass(classArg);
-        Constructor constructor = barWrapped.getConstructor(int.class);
+        wrappedClass = wrapClass(classArg);
+        Constructor constructor = wrappedClass.getConstructor(int.class);
         Object instance = constructor.newInstance(20);
 
         Invocation invocation = new Invocation(
-                barWrapped,
+                wrappedClass,
                 instance,
                 "__construct__",
                 new Class[] { int.class },
@@ -442,9 +406,9 @@ public class EyePatchClassBuilderTest {
 
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = wrapClass(Bar.class);
-        Whitebox.invokeStatic(barWrapped, "foo");
-        assertEquals(barWrapped.getName(), klass[0].getName());
+        wrappedClass = wrapClass(Bar.class);
+        Whitebox.invokeStatic(wrappedClass, "foo");
+        assertEquals(wrappedClass.getName(), klass[0].getName());
         assertSame(classLoader, klass[0].getClassLoader());
     }
 
@@ -479,9 +443,9 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testMethodPolymorph() throws Throwable {
-        Class barWrapped = wrapClass(Foo3.class);
+        wrappedClass = wrapClass(Foo3.class);
         Invocation expectedInvocation = new Invocation(
-                barWrapped,
+                wrappedClass,
                 null,
                 "bar",
                 new Class[] { int.class },
@@ -491,7 +455,7 @@ public class EyePatchClassBuilderTest {
                 .thenReturn("int1");
 
         Invocation expectedInvocation2 = new Invocation(
-                barWrapped,
+                wrappedClass,
                 null,
                 "bar",
                 new Class[] { String.class },
@@ -501,8 +465,8 @@ public class EyePatchClassBuilderTest {
                 .thenReturn("String1");
 
 
-        assertEquals("int1", Whitebox.invokeStatic(barWrapped, "bar", arg(int.class, 2)));
-        assertEquals("String1", Whitebox.invokeStatic(barWrapped, "bar", arg(String.class, "two")));
+        assertEquals("int1", Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2)));
+        assertEquals("String1", Whitebox.invokeStatic(wrappedClass, "bar", arg(String.class, "two")));
     }
 
     public static class Foo3 {

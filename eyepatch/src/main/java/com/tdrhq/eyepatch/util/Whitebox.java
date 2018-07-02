@@ -8,13 +8,20 @@ import java.util.HashSet;
 
 public class Whitebox {
     public static class Arg {
-        Class type;
-        Object value;
+        public Class type;
+        public Object value;
     }
 
     public static <T> Arg arg(Class<T> type, T value) {
         Arg arg = new Arg();
         arg.type = type;
+        arg.value = value;
+        return arg;
+    }
+
+    public static Arg arg(Object value) {
+        Arg arg = new Arg();
+        arg.type = value.getClass();
         arg.value = value;
         return arg;
     }
