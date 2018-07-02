@@ -12,6 +12,10 @@ import com.tdrhq.eyepatch.util.Checks;
  */
 public abstract class Dispatcher {
 
+    // A token to mark that the Dispatcher should dispatch to the
+    // default method.
+    public static Object UNHANDLED = new Object();
+
     private static StaticInvocationHandler DEFAULT_HANDLER = new DelegatingInvocationHandler();
 
     private static StaticInvocationHandler sHandler = DEFAULT_HANDLER;

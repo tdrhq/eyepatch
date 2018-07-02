@@ -11,9 +11,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DexFileGenerator {
     private File mDataDir;
@@ -31,7 +28,8 @@ public class DexFileGenerator {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             File of = new File(mDataDir, "EPG" + (++counter) + ".dex");
-            return Util.createDexFile(dexmaker, of);
+            Util.writeDexFile(dexmaker, of);
+            return Util.loadDexFile(of);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -96,6 +94,7 @@ public class DexFileGenerator {
         constructorGenerator.invokeSuper();
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
+        generateDefaultLabel(code, locals);
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
@@ -112,6 +111,16 @@ public class DexFileGenerator {
         Locals locals = new Locals(code, returnType);
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
+
+        generateDefaultLabel(code, locals);
+    }
+
+    private void generateDefaultLabel(Code code, Locals locals) {
+        code.mark(locals.defaultImplementation);
+        code.newInstance(
+                locals.uoe,
+                TypeId.get(UnsupportedOperationException.class).getConstructor());
+        code.throwValue(locals.uoe);
     }
 
     private static void generateMethodContentsInternal(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
@@ -125,7 +134,7 @@ public class DexFileGenerator {
     }
 
     private static void generateInvokeWithoutReturn(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
-        TypeId staticInvoker = TypeId.get(Dispatcher.class);
+        TypeId<?> staticInvoker = TypeId.get(Dispatcher.class);
         TypeId classType = TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
         TypeId objectType = TypeId.get(Object.class);
@@ -141,6 +150,7 @@ public class DexFileGenerator {
                 stringType,
                 argArType,
                 objectArType);
+
 
 
         code.loadConstant(locals.parameterLength, parameterTypes.length);
@@ -167,6 +177,15 @@ public class DexFileGenerator {
                 locals.argTypes,
                 locals.callerArgs);
 
+        FieldId<?, ?> unhandledValueField =
+                staticInvoker.getField(TypeId.OBJECT, "UNHANDLED");
+        code.sget(unhandledValueField, locals.unhandledValue);
+        code.compare(
+                Comparison.EQ,
+                locals.defaultImplementation,
+                Checks.notNull(locals.returnValue),
+                Checks.notNull(locals.unhandledValue));
+
         if (Primitives.isPrimitive(returnType)) {
             MethodId intValue = Primitives.getBoxedType(returnType)
                     .getMethod(
@@ -184,6 +203,7 @@ public class DexFileGenerator {
     }
 
     private static class Locals {
+        Label defaultImplementation;
         Local<Object> returnValue;
         Local<Class> callerClass;
         Local instanceArg;
@@ -194,14 +214,12 @@ public class DexFileGenerator {
         Local<Integer> parameterLength;
         Local<Object> tmp;
         Local boxedReturnValue;
+        Local<UnsupportedOperationException> uoe;
+        Local<Object> unhandledValue;
 
         public Locals(Code code, TypeId returnType) {
-            returnValue = null;
-
-            if (returnType != TypeId.VOID) {
-                returnValue = code.newLocal(TypeId.OBJECT);
-            }
-
+            defaultImplementation = new Label();
+            returnValue = code.newLocal(TypeId.OBJECT);
             callerClass = code.newLocal(TypeId.get(Class.class));
             instanceArg = code.newLocal(TypeId.OBJECT);
             callerMethod = code.newLocal(TypeId.STRING);
@@ -210,6 +228,8 @@ public class DexFileGenerator {
             castedReturnValue = code.newLocal(returnType);
             parameterLength = code.newLocal(TypeId.INT);
             tmp = code.newLocal(TypeId.OBJECT);
+            uoe = code.newLocal(TypeId.get(UnsupportedOperationException.class));
+            unhandledValue = code.newLocal(TypeId.OBJECT);
 
             boxedReturnValue = null;
 

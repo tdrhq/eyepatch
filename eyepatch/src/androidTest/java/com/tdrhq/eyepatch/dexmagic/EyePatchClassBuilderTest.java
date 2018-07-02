@@ -466,6 +466,22 @@ public class EyePatchClassBuilderTest {
         assertEquals("String1", Whitebox.invokeStatic(wrappedClass, "bar", arg(String.class, "two")));
     }
 
+    private void testUnhandledDefaultHandler() throws Throwable {
+        wrappedClass = wrapClass(Foo3.class);
+        when(handler.handleInvocation(newInvocation(
+                                              null,
+                                              "bar",
+                                              arg(int.class, 2))))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+        try {
+            Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2));
+            fail("expected exception");
+        } catch (UnsupportedOperationException e) {
+            // expected
+        }
+    }
+
     public static class Foo3 {
         public static String bar(String arg) {
             return "String";
