@@ -2,8 +2,18 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 android {
     compileSdkVersion 27
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion 14
@@ -27,6 +37,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.linkedin.dexmaker:dexmaker:2.16.0'
+    implementation 'org.smali:dexlib2:2.2.4'
+
     implementation 'com.linkedin.dexmaker:dexmaker-mockito:2.16.0'
     implementation 'com.android.support.test:runner:1.0.2'
     implementation 'org.mockito:mockito-core:1.10.19'
