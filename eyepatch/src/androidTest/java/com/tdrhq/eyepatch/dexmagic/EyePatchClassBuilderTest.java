@@ -121,7 +121,6 @@ public class EyePatchClassBuilderTest {
         when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
 
-        Method method = barWrapped.getMethod("nonStatic");
         assertEquals("foo3", Whitebox.invoke(instance, "nonStatic"));
     }
 
