@@ -28,7 +28,17 @@ public class EyePatchClassBuilder {
      * Wraps realClass, to generate a patchable class and loads it
      * into the ClassLoader.
      */
-    public Class wrapClass(Class realClass, ClassLoader classLoader) {
+    public Class wrapClass(
+            String realClassName,
+            ClassLoader originalClassLoader,
+            ClassLoader classLoader) {
+
+        Class realClass;
+        try {
+            realClass = originalClassLoader.loadClass(realClassName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("No such class: " + realClassName, e);
+        }
         if (realClass.getClassLoader() == classLoader) {
             throw new IllegalArgumentException(
                     "The classLoader provided must be different from the one " +

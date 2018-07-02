@@ -130,7 +130,8 @@ public class TestController {
 
     private Class buildPatchableClass(EyePatchClassLoader classLoader, String className) throws ClassNotFoundException {
         return classBuilder.wrapClass(
-                classLoader.getClass().getClassLoader().loadClass(className),
+                className,
+                getClass().getClassLoader(),
                 classLoader);
     }
 
