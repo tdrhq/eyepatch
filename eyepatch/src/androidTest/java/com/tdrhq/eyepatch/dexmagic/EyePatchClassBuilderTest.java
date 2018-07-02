@@ -96,16 +96,18 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testHandlerArgs() throws Exception {
         wrappedClass = wrapClass(Bar.class);
-        Invocation expectedInvocation = newInvocation(null, "foo");
+        String foo = "foo";
+        Invocation expectedInvocation = newInvocation(null, foo);
 
         when(handler.handleInvocation(expectedInvocation))
                 .thenReturn("foo3");
 
-        Invocation expectedCarInvocation = newInvocation(null, "car");
+        String car = "car";
+        Invocation expectedCarInvocation = newInvocation(null, car);
         when(handler.handleInvocation(expectedCarInvocation))
                 .thenReturn("car3");
-        assertEquals("foo3", Whitebox.invokeStatic(wrappedClass, "foo"));
-        assertEquals("car3", Whitebox.invokeStatic(wrappedClass, "car"));
+        assertEquals("foo3", Whitebox.invokeStatic(wrappedClass, foo));
+        assertEquals("car3", Whitebox.invokeStatic(wrappedClass, car));
     }
 
     @Test
@@ -113,12 +115,13 @@ public class EyePatchClassBuilderTest {
         wrappedClass = wrapClass(Bar.class);
         Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = newInvocation(instance, "nonStatic");
+        String functionName = "nonStatic";
+        Invocation invocation = newInvocation(instance, functionName);
 
         when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
 
-        assertEquals("foo3", Whitebox.invoke(instance, "nonStatic"));
+        assertEquals("foo3", Whitebox.invoke(instance, functionName));
     }
 
     @Test
@@ -126,12 +129,13 @@ public class EyePatchClassBuilderTest {
         wrappedClass = wrapClass(Bar.class);
         Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = newInvocation(instance, "finalMethod");
+        String functionName = "finalMethod";
+        Invocation invocation = newInvocation(instance, functionName);
 
         when(handler.handleInvocation(invocation))
                 .thenReturn("foo3");
 
-        assertEquals("foo3", Whitebox.invoke(instance, "finalMethod"));
+        assertEquals("foo3", Whitebox.invoke(instance, functionName));
     }
 
     @Test
@@ -139,12 +143,13 @@ public class EyePatchClassBuilderTest {
         wrappedClass = wrapClass(Bar.class);
         Object instance = wrappedClass.newInstance();
 
-        Invocation invocation = newInvocation(instance, "otherReturnType");
+        String functionName = "otherReturnType";
+        Invocation invocation = newInvocation(instance, functionName);
 
         when(handler.handleInvocation(invocation))
                 .thenReturn(Integer.valueOf(30));
 
-        assertEquals(Integer.valueOf(30), Whitebox.invoke(instance, "otherReturnType"));
+        assertEquals(Integer.valueOf(30), Whitebox.invoke(instance, functionName));
     }
 
     @Test
