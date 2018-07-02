@@ -59,7 +59,7 @@ public class EyePatchClassBuilderTest {
     public void testWrapping() throws Exception {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-        Class barWrapped = classBuilder.wrapClass(Bar.class.getName(), getClass().getClassLoader(), classLoader);
+        Class barWrapped = wrapClass(Bar.class);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
                 null,
@@ -80,7 +80,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
 
-        Class barWrapped = classBuilder.wrapClass(Bar.class.getName(), getClass().getClassLoader(), classLoader);
+        Class barWrapped = wrapClass(Bar.class);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
                 null,
@@ -111,9 +111,7 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = classBuilder.wrapClass(Bar.class.getName(),
-                                                  getClass().getClassLoader(),
-                                                  classLoader);
+        Class barWrapped = wrapClass(Bar.class);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -135,9 +133,7 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = classBuilder.wrapClass(Bar.class.getName(),
-                                                  getClass().getClassLoader(),
-                                                  classLoader);
+        Class barWrapped = wrapClass(Bar.class);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -159,9 +155,7 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = classBuilder.wrapClass(Bar.class.getName(),
-                                                  getClass().getClassLoader(),
-                                                  classLoader);
+        Class barWrapped = wrapClass(Bar.class);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -184,10 +178,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "primitiveReturnType";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithPrimitive.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithPrimitive.class);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -210,10 +201,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "floatType";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithfloat.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithfloat.class);
         Object instance = barWrapped.newInstance();
 
         Invocation invocation = new Invocation(
@@ -236,10 +224,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithVoid.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithVoid.class);
         Object instance = barWrapped.newInstance();
 
 
@@ -303,10 +288,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithArgument.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithArgument.class);
         Object instance = barWrapped.newInstance();
 
 
@@ -336,10 +318,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithTwoArgument.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithTwoArgument.class);
         Object instance = barWrapped.newInstance();
 
 
@@ -370,10 +349,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithPrimitiveArgument.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithPrimitiveArgument.class);
         Object instance = barWrapped.newInstance();
 
 
@@ -403,10 +379,7 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
 
         String functionName = "doSomething";
-        Class barWrapped = classBuilder.wrapClass(
-                BarWithTwoArgumentWithPrim.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(BarWithTwoArgumentWithPrim.class);
         Object instance = barWrapped.newInstance();
 
 
@@ -435,10 +408,7 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = classBuilder.wrapClass(
-                Foo.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(Foo.class);
         Object instance = barWrapped.newInstance();
 
         Invocation preInvocation = new Invocation(
@@ -467,10 +437,8 @@ public class EyePatchClassBuilderTest {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = classBuilder.wrapClass(
-                FooWithArg.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class<?> classArg = FooWithArg.class;
+        Class barWrapped = wrapClass(classArg);
         Constructor constructor = barWrapped.getConstructor(int.class);
         Object instance = constructor.newInstance(20);
 
@@ -484,13 +452,17 @@ public class EyePatchClassBuilderTest {
         verify(handler).handleInvocation(invocation);
     }
 
+    private Class wrapClass(Class<?> classArg) {
+        return classBuilder.wrapClass(
+                    classArg.getName(),
+                    getClass().getClassLoader(),
+                    classLoader);
+    }
+
     @Test
     public void testWrappingTheSameClassTwiceIsFine() throws Throwable {
         ClassLoader classLoader2 = new PathClassLoader("", null, getClass().getClassLoader());
-        Class barWrapped1 = classBuilder.wrapClass(
-                FooWithArg.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped1 = wrapClass(FooWithArg.class);
         Class barWrapped2 = classBuilder.wrapClass(
                 FooWithArg.class.getName(),
                 getClass().getClassLoader(),
@@ -513,10 +485,7 @@ public class EyePatchClassBuilderTest {
 
         Dispatcher.setHandler(handler);
 
-        Class barWrapped = classBuilder.wrapClass(
-                Bar.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(Bar.class);
         Method method = barWrapped.getMethod("foo");
         method.invoke(null);
         assertEquals(barWrapped.getName(), klass[0].getName());
@@ -543,10 +512,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testClassExtension() throws Throwable {
-        Class fooWrapped = classBuilder.wrapClass(
-                Foo2.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class fooWrapped = wrapClass(Foo2.class);
         assertNotNull(fooWrapped);
 
         assertSame(Foo.class, fooWrapped.getSuperclass());
@@ -559,10 +525,7 @@ public class EyePatchClassBuilderTest {
     public void testMethodPolymorph() throws Throwable {
         StaticInvocationHandler handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-        Class barWrapped = classBuilder.wrapClass(
-                Foo3.class.getName(),
-                getClass().getClassLoader(),
-                classLoader);
+        Class barWrapped = wrapClass(Foo3.class);
         Invocation expectedInvocation = new Invocation(
                 barWrapped,
                 null,
