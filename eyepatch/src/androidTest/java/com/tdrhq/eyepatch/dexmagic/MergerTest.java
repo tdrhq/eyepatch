@@ -4,10 +4,13 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import dalvik.system.DexFile;
 import java.io.File;
+import java.util.Collections;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
 public class MergerTest {
     @Rule
@@ -23,7 +26,10 @@ public class MergerTest {
 
     @Test
     public void testPreconditions() throws Throwable {
-        assertNotNull(extractClass(Foo.class));
+        File file = extractClass(Foo.class);
+        assertNotNull(file);
+        assertThat(Collections.list(new DexFile(file).entries()),
+                   hasItem(Foo.class.getName()));
     }
 
     static class Foo {
