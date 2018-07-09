@@ -7,8 +7,10 @@ import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ClassLoaderIntrospector {
@@ -31,6 +33,21 @@ public class ClassLoaderIntrospector {
         }
 
         return ret;
+    }
+
+    public static File getDefiningDexFile(Class realClass) {
+        List<String> dexPath = getOriginalDexPath(realClass.getClassLoader());
+        for (String file : dexPath) {
+            try {
+                DexFile dexFile = new DexFile(new File(file));
+                if (Collections.list(dexFile.entries()).contains(realClass.getName())) {
+                    return new File(file);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
 
     public static String getOriginalDexPathAsStr(ClassLoader parent) {
