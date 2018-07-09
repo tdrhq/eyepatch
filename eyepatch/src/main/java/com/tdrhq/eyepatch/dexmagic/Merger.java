@@ -7,6 +7,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * Merges a template implementation with a real implementation.
+ *
+ * This allows the template implementation to dispatch to the
+ * Dispatcher, but if the Dispatcher responds by saying that we need
+ * to run the original code, then this bypasses to the original
+ * implementation.
+ */
 public class Merger {
     public Merger() {
     }
