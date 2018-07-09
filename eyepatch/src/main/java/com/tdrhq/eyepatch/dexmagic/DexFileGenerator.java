@@ -5,6 +5,7 @@ package com.tdrhq.eyepatch.dexmagic;
 import android.support.annotation.NonNull;
 import com.android.dx.*;
 import com.tdrhq.eyepatch.util.Checks;
+import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -16,6 +17,7 @@ public class DexFileGenerator {
     private File mDataDir;
     private int counter = 0;
     private ConstructorGeneratorFactory constructorGeneratorFactory;
+    private Merger merger = new Merger();
 
     public DexFileGenerator(File dataDir,
                             ConstructorGeneratorFactory mConstructorGeneratorFactory) {
@@ -27,13 +29,17 @@ public class DexFileGenerator {
     public DexFile generate(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
-            File of = new File(mDataDir, "EPG" + (++counter) + ".dex");
+            int suffix = (++counter);
+            File of = new File(mDataDir, "EPG" + suffix + ".dex");
+            File mergedOf = new File(mDataDir, "EPG_merged" + suffix + ".dex");
             Util.writeDexFile(dexmaker, of);
-            return Util.loadDexFile(of);
+            merger.mergeDexFile(of, ClassLoaderIntrospector.getDefiningDexFile(realClass), mergedOf);
+            return Util.loadDexFile(mergedOf);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     private DexMaker buildDexMaker(String name, Class original) {
         DexMaker dexmaker = new DexMaker();
