@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.DexFile;
+import org.jf.dexlib2.iface.MethodImplementation;
+import org.jf.dexlib2.rewriter.DexRewriter;
+import org.jf.dexlib2.rewriter.Rewriter;
+import org.jf.dexlib2.rewriter.RewriterModule;
+import org.jf.dexlib2.rewriter.Rewriters;
 import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.DexPool;
 
@@ -47,7 +52,29 @@ public class Merger {
         dataStore.close();
     }
 
-    private DexFile mergeDexFile(DexFile template, DexFile real) {
-        return template;
+    private DexFile mergeDexFile(final DexFile template, final DexFile real) {
+        DexRewriter rewriter = new DexRewriter(new RewriterModule() {
+                public Rewriter<MethodImplementation> getMethodImplementationRewriter(Rewriters rewriters) {
+                    return new MergedMethodImplementationRewriter(template, real);
+                }
+            });
+        DexFile rewrittenDexFile = rewriter.rewriteDexFile(template);
+
+        return rewrittenDexFile;
+    }
+
+    static class MergedMethodImplementationRewriter implements Rewriter<MethodImplementation> {
+        private DexFile template;
+        private DexFile real;
+
+        public MergedMethodImplementationRewriter(DexFile template, DexFile real) {
+            this.template = template;
+            this.real = real;
+        }
+
+        @Override
+        public MethodImplementation rewrite(MethodImplementation methodImplementation) {
+            return methodImplementation;
+        }
     }
 }
