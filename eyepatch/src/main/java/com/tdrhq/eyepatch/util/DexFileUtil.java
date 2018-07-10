@@ -20,14 +20,21 @@ public class DexFileUtil {
     }
 
     public static DexBackedDexFile readDexFile(File ret) throws IOException {
-        InputStream fis = new BufferedInputStream(new FileInputStream(ret));
-        InputStream dexFileExtracted = extractDexFile(fis);
-        InputStream is = new BufferedInputStream(dexFileExtracted);
+        FileInputStream fis = new FileInputStream(ret);
         try {
-            return DexBackedDexFile.fromInputStream(Opcodes.forApi(16), is);
+            return readDexFile(fis);
         } finally {
-            is.close();
             fis.close();
+        }
+    }
+
+    public static DexBackedDexFile readDexFile(InputStream input) throws IOException {
+        InputStream bis = new BufferedInputStream(input);
+        InputStream dexFileExtracted = extractDexFile(bis);
+        try {
+            return DexBackedDexFile.fromInputStream(Opcodes.forApi(16), new BufferedInputStream(dexFileExtracted));
+        } finally {
+            dexFileExtracted.close();
         }
     }
 
