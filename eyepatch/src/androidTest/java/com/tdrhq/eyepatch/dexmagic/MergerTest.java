@@ -46,7 +46,7 @@ public class MergerTest {
 
         assertNotNull(theClassDef);
         DexFile copy = new ImmutableDexFile(
-                Opcodes.getDefault(),
+                Opcodes.forApi(16),
                 ImmutableSet.of(theClassDef));
         DexFileFactory.writeDexFile(tmpOutput.toString(), copy);
         return tmpOutput;

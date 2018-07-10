@@ -24,7 +24,7 @@ public class DexFileUtil {
         InputStream dexFileExtracted = extractDexFile(ret);
         InputStream is = new BufferedInputStream(dexFileExtracted);
         try {
-            return DexBackedDexFile.fromInputStream(Opcodes.getDefault(), is);
+            return DexBackedDexFile.fromInputStream(Opcodes.forApi(16), is);
         } finally {
             is.close();
         }
