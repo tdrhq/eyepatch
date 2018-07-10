@@ -36,11 +36,6 @@ public class MergerTest {
         DexBackedDexFile dexfile = DexFileUtil.readDexFile(ret);
         Log.i("MergerTest", "Finished reading the DexBackedDexFile");
 
-        DexRewriter rewriter = new DexRewriter(new RewriterModule() {
-            });
-        DexFile rewrittenDexFile = rewriter.rewriteDexFile(dexfile);
-
-
         File tmpOutput = tmpdir.newFile("tmpoutput.dex");
         ClassDef theClassDef = DexFileUtil.findClassDef(dexfile, klass);
 
@@ -48,7 +43,7 @@ public class MergerTest {
         DexFile copy = new ImmutableDexFile(
                 Opcodes.forApi(16),
                 ImmutableSet.of(theClassDef));
-        DexFileFactory.writeDexFile(tmpOutput.toString(), copy);
+        DexFileFactory.writeDexFile(tmpOutput.toString(), dexfile);
         return tmpOutput;
     }
 
