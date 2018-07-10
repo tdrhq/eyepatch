@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.support.test.espresso.core.internal.deps.guava.collect.ImmutableSet;
 import android.util.Log;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
@@ -12,12 +13,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
+import org.jf.dexlib2.immutable.ImmutableDexFile;
 import org.jf.dexlib2.rewriter.DexRewriter;
 import org.jf.dexlib2.rewriter.RewriterModule;
 import org.junit.Rule;
@@ -46,7 +50,19 @@ public class MergerTest {
 
 
         File tmpOutput = tmpdir.newFile("tmpoutput.dex");
-        DexFileFactory.writeDexFile(tmpOutput.toString(), dexfile);
+        Set<? extends ClassDef> classes = dexfile.getClasses();
+        ClassDef theClassDef = null;
+        for (ClassDef classDef : classes) {
+            if (classDef.getType().equals("L" + klass.getName().replace(".", "/") + ";")) {
+                theClassDef = classDef;
+            }
+        }
+
+        assertNotNull(theClassDef);
+        DexFile copy = new ImmutableDexFile(
+                Opcodes.getDefault(),
+                ImmutableSet.of(theClassDef));
+        DexFileFactory.writeDexFile(tmpOutput.toString(), copy);
         return tmpOutput;
     }
 
