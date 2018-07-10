@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.DexPool;
 
@@ -37,9 +38,16 @@ public class Merger {
         int length;
 
         DexBackedDexFile templateDexFile = DexFileUtil.readDexFile(template);
+        DexBackedDexFile realDexFile = DexFileUtil.readDexFile(realCode);
+
+        DexFile merged = mergeDexFile(templateDexFile, realDexFile);
 
         FileDataStore dataStore = new FileDataStore(output);
-        DexPool.writeTo(dataStore, templateDexFile);
+        DexPool.writeTo(dataStore, merged);
         dataStore.close();
+    }
+
+    private DexFile mergeDexFile(DexFile template, DexFile real) {
+        return template;
     }
 }
