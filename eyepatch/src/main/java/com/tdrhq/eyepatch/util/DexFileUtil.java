@@ -8,10 +8,13 @@ import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.ClassDef;
+import org.jf.dexlib2.iface.DexFile;
 
 public class DexFileUtil {
     private DexFileUtil() {
@@ -25,6 +28,17 @@ public class DexFileUtil {
         } finally {
             is.close();
         }
+    }
+
+    public static ClassDef findClassDef(DexFile dexfile, Class klass) {
+        Set<? extends ClassDef> classes = dexfile.getClasses();
+        String name = "L" + klass.getName().replace(".", "/") + ";";
+        for (ClassDef classDef : classes) {
+            if (classDef.getType().equals(name)) {
+                return classDef;
+            }
+        }
+        return null;
     }
 
     private static InputStream extractDexFile(File input) throws IOException {

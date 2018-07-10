@@ -42,13 +42,7 @@ public class MergerTest {
 
 
         File tmpOutput = tmpdir.newFile("tmpoutput.dex");
-        Set<? extends ClassDef> classes = dexfile.getClasses();
-        ClassDef theClassDef = null;
-        for (ClassDef classDef : classes) {
-            if (classDef.getType().equals("L" + klass.getName().replace(".", "/") + ";")) {
-                theClassDef = classDef;
-            }
-        }
+        ClassDef theClassDef = DexFileUtil.findClassDef(dexfile, klass);
 
         assertNotNull(theClassDef);
         DexFile copy = new ImmutableDexFile(
