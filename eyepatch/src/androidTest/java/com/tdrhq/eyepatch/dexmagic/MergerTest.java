@@ -51,7 +51,7 @@ public class MergerTest {
     public void testPreconditions() throws Throwable {
         File file = extractClass(Foo.class);
         assertNotNull(file);
-        assertThat(Collections.list(new dalvik.system.DexFile(file).entries()),
+        assertThat(Collections.list(Util.loadDexFile(file).entries()),
                    hasItem(Foo.class.getName()));
     }
 
