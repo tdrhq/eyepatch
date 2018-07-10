@@ -36,6 +36,7 @@ public class MergerTest {
         InputStream is = new BufferedInputStream(new FileInputStream(dexFileExtracted));
         DexBackedDexFile dexfile = DexBackedDexFile.fromInputStream(Opcodes.getDefault(), is);
         is.close();
+        Log.i("MergerTest", "Finished reading the DexBackedDexFile");
 
 
         File tmpOutput = tmpdir.newFile("tmpoutput.dex");
@@ -62,7 +63,6 @@ public class MergerTest {
         int length;
         FileOutputStream os = new FileOutputStream(output);
         while ((length = is.read(data)) > 0){
-            Log.i("MergerTest", "Read: " + length);
             os.write(data, 0, length);
         }
 
