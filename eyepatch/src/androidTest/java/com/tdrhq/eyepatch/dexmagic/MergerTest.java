@@ -5,7 +5,6 @@ package com.tdrhq.eyepatch.dexmagic;
 import android.util.Log;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
-import dalvik.system.DexFile;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +17,9 @@ import java.util.jar.JarFile;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.DexFile;
+import org.jf.dexlib2.rewriter.DexRewriter;
+import org.jf.dexlib2.rewriter.RewriterModule;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
@@ -37,6 +39,10 @@ public class MergerTest {
         DexBackedDexFile dexfile = DexBackedDexFile.fromInputStream(Opcodes.getDefault(), is);
         is.close();
         Log.i("MergerTest", "Finished reading the DexBackedDexFile");
+
+        DexRewriter rewriter = new DexRewriter(new RewriterModule() {
+            });
+        DexFile rewrittenDexFile = rewriter.rewriteDexFile(dexfile);
 
 
         File tmpOutput = tmpdir.newFile("tmpoutput.dex");
@@ -76,7 +82,7 @@ public class MergerTest {
     public void testPreconditions() throws Throwable {
         File file = extractClass(Foo.class);
         assertNotNull(file);
-        assertThat(Collections.list(new DexFile(file).entries()),
+        assertThat(Collections.list(new dalvik.system.DexFile(file).entries()),
                    hasItem(Foo.class.getName()));
     }
 
