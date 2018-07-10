@@ -9,7 +9,7 @@ import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -38,8 +38,8 @@ public class MergerTest {
      */
     private File extractClass(Class klass)  throws IOException {
         File ret = ClassLoaderIntrospector.getDefiningDexFile(klass);
-        File dexFileExtracted = extractDexFile(ret, tmpdir.newFile("anotheroutput.dex"));
-        InputStream is = new BufferedInputStream(new FileInputStream(dexFileExtracted));
+        InputStream dexFileExtracted = extractDexFile(ret);
+        InputStream is = new BufferedInputStream(dexFileExtracted);
         DexBackedDexFile dexfile = DexBackedDexFile.fromInputStream(Opcodes.getDefault(), is);
         is.close();
         Log.i("MergerTest", "Finished reading the DexBackedDexFile");
@@ -67,30 +67,26 @@ public class MergerTest {
     }
 
 
-    File extractDexFile(File input, File output) throws IOException {
+    InputStream extractDexFile(File input) throws IOException {
         if (input.toString().endsWith(".dex")) {
-            return input;
+            return new FileInputStream(input);
         }
 
-        extractJarFile(input, output);
-        return output;
+        return extractJarFile(input);
     }
 
-    private void extractJarFile(File input, File output) throws IOException {
-        JarFile jarFile = new JarFile(input);
+    private InputStream extractJarFile(File input) throws IOException {
+        final JarFile jarFile = new JarFile(input);
         JarEntry entry = jarFile.getJarEntry("classes.dex");
         InputStream is = jarFile.getInputStream(entry);
 
-        byte[] data = new byte[1000];
-        int length;
-        FileOutputStream os = new FileOutputStream(output);
-        while ((length = is.read(data)) > 0){
-            os.write(data, 0, length);
-        }
-
-        os.close();
-        is.close();
-        jarFile.close();
+        return new FilterInputStream(is) {
+            @Override
+            public void close() throws IOException {
+                super.close();
+                jarFile.close();
+            }
+        };
     }
 
 
