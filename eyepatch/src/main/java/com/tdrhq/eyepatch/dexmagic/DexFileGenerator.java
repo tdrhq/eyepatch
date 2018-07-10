@@ -30,10 +30,22 @@ public class DexFileGenerator {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             int suffix = (++counter);
-            File of = new File(mDataDir, "EPG" + suffix + ".dex");
             File mergedOf = new File(mDataDir, "EPG_merged" + suffix + ".dex");
-            Util.writeDexFile(dexmaker, of);
-            merger.mergeDexFile(of, ClassLoaderIntrospector.getDefiningDexFile(realClass), mergedOf);
+
+            ByteArrayInputStream template = new ByteArrayInputStream(dexmaker.generate());
+            FileInputStream real = new FileInputStream(ClassLoaderIntrospector.getDefiningDexFile(realClass));
+            FileOutputStream output = new FileOutputStream(mergedOf);
+
+            try {
+                merger.mergeDexFile(
+                        template,
+                        real,
+                        output);
+            } finally {
+                template.close();
+                real.close();
+                output.close();
+            }
             return Util.loadDexFile(mergedOf);
         } catch (IOException e) {
             throw new RuntimeException(e);
