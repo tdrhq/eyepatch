@@ -34,17 +34,15 @@ public class DexFileGenerator {
 
             ByteArrayInputStream template = new ByteArrayInputStream(dexmaker.generate());
             FileInputStream real = new FileInputStream(ClassLoaderIntrospector.getDefiningDexFile(realClass));
-            FileOutputStream output = new FileOutputStream(mergedOf);
 
             try {
                 merger.mergeDexFile(
                         template,
                         real,
-                        output);
+                        mergedOf);
             } finally {
                 template.close();
                 real.close();
-                output.close();
             }
             return Util.loadDexFile(mergedOf);
         } catch (IOException e) {
