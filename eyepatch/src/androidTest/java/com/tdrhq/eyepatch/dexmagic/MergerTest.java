@@ -6,16 +6,11 @@ import android.support.test.espresso.core.internal.deps.guava.collect.ImmutableS
 import android.util.Log;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
-import java.io.BufferedInputStream;
+import com.tdrhq.eyepatch.util.DexFileReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
@@ -38,10 +33,7 @@ public class MergerTest {
      */
     private File extractClass(Class klass)  throws IOException {
         File ret = ClassLoaderIntrospector.getDefiningDexFile(klass);
-        InputStream dexFileExtracted = extractDexFile(ret);
-        InputStream is = new BufferedInputStream(dexFileExtracted);
-        DexBackedDexFile dexfile = DexBackedDexFile.fromInputStream(Opcodes.getDefault(), is);
-        is.close();
+        DexBackedDexFile dexfile = DexFileReader.readDexFile(ret);
         Log.i("MergerTest", "Finished reading the DexBackedDexFile");
 
         DexRewriter rewriter = new DexRewriter(new RewriterModule() {
@@ -65,30 +57,6 @@ public class MergerTest {
         DexFileFactory.writeDexFile(tmpOutput.toString(), copy);
         return tmpOutput;
     }
-
-
-    InputStream extractDexFile(File input) throws IOException {
-        if (input.toString().endsWith(".dex")) {
-            return new FileInputStream(input);
-        }
-
-        return extractJarFile(input);
-    }
-
-    private InputStream extractJarFile(File input) throws IOException {
-        final JarFile jarFile = new JarFile(input);
-        JarEntry entry = jarFile.getJarEntry("classes.dex");
-        InputStream is = jarFile.getInputStream(entry);
-
-        return new FilterInputStream(is) {
-            @Override
-            public void close() throws IOException {
-                super.close();
-                jarFile.close();
-            }
-        };
-    }
-
 
     @Test
     public void testPreconditions() throws Throwable {
