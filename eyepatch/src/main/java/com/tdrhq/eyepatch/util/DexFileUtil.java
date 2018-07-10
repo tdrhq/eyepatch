@@ -13,8 +13,8 @@ import java.util.jar.JarFile;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 
-public class DexFileReader {
-    private DexFileReader() {
+public class DexFileUtil {
+    private DexFileUtil() {
     }
 
     public static DexBackedDexFile readDexFile(File ret) throws IOException {

@@ -6,7 +6,7 @@ import android.support.test.espresso.core.internal.deps.guava.collect.ImmutableS
 import android.util.Log;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
-import com.tdrhq.eyepatch.util.DexFileReader;
+import com.tdrhq.eyepatch.util.DexFileUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class MergerTest {
      */
     private File extractClass(Class klass)  throws IOException {
         File ret = ClassLoaderIntrospector.getDefiningDexFile(klass);
-        DexBackedDexFile dexfile = DexFileReader.readDexFile(ret);
+        DexBackedDexFile dexfile = DexFileUtil.readDexFile(ret);
         Log.i("MergerTest", "Finished reading the DexBackedDexFile");
 
         DexRewriter rewriter = new DexRewriter(new RewriterModule() {
