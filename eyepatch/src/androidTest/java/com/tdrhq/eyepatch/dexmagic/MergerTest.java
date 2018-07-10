@@ -10,15 +10,13 @@ import com.tdrhq.eyepatch.util.DexFileUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Set;
-import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.immutable.ImmutableDexFile;
-import org.jf.dexlib2.rewriter.DexRewriter;
-import org.jf.dexlib2.rewriter.RewriterModule;
+import org.jf.dexlib2.writer.io.FileDataStore;
+import org.jf.dexlib2.writer.pool.DexPool;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
@@ -43,7 +41,9 @@ public class MergerTest {
         DexFile copy = new ImmutableDexFile(
                 Opcodes.forApi(16),
                 ImmutableSet.of(theClassDef));
-        DexFileFactory.writeDexFile(tmpOutput.toString(), dexfile);
+        FileDataStore dataStore = new FileDataStore(tmpOutput);
+        DexPool.writeTo(dataStore, copy);
+        dataStore.close();
         return tmpOutput;
     }
 
