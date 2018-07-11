@@ -14,6 +14,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class DexFileGenerator {
+
+    public static int UNUSED_REGISTER_COUNT = 16;
     private File mDataDir;
     private int counter = 0;
     private ConstructorGeneratorFactory constructorGeneratorFactory;
@@ -236,9 +238,7 @@ public class DexFileGenerator {
         public Locals(Code code, TypeId returnType) {
             defaultImplementation = new Label();
 
-            for (int i = 0; i < 16; i++) {
-                code.newLocal(TypeId.OBJECT);
-            }
+            addUnusedLocals(code);
             returnValue = code.newLocal(TypeId.OBJECT);
             callerClass = code.newLocal(TypeId.get(Class.class));
             instanceArg = code.newLocal(TypeId.OBJECT);
@@ -257,6 +257,17 @@ public class DexFileGenerator {
                 boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
             }
 
+        }
+
+        /**
+         * By adding unused locals, we can ensure that we don't
+         * generate any instructions that use the 4 bit addressing
+         * scheme to reference registers.
+         */
+        private void addUnusedLocals(Code code) {
+            for (int i = 0; i < UNUSED_REGISTER_COUNT; i++) {
+                code.newLocal(TypeId.OBJECT);
+            }
         }
     }
 
