@@ -6,16 +6,18 @@ import android.support.annotation.NonNull;
 import com.android.dx.*;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 public class DexFileGenerator {
 
-    public static int UNUSED_REGISTER_COUNT = 16;
+    public static int UNUSED_REGISTER_COUNT = 256;
     private File mDataDir;
     private int counter = 0;
     private ConstructorGeneratorFactory constructorGeneratorFactory;
@@ -100,6 +102,10 @@ public class DexFileGenerator {
         constructorGenerator.declareLocals();
 
         code.loadConstant(thisClass, original.getSuperclass());
+        int firstReg = (int) Whitebox.getField(locals.returnValue, "reg");
+        if (firstReg != 256) {
+            throw new RuntimeException("got first reg as: " + firstReg);
+        }
         MethodId getEasiestInvocation = TypeId.get(SuperInvocation.class)
                 .getMethod(
                         TypeId.get(SuperInvocation.class),
@@ -265,6 +271,9 @@ public class DexFileGenerator {
          * scheme to reference registers.
          */
         private void addUnusedLocals(Code code) {
+            if (((List)Whitebox.getField(code, "locals")).size() != 0) {
+                throw new RuntimeException("locals already defined!");
+            }
             for (int i = 0; i < UNUSED_REGISTER_COUNT; i++) {
                 code.newLocal(TypeId.OBJECT);
             }

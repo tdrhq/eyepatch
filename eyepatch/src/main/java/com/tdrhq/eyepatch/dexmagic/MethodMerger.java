@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import android.util.Log;
 import com.google.common.collect.Lists;
 import java.util.List;
 import org.jf.dexlib2.Opcode;
@@ -45,12 +46,12 @@ public class MethodMerger {
 
 
     private int renameRegister(int reg) {
-        int params = MethodUtil.getParameterRegisterCount(template);
-        if (reg < params) {
-            return reg;
+        if (reg < 16) {
+            throw new RuntimeException("Can't renumber a register < 16, because it's likely to affect the instruction itself: " +
+                                       reg + " for method " + template);
+
         }
 
-        reg -= params;
         return realMethod.getImplementation().getRegisterCount() + reg;
     }
 
@@ -62,6 +63,7 @@ public class MethodMerger {
 
         for (Instruction ins : template.getImplementation().getInstructions()) {
             // we're going to rename the registers in each instruction
+            Log.i("MethodMerger", "working on: " + ins + ", " + ins.getOpcode());
             if (ins instanceof Instruction21c) {
                 Instruction21c ins1 = (Instruction21c) ins;
                 instructions.add(new ImmutableInstruction21c(
@@ -167,7 +169,7 @@ public class MethodMerger {
 
         impl = new ImmutableMethodImplementation(
                 impl.getRegisterCount() +
-                realMethod.getImplementation().getRegisterCount() - params,
+                realMethod.getImplementation().getRegisterCount(),
                 instructions,
                 impl.getTryBlocks(),
                 impl.getDebugItems());

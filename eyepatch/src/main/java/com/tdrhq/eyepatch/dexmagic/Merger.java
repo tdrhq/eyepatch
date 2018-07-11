@@ -84,7 +84,8 @@ public class Merger {
         public Method rewrite(Method template) {
             Method realMethod = findRealImpl(template);
 
-            return new MethodMerger(template, realMethod).merge();
+            return template;
+            // return new MethodMerger(template, realMethod).merge();
         }
 
 
