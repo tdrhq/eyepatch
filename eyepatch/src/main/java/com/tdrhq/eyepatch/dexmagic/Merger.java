@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.Method;
@@ -81,6 +82,13 @@ public class Merger {
             MethodImplementation impl = oldMethod.getImplementation();
 
             List<Instruction> instructions = Lists.newArrayList(impl.getInstructions());
+            // get rid of the final instruction
+            Instruction last = instructions.get(instructions.size() - 1);
+
+            if (last.getOpcode() != Opcode.THROW) {
+                throw new IllegalStateException("this doesn't look like a template now does it");
+            }
+
             return new ImmutableMethod(
                     oldMethod.getDefiningClass(),
                     oldMethod.getName(),

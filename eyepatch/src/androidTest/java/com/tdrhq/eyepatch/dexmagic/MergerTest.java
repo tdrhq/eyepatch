@@ -14,6 +14,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.Annotation;
@@ -32,6 +33,7 @@ import org.jf.dexlib2.immutable.ImmutableDexFile;
 import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.immutable.ImmutableMethodImplementation;
 import org.jf.dexlib2.immutable.ImmutableMethodParameter;
+import org.jf.dexlib2.immutable.instruction.ImmutableInstruction11x;
 import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.DexPool;
 import org.junit.Before;
@@ -55,7 +57,8 @@ public class MergerTest {
 
         MethodImplementation methodImplementation = new ImmutableMethodImplementation(
                 10,
-                new ArrayList<Instruction>(),
+                Lists.newArrayList(
+                        new ImmutableInstruction11x(Opcode.THROW, 0)),
                 new ArrayList<TryBlock<? extends ExceptionHandler>>(),
                 new ArrayList<DebugItem>());
 
