@@ -10,6 +10,7 @@ import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.immutable.ImmutableMethodImplementation;
+import org.jf.dexlib2.util.MethodUtil;
 
 public class MethodMerger {
     private Method oldMethod;
@@ -20,13 +21,9 @@ public class MethodMerger {
         this.realMethod = realMethod;
     }
 
-    static int registersForParameters(Method method) {
-        return method.getParameters().size() + 1;
-    }
-
     public Method merge() {
         MethodImplementation impl = oldMethod.getImplementation();
-        int params = registersForParameters(oldMethod);
+        int params = MethodUtil.getParameterRegisterCount(oldMethod);
         List<Instruction> instructions = Lists.newArrayList(impl.getInstructions());
         // get rid of the final instruction
         Instruction last = instructions.get(instructions.size() - 1);
