@@ -2,14 +2,20 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.google.common.collect.Lists;
+import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.DexFileUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
-import org.jf.dexlib2.iface.MethodImplementation;
+import org.jf.dexlib2.iface.Method;
+import org.jf.dexlib2.immutable.ImmutableClassDef;
+import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.rewriter.DexRewriter;
 import org.jf.dexlib2.rewriter.Rewriter;
 import org.jf.dexlib2.rewriter.RewriterModule;
@@ -52,10 +58,11 @@ public class Merger {
         dataStore.close();
     }
 
-    private DexFile mergeDexFile(final DexFile template, final DexFile real) {
+    DexFile mergeDexFile(final DexFile template, final DexFile real) {
         DexRewriter rewriter = new DexRewriter(new RewriterModule() {
-                public Rewriter<MethodImplementation> getMethodImplementationRewriter(Rewriters rewriters) {
-                    return new MergedMethodImplementationRewriter(template, real);
+                @Override
+                public Rewriter<Method> getMethodRewriter(Rewriters rewriters) {
+                    return new MyRewriter(real);
                 }
             });
         DexFile rewrittenDexFile = rewriter.rewriteDexFile(template);
@@ -63,18 +70,23 @@ public class Merger {
         return rewrittenDexFile;
     }
 
-    static class MergedMethodImplementationRewriter implements Rewriter<MethodImplementation> {
-        private DexFile template;
+    static class MyRewriter implements Rewriter<Method> {
         private DexFile real;
 
-        public MergedMethodImplementationRewriter(DexFile template, DexFile real) {
-            this.template = template;
+        public MyRewriter(DexFile real) {
             this.real = real;
         }
 
         @Override
-        public MethodImplementation rewrite(MethodImplementation methodImplementation) {
-            return methodImplementation;
+        public Method rewrite(Method oldMethod) {
+            return new ImmutableMethod(
+                    oldMethod.getDefiningClass(),
+                    oldMethod.getName(),
+                    oldMethod.getParameters(),
+                    oldMethod.getReturnType(),
+                    oldMethod.getAccessFlags(),
+                    oldMethod.getAnnotations(),
+                    oldMethod.getImplementation());
         }
     }
 }
