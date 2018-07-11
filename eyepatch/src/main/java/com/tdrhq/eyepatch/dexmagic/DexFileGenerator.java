@@ -235,6 +235,10 @@ public class DexFileGenerator {
 
         public Locals(Code code, TypeId returnType) {
             defaultImplementation = new Label();
+
+            for (int i = 0; i < 16; i++) {
+                code.newLocal(TypeId.OBJECT);
+            }
             returnValue = code.newLocal(TypeId.OBJECT);
             callerClass = code.newLocal(TypeId.get(Class.class));
             instanceArg = code.newLocal(TypeId.OBJECT);

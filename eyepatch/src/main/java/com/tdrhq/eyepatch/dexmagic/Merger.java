@@ -81,11 +81,10 @@ public class Merger {
         }
 
         @Override
-        public Method rewrite(Method oldMethod) {
-            Method realMethod = findRealImpl(oldMethod);
+        public Method rewrite(Method template) {
+            Method realMethod = findRealImpl(template);
 
-            return oldMethod;
-            //return mergeMethods(oldMethod, realMethod);
+            return new MethodMerger(template, realMethod).merge();
         }
 
 
