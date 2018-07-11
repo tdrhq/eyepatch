@@ -89,6 +89,8 @@ public class Merger {
                 throw new IllegalStateException("this doesn't look like a template now does it");
             }
 
+            instructions.remove(instructions.size() - 1);
+
             return new ImmutableMethod(
                     oldMethod.getDefiningClass(),
                     oldMethod.getName(),
