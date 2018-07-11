@@ -2,15 +2,18 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.google.common.collect.Lists;
 import com.tdrhq.eyepatch.util.DexFileUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.Method;
 import org.jf.dexlib2.iface.MethodImplementation;
+import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.rewriter.DexRewriter;
 import org.jf.dexlib2.rewriter.Rewriter;
@@ -76,6 +79,8 @@ public class Merger {
         @Override
         public Method rewrite(Method oldMethod) {
             MethodImplementation impl = oldMethod.getImplementation();
+
+            List<Instruction> instructions = Lists.newArrayList(impl.getInstructions());
             return new ImmutableMethod(
                     oldMethod.getDefiningClass(),
                     oldMethod.getName(),
