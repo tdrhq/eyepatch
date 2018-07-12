@@ -118,7 +118,7 @@ public class DexFileGenerator {
         constructorGenerator.invokeSuper();
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
-        generateDefaultLabel(code, locals);
+        generateUnsupportedLabel(code, locals);
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
@@ -136,10 +136,10 @@ public class DexFileGenerator {
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
-        generateDefaultLabel(code, locals);
+        generateUnsupportedLabel(code, locals);
     }
 
-    private void generateDefaultLabel(Code code, Locals locals) {
+    private void generateUnsupportedLabel(Code code, Locals locals) {
         code.mark(locals.defaultImplementation);
         code.newInstance(
                 locals.uoe,
