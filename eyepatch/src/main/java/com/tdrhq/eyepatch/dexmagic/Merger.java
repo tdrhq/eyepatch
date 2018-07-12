@@ -64,7 +64,7 @@ public class Merger {
     DexFile mergeDexFile(final DexFile template, final DexFile real) {
         DexRewriter rewriter = new DexRewriter(new RewriterModule() {
                 @Override
-                public Rewriter<Method> getMethodRewriter(Rewriters rewriters) {
+                public Rewriter<ClassDef> getClassDefRewriter(Rewriters rewriters) {
                     return new MyRewriter(real);
                 }
             });
@@ -73,7 +73,7 @@ public class Merger {
         return rewrittenDexFile;
     }
 
-    static class MyRewriter implements Rewriter<Method> {
+    static class MyRewriter implements Rewriter<ClassDef> {
         private DexFile real;
 
         public MyRewriter(DexFile real) {
@@ -81,9 +81,7 @@ public class Merger {
         }
 
         @Override
-        public Method rewrite(Method template) {
-            Method realMethod = findRealImpl(template);
-
+        public ClassDef rewrite(ClassDef template) {
             return template;
         }
 
