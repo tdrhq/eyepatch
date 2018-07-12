@@ -104,10 +104,6 @@ public class DexFileGenerator {
         constructorGenerator.declareLocals();
 
         code.loadConstant(thisClass, original.getSuperclass());
-        int firstReg = (int) Whitebox.getField(locals.returnValue, "reg");
-        if (firstReg != 256) {
-            throw new RuntimeException("got first reg as: " + firstReg);
-        }
         MethodId getEasiestInvocation = TypeId.get(SuperInvocation.class)
                 .getMethod(
                         TypeId.get(SuperInvocation.class),
@@ -287,7 +283,6 @@ public class DexFileGenerator {
         public Locals(Code code, TypeId returnType) {
             defaultImplementation = new Label();
 
-            addUnusedLocals(code);
             returnValue = code.newLocal(TypeId.OBJECT);
             callerClass = code.newLocal(TypeId.get(Class.class));
             instanceArg = code.newLocal(TypeId.OBJECT);
@@ -306,20 +301,6 @@ public class DexFileGenerator {
                 boxedReturnValue = code.newLocal(Primitives.getBoxedType(returnType));
             }
 
-        }
-
-        /**
-         * By adding unused locals, we can ensure that we don't
-         * generate any instructions that use the 4 bit addressing
-         * scheme to reference registers.
-         */
-        private void addUnusedLocals(Code code) {
-            if (((List)Whitebox.getField(code, "locals")).size() != 0) {
-                throw new RuntimeException("locals already defined!");
-            }
-            for (int i = 0; i < UNUSED_REGISTER_COUNT; i++) {
-                code.newLocal(TypeId.OBJECT);
-            }
         }
     }
 
