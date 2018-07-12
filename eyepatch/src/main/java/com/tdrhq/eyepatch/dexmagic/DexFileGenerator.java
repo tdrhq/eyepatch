@@ -155,28 +155,32 @@ public class DexFileGenerator {
                 parameterTypes);
 
         code.mark(locals.defaultImplementation);
+        Local<?>[] params = new Local<?>[parameterTypes.length];
+        for (int i = 0; i < params.length; i++) {
+            params[i] = code.getParameter(i, parameterTypes[i]);
+        }
+
+        Local<R> returnValue = null;
+        if (returnType != TypeId.VOID) {
+            returnValue = locals.castedReturnValue;
+        }
+
+        if (isStatic) {
+            code.invokeStatic(
+                    methodId,
+                    returnValue,
+                    params);
+        } else {
+            code.invokeVirtual(
+                    methodId,
+                    returnValue,
+                    code.getThis(typeId),
+                    params);
+        }
+
         if (returnType == TypeId.VOID) {
             code.returnVoid();
         } else {
-
-            Local<?>[] params = new Local<?>[parameterTypes.length];
-            for (int i = 0; i < params.length; i++) {
-                params[i] = code.getParameter(i, parameterTypes[i]);
-            }
-
-            if (isStatic) {
-                code.invokeStatic(
-                        methodId,
-                        (Local<R>) locals.castedReturnValue,
-                        params);
-            } else {
-                code.invokeVirtual(
-                        methodId,
-                        (Local<R>) locals.castedReturnValue,
-                        code.getThis(typeId),
-                        params);
-            }
-
             code.returnValue(locals.castedReturnValue);
         }
     }

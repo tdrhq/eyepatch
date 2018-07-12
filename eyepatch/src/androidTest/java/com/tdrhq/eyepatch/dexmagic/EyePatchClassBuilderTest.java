@@ -503,4 +503,41 @@ public class EyePatchClassBuilderTest {
             return "car";
         }
     }
+
+
+    @Test
+    public void testUnhandledDefaultHandlerForVoidMethods() throws Throwable {
+        wrappedClass = wrapClass(Foo3WithVoid.class);
+        Object instance = wrappedClass.newInstance();
+
+        when(handler.handleInvocation(newInvocation(
+                                              null,
+                                              "bar",
+                                              arg(int.class, 2))))
+                .thenReturn(Dispatcher.UNHANDLED);
+        when(handler.handleInvocation(newInvocation(
+                                              instance,
+                                              "nonStatic")))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+
+        Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2));
+        assertEquals("kirk", Whitebox.getField(null, wrappedClass, "sField"));
+
+        Whitebox.invoke(instance, "nonStatic");
+        assertEquals("aisha", Whitebox.getField(instance, wrappedClass, "field"));
+
+    }
+
+    public static class Foo3WithVoid {
+        static String sField = "zoidberg";
+        String field = "zoidberg";
+        public static void bar(int arg) {
+            sField = "kirk";
+        }
+
+        public void nonStatic() {
+            field = "aisha";
+        }
+    }
 }
