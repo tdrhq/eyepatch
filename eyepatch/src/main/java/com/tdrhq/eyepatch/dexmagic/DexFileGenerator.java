@@ -136,7 +136,8 @@ public class DexFileGenerator {
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
-        generateBypassLabel(code, typeId, returnType, locals);
+        // generateBypassLabel(code, typeId, returnType, locals);
+        generateUnsupportedLabel(code, locals);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {

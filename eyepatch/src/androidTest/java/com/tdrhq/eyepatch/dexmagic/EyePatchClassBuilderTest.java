@@ -9,10 +9,12 @@ import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.*;
+import org.junit.Test;
 import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -466,7 +468,8 @@ public class EyePatchClassBuilderTest {
         assertEquals("String1", Whitebox.invokeStatic(wrappedClass, "bar", arg(String.class, "two")));
     }
 
-    private void testUnhandledDefaultHandler() throws Throwable {
+    @Test
+    public void testUnhandledDefaultHandler() throws Throwable {
         wrappedClass = wrapClass(Foo3.class);
         when(handler.handleInvocation(newInvocation(
                                               null,
@@ -477,8 +480,9 @@ public class EyePatchClassBuilderTest {
         try {
             Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2));
             fail("expected exception");
-        } catch (UnsupportedOperationException e) {
-            // expected
+        } catch (RuntimeException e) {
+            assertEquals(UnsupportedOperationException.class,
+                         e.getCause().getCause().getClass());
         }
     }
 
