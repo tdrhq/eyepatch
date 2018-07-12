@@ -136,7 +136,7 @@ public class DexFileGenerator {
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
-        generateBypassLabel(code, locals);
+        generateBypassLabel(code, typeId, returnType, locals);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
@@ -147,7 +147,7 @@ public class DexFileGenerator {
         code.throwValue(locals.uoe);
     }
 
-    private void generateBypassLabel(Code code, Locals locals) {
+    private void generateBypassLabel(Code code, TypeId<?> typeId, TypeId<?> returnType, Locals locals) {
         code.mark(locals.defaultImplementation);
         code.newInstance(
                 locals.uoe,
