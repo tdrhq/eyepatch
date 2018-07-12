@@ -136,8 +136,7 @@ public class DexFileGenerator {
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
-        // generateBypassLabel(code, typeId, returnType, locals);
-        generateUnsupportedLabel(code, locals);
+        generateBypassLabel(code, typeId, returnType, methodName, arguments, Modifier.isStatic(modifiers), locals);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
@@ -148,12 +147,36 @@ public class DexFileGenerator {
         code.throwValue(locals.uoe);
     }
 
-    private void generateBypassLabel(Code code, TypeId<?> typeId, TypeId<?> returnType, Locals locals) {
+    private <D,R> void generateBypassLabel(Code code, TypeId<D> typeId, TypeId<R> returnType, String methodName, TypeId<?>[] parameterTypes, boolean isStatic, Locals locals) {
+        methodName = "__or1g__" + methodName;
+        MethodId<D, R>  methodId = typeId.getMethod(
+                returnType,
+                methodName,
+                parameterTypes);
+
         code.mark(locals.defaultImplementation);
         if (returnType == TypeId.VOID) {
             code.returnVoid();
         } else {
-            code.loadConstant(locals.castedReturnValue, null);
+
+            Local<?>[] params = new Local<?>[parameterTypes.length];
+            for (int i = 0; i < params.length; i++) {
+                params[i] = code.getParameter(i, parameterTypes[i]);
+            }
+
+            if (isStatic) {
+                code.invokeStatic(
+                        methodId,
+                        (Local<R>) locals.castedReturnValue,
+                        params);
+            } else {
+                code.invokeVirtual(
+                        methodId,
+                        (Local<R>) locals.castedReturnValue,
+                        code.getThis(typeId),
+                        params);
+            }
+
             code.returnValue(locals.castedReturnValue);
         }
     }

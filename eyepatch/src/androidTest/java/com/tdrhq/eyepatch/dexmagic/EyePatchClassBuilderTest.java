@@ -471,19 +471,24 @@ public class EyePatchClassBuilderTest {
     @Test
     public void testUnhandledDefaultHandler() throws Throwable {
         wrappedClass = wrapClass(Foo3.class);
+        Object instance = wrappedClass.newInstance();
+
         when(handler.handleInvocation(newInvocation(
                                               null,
                                               "bar",
                                               arg(int.class, 2))))
                 .thenReturn(Dispatcher.UNHANDLED);
+        when(handler.handleInvocation(newInvocation(
+                                              instance,
+                                              "nonStatic")))
+                .thenReturn(Dispatcher.UNHANDLED);
 
-        try {
-            Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2));
-            fail("expected exception");
-        } catch (RuntimeException e) {
-            assertEquals(UnsupportedOperationException.class,
-                         e.getCause().getCause().getClass());
-        }
+
+        assertEquals("int", Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2)));
+
+        assertEquals("car", Whitebox.invoke(
+                             instance, "nonStatic"));
+
     }
 
     public static class Foo3 {
@@ -492,6 +497,10 @@ public class EyePatchClassBuilderTest {
         }
         public static String bar(int arg) {
             return "int";
+        }
+
+        public String nonStatic() {
+            return "car";
         }
     }
 }
