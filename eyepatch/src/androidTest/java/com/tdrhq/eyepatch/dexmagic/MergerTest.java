@@ -150,7 +150,7 @@ public class MergerTest {
         assertEquals(1, merged.getClasses().size());
         List<Method> methods = Lists.newArrayList(merged.getClasses().iterator().next().getMethods());
 
-        assertEquals(1, methods.size());
+        assertEquals(2, methods.size());
     }
 
     static class Foo {

@@ -14,6 +14,7 @@ import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.Method;
 import org.jf.dexlib2.immutable.ImmutableClassDef;
+import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.rewriter.DexRewriter;
 import org.jf.dexlib2.rewriter.Rewriter;
 import org.jf.dexlib2.rewriter.RewriterModule;
@@ -78,7 +79,31 @@ public class Merger {
         @Override
         public ClassDef rewrite(ClassDef template) {
 
+            ClassDef realClass = null;
+            for (ClassDef r : real.getClasses()) {
+                if (r.getType().equals(template.getType())) {
+                    realClass = r;
+                    break;
+                }
+            }
+
             List<Method> methods = Lists.newArrayList(template.getMethods());
+            for (Method method : realClass.getMethods()) {
+                if (method.getName().equals("<init>")) {
+                    continue;
+                }
+
+                methods.add(
+                        new ImmutableMethod(
+                                method.getDefiningClass(),
+                                "__or1g__" + method.getName(),
+                                method.getParameters(),
+                                method.getReturnType(),
+                                method.getAccessFlags(),
+                                method.getAnnotations(),
+                                method.getImplementation()));
+
+            }
             return new ImmutableClassDef(
                     template.getType(),
                     template.getAccessFlags(),
