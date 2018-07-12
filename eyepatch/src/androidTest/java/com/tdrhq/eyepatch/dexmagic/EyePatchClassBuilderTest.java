@@ -35,7 +35,7 @@ public class EyePatchClassBuilderTest {
         classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
         handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-        final SmaliPrinter smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smali"));
+        final SmaliPrinter smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
 
         DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
                 @Override
