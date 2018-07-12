@@ -85,17 +85,8 @@ public class Merger {
             Method realMethod = findRealImpl(template);
 
             return template;
-            // return new MethodMerger(template, realMethod).merge();
         }
 
-
-
-        private int fixReg(int params, int templateReg, int reg) {
-            if (reg < params) {
-                return reg;
-            }
-            return templateReg + reg - params;
-        }
 
         Method findRealImpl(Method oldMethod) {
             for (ClassDef realClass : real.getClasses()) {
