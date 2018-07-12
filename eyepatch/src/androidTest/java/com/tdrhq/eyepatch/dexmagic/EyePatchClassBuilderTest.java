@@ -10,6 +10,7 @@ import com.tdrhq.eyepatch.util.SmaliPrinter;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +30,19 @@ public class EyePatchClassBuilderTest {
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
     private StaticInvocationHandler handler;
+    SmaliPrinter smaliPrinter;
 
     @Before
     public void before() throws Exception {
         classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
         handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-        final SmaliPrinter smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
 
+        setupSmaliPrinter();
+    }
+
+    private void setupSmaliPrinter() throws IOException {
+        smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
         DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
                 @Override
                 public void print(Class klass, File file) {
