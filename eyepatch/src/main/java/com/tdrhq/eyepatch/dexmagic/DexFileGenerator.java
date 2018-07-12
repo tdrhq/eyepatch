@@ -14,6 +14,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
 
 public class DexFileGenerator {
@@ -149,7 +150,8 @@ public class DexFileGenerator {
     }
 
     private <D,R> void generateBypassLabel(Code code, TypeId<D> typeId, TypeId<R> returnType, String methodName, TypeId<?>[] parameterTypes, boolean isStatic, Locals locals) {
-        methodName = "__or1g__" + methodName;
+        parameterTypes = Arrays.copyOf(parameterTypes, parameterTypes.length + 1);
+        parameterTypes[parameterTypes.length - 1] = TypeId.get(Token.class);
         MethodId<D, R>  methodId = typeId.getMethod(
                 returnType,
                 methodName,
@@ -157,9 +159,11 @@ public class DexFileGenerator {
 
         code.mark(locals.defaultImplementation);
         Local<?>[] params = new Local<?>[parameterTypes.length];
-        for (int i = 0; i < params.length; i++) {
+        for (int i = 0; i < params.length - 1; i++) {
             params[i] = code.getParameter(i, parameterTypes[i]);
         }
+        code.loadConstant(locals.tmp, null);
+        params[params.length - 1] = locals.tmp;
 
         Local<R> returnValue = null;
         if (returnType != TypeId.VOID) {

@@ -2,6 +2,8 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.android.dx.TypeId;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.tdrhq.eyepatch.util.DexFileUtil;
 import com.tdrhq.eyepatch.util.Sorter;
@@ -14,8 +16,12 @@ import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.Method;
+import org.jf.dexlib2.iface.MethodImplementation;
+import org.jf.dexlib2.iface.MethodParameter;
 import org.jf.dexlib2.immutable.ImmutableClassDef;
 import org.jf.dexlib2.immutable.ImmutableMethod;
+import org.jf.dexlib2.immutable.ImmutableMethodImplementation;
+import org.jf.dexlib2.immutable.ImmutableMethodParameter;
 import org.jf.dexlib2.rewriter.DexRewriter;
 import org.jf.dexlib2.rewriter.Rewriter;
 import org.jf.dexlib2.rewriter.RewriterModule;
@@ -94,15 +100,28 @@ public class Merger {
                     continue;
                 }
 
+                List<MethodParameter> parameters = Lists.newArrayList(method.getParameters());
+                parameters.add(new ImmutableMethodParameter(
+                                       TypeId.get(Token.class).getName(),
+                                       ImmutableSet.of(),
+                                       "__unused__token"));
+
+                MethodImplementation implementation = method.getImplementation();
+                implementation = new ImmutableMethodImplementation(
+                        implementation.getRegisterCount() + 1,
+                        implementation.getInstructions(),
+                        implementation.getTryBlocks(),
+                        implementation.getDebugItems());
+
                 methods.add(
                         new ImmutableMethod(
                                 method.getDefiningClass(),
-                                "__or1g__" + method.getName(),
-                                method.getParameters(),
+                                method.getName(),
+                                parameters,
                                 method.getReturnType(),
                                 method.getAccessFlags(),
                                 method.getAnnotations(),
-                                method.getImplementation()));
+                                implementation));
 
             }
             return new ImmutableClassDef(
