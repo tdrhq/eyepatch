@@ -9,11 +9,18 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.jf.dexlib2.iface.MethodParameter;
 
 public class Sorter {
     public static List<Method> sortMethods(Iterable<Method> methods) {
         List<Method> copy = Lists.newArrayList(methods);
         Collections.sort(copy, methodComparator);
+        return copy;
+    }
+
+    public static List<org.jf.dexlib2.iface.Method> sortDexlibMethods(Iterable<org.jf.dexlib2.iface.Method> methods) {
+        List<org.jf.dexlib2.iface.Method> copy = Lists.newArrayList(methods);
+        Collections.sort(copy, dexlibMethodComparator);
         return copy;
     }
 
@@ -48,6 +55,28 @@ public class Sorter {
                 }
                 return ret;
             }
+        };
+
+
+    static Comparator<org.jf.dexlib2.iface.Method> dexlibMethodComparator = new Comparator<org.jf.dexlib2.iface.Method>() {
+            @Override
+            public int compare(org.jf.dexlib2.iface.Method one, org.jf.dexlib2.iface.Method two) {
+                MethodDeets oned = getDeets(one);
+                MethodDeets twod = getDeets(two);
+                return methodDeetsComparator.compare(oned, twod);
+            }
+
+            private MethodDeets getDeets(org.jf.dexlib2.iface.Method method) {
+                MethodDeets ret = new MethodDeets();
+                ret.name = method.getName();
+                List<? extends MethodParameter> args = method.getParameters();
+                ret.args = new TypeId[args.size()];
+                for (int i = 0; i < args.size(); i++) {
+                    ret.args[i] = TypeId.get(args.get(i).getType());
+                }
+                return ret;
+            }
+
         };
 
     private static Comparator<MethodDeets> methodDeetsComparator = new Comparator<MethodDeets>() {
