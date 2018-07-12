@@ -234,18 +234,19 @@ public class DexFileGenerator {
         buildArgArray(locals.argTypes, locals.parameterLength, parameterTypes, locals.tmp, code);
 
         code.loadConstant(locals.callerClass, original);
+        Local<Object> instanceArg;
         if (Modifier.isStatic(modifiers)) {
             code.loadConstant(locals.instanceArg, null);
+            instanceArg = locals.instanceArg;
         } else {
-            code.move(locals.instanceArg, code.getThis(typeId));
-            //locals.instanceArg = code.getThis(typeId);
+            instanceArg = code.getThis(typeId);
         }
         code.loadConstant(locals.callerMethod, methodName);
         code.invokeStatic(
                 invokeStaticMethod,
                 locals.returnValue,
                 locals.callerClass,
-                locals.instanceArg,
+                instanceArg,
                 locals.callerMethod,
                 locals.argTypes,
                 locals.callerArgs);
