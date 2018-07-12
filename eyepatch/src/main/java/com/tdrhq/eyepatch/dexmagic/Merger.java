@@ -96,7 +96,7 @@ public class Merger {
 
             List<Method> methods = Sorter.sortDexlibMethods(Lists.newArrayList(template.getMethods()));
             for (Method method : realClass.getMethods()) {
-                if (method.getName().equals("<init>") || method.getName().equals("<clinit>")) {
+                if (method.getName().equals("<clinit>")) {
                     continue;
                 }
 
