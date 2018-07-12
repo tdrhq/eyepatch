@@ -37,8 +37,6 @@ public class EyePatchClassBuilderTest {
         classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
         handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
-
-        setupSmaliPrinter();
     }
 
     private void setupSmaliPrinter() throws IOException {
