@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.android.dx.*;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.Sorter;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.DexFile;
 import java.io.*;
@@ -68,7 +69,7 @@ public class DexFileGenerator {
             generateConstructor(dexmaker, constructor, typeId, original);
         }
 
-        for (Method methodTemplate : original.getDeclaredMethods()) {
+        for (Method methodTemplate : Sorter.sortMethods(original.getDeclaredMethods())) {
             generateMethod(dexmaker, methodTemplate, typeId, original);
         }
         return dexmaker;

@@ -4,6 +4,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.google.common.collect.Lists;
 import com.tdrhq.eyepatch.util.DexFileUtil;
+import com.tdrhq.eyepatch.util.Sorter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class Merger {
                 }
             }
 
-            List<Method> methods = Lists.newArrayList(template.getMethods());
+            List<Method> methods = Sorter.sortDexlibMethods(Lists.newArrayList(template.getMethods()));
             for (Method method : realClass.getMethods()) {
                 if (method.getName().equals("<init>") || method.getName().equals("<clinit>")) {
                     continue;

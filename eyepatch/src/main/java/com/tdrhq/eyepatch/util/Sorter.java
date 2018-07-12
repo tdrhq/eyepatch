@@ -18,6 +18,12 @@ public class Sorter {
         return copy;
     }
 
+    public static List<Method> sortMethods(Method[] methods) {
+        List<Method> copy = Lists.newArrayList(methods);
+        Collections.sort(copy, methodComparator);
+        return copy;
+    }
+
     public static List<org.jf.dexlib2.iface.Method> sortDexlibMethods(Iterable<org.jf.dexlib2.iface.Method> methods) {
         List<org.jf.dexlib2.iface.Method> copy = Lists.newArrayList(methods);
         Collections.sort(copy, dexlibMethodComparator);
