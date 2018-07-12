@@ -65,7 +65,7 @@ public class DexFileGenerator {
             generateField(dexmaker, field, typeId);
         }
 
-        for (Constructor constructor : original.getDeclaredConstructors()) {
+        for (Constructor constructor : Sorter.sortConstructors(original.getDeclaredConstructors()) ){
             generateConstructor(dexmaker, constructor, typeId, original);
         }
 

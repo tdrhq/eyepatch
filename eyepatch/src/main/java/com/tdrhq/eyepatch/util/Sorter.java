@@ -5,6 +5,7 @@ package com.tdrhq.eyepatch.util;
 import com.android.dx.TypeId;
 import com.google.common.collect.Lists;
 import java.lang.Iterable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,6 +22,12 @@ public class Sorter {
     public static List<Method> sortMethods(Method[] methods) {
         List<Method> copy = Lists.newArrayList(methods);
         Collections.sort(copy, methodComparator);
+        return copy;
+    }
+
+    public static List<Constructor> sortConstructors(Constructor[] methods) {
+        List<Constructor> copy = Lists.newArrayList(methods);
+        Collections.sort(copy, constructorComparator);
         return copy;
     }
 
@@ -62,6 +69,27 @@ public class Sorter {
                 return ret;
             }
         };
+
+    static Comparator<Constructor> constructorComparator = new Comparator<Constructor>() {
+            @Override
+            public int compare(Constructor one, Constructor two) {
+                MethodDeets oned = getDeets(one);
+                MethodDeets twod = getDeets(two);
+                return methodDeetsComparator.compare(oned, twod);
+            }
+
+            private MethodDeets getDeets(Constructor method) {
+                MethodDeets ret = new MethodDeets();
+                ret.name = "<init>";
+                Class[] args = method.getParameterTypes();
+                ret.args = new TypeId[args.length];
+                for (int i = 0; i < args.length; i++) {
+                    ret.args[i] = TypeId.get(args[i]);
+                }
+                return ret;
+            }
+        };
+
 
 
     static Comparator<org.jf.dexlib2.iface.Method> dexlibMethodComparator = new Comparator<org.jf.dexlib2.iface.Method>() {
