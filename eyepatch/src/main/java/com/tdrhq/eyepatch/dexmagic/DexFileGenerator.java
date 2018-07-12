@@ -136,10 +136,18 @@ public class DexFileGenerator {
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
-        generateUnsupportedLabel(code, locals);
+        generateBypassLabel(code, locals);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
+        code.mark(locals.defaultImplementation);
+        code.newInstance(
+                locals.uoe,
+                TypeId.get(UnsupportedOperationException.class).getConstructor());
+        code.throwValue(locals.uoe);
+    }
+
+    private void generateBypassLabel(Code code, Locals locals) {
         code.mark(locals.defaultImplementation);
         code.newInstance(
                 locals.uoe,
@@ -159,7 +167,7 @@ public class DexFileGenerator {
 
     private static void generateInvokeWithoutReturn(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
         TypeId<?> staticInvoker = TypeId.get(Dispatcher.class);
-        TypeId classType = TypeId.get(Class.class);
+        TypeId classType =  TypeId.get(Class.class);
         TypeId instance = TypeId.OBJECT;
         TypeId objectType = TypeId.get(Object.class);
         TypeId stringType = TypeId.get(String.class);
