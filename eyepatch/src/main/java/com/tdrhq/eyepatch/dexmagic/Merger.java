@@ -2,23 +2,16 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.google.common.collect.Lists;
 import com.tdrhq.eyepatch.util.DexFileUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.Method;
-import org.jf.dexlib2.iface.MethodImplementation;
-import org.jf.dexlib2.iface.instruction.Instruction;
-import org.jf.dexlib2.immutable.ImmutableMethod;
-import org.jf.dexlib2.immutable.ImmutableMethodImplementation;
-import org.jf.dexlib2.immutable.instruction.ImmutableInstruction21s;
+import org.jf.dexlib2.immutable.ImmutableClassDef;
 import org.jf.dexlib2.rewriter.DexRewriter;
 import org.jf.dexlib2.rewriter.Rewriter;
 import org.jf.dexlib2.rewriter.RewriterModule;
@@ -82,7 +75,16 @@ public class Merger {
 
         @Override
         public ClassDef rewrite(ClassDef template) {
-            return template;
+
+            return new ImmutableClassDef(
+                    template.getType(),
+                    template.getAccessFlags(),
+                    template.getSuperclass(),
+                    template.getInterfaces(),
+                    template.getSourceFile(),
+                    template.getAnnotations(),
+                    template.getFields(),
+                    template.getMethods());
         }
 
 
