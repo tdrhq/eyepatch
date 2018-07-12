@@ -94,10 +94,10 @@ public class DexFileGenerator {
         dexmaker.declare(fieldId, modifiers, null);
     }
 
-    private void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+    private <D> void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<D> typeId, Class original) {
         String methodName = EyePatchClassBuilder.CONSTRUCT;
         int modifiers = constructor.getModifiers();
-        TypeId returnType = TypeId.VOID;
+        TypeId<Void> returnType = TypeId.VOID;
         Class[] parameterTypes = constructor.getParameterTypes();
         TypeId[] arguments = new TypeId[parameterTypes.length];
         for (int i = 0 ;i < parameterTypes.length; i++) {
@@ -126,7 +126,14 @@ public class DexFileGenerator {
         constructorGenerator.invokeSuper();
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
-        generateUnsupportedLabel(code, locals);
+        this.<D, Void>generateBypassLabel(
+                code,
+                typeId,
+                TypeId.VOID,
+                "<init>",
+                arguments,
+                false,
+                locals);
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
@@ -168,15 +175,21 @@ public class DexFileGenerator {
         for (int i = 0; i < params.length - 1; i++) {
             params[i] = code.getParameter(i, parameterTypes[i]);
         }
-        code.loadConstant(locals.tmp, null);
-        params[params.length - 1] = locals.tmp;
+        code.loadConstant(locals.tmp2, null);
+        params[params.length - 1] = locals.tmp2;
 
         Local<R> returnValue = null;
         if (returnType != TypeId.VOID) {
             returnValue = locals.castedReturnValue;
         }
 
-        if (isStatic) {
+        if (methodName.equals("<init>")) {
+            code.invokeDirect(
+                    methodId,
+                    null,
+                    code.getThis(typeId),
+                    params);
+        } else if (isStatic) {
             code.invokeStatic(
                     methodId,
                     returnValue,
@@ -287,6 +300,7 @@ public class DexFileGenerator {
         Local castedReturnValue;
         Local<Integer> parameterLength;
         Local<Object> tmp;
+        Local<Object> tmp2;
         Local boxedReturnValue;
         Local<UnsupportedOperationException> uoe;
         Local<Object> unhandledValue;
@@ -303,6 +317,7 @@ public class DexFileGenerator {
             castedReturnValue = code.newLocal(returnType);
             parameterLength = code.newLocal(TypeId.INT);
             tmp = code.newLocal(TypeId.OBJECT);
+            tmp2 = code.newLocal(TypeId.OBJECT);
             uoe = code.newLocal(TypeId.get(UnsupportedOperationException.class));
             unhandledValue = code.newLocal(TypeId.OBJECT);
 

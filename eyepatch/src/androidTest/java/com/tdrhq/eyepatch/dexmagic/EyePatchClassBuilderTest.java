@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.*;
+import org.junit.After;
 import org.junit.Test;
 import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
@@ -26,14 +27,15 @@ public class EyePatchClassBuilderTest {
     private Dispatcher oldHandler;
     private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
     private Class wrappedClass;
+    private SmaliPrinter smaliPrinter;
 
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
     private StaticInvocationHandler handler;
-    SmaliPrinter smaliPrinter;
 
     @Before
     public void before() throws Exception {
+        smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smali"));
         classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
         handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
@@ -43,6 +45,7 @@ public class EyePatchClassBuilderTest {
 
     private void setupSmaliPrinter() throws IOException {
         smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
+
         DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
                 @Override
                 public void print(Class klass, File file) {
@@ -555,6 +558,30 @@ public class EyePatchClassBuilderTest {
 
         public void nonStatic() {
             field = "aisha";
+        }
+    }
+
+    @Test
+    public void testUnhandledConstructor() throws Throwable {
+        wrappedClass = wrapClass(FooWithConstructor.class);
+
+        when(handler.handleInvocation(newInvocation(
+                                              null,
+                                              "__pre_construct__",
+                                              arg(int.class, 2))))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+        Constructor cons = wrappedClass.getConstructor(int.class);
+        Object instance = cons.newInstance(2);
+
+        int num = (int) Whitebox.getField(instance, wrappedClass, "counter");
+        assertEquals(3, num);
+    }
+
+    public static class FooWithConstructor {
+        int counter = 0;
+        public FooWithConstructor(int i) {
+            counter = i + 1;
         }
     }
 }

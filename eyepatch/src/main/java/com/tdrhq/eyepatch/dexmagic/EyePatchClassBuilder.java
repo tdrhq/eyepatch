@@ -20,6 +20,8 @@ public class EyePatchClassBuilder {
 
     DexFileGenerator dexFileGenerator;
 
+    public File lastDexFile = null;
+
     public EyePatchClassBuilder(File dataDir, ConstructorGeneratorFactory constructorGeneratorFactory) {
         dexFileGenerator = new DexFileGenerator(dataDir, constructorGeneratorFactory);
     }
