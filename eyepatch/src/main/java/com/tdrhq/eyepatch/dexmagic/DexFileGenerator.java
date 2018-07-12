@@ -149,10 +149,12 @@ public class DexFileGenerator {
 
     private void generateBypassLabel(Code code, TypeId<?> typeId, TypeId<?> returnType, Locals locals) {
         code.mark(locals.defaultImplementation);
-        code.newInstance(
-                locals.uoe,
-                TypeId.get(UnsupportedOperationException.class).getConstructor());
-        code.throwValue(locals.uoe);
+        if (returnType == TypeId.VOID) {
+            code.returnVoid();
+        } else {
+            code.loadConstant(locals.castedReturnValue, null);
+            code.returnValue(locals.castedReturnValue);
+        }
     }
 
     private static void generateMethodContentsInternal(Code code, TypeId typeId, TypeId returnType, Class[] parameterTypes, Class original, int modifiers, String methodName, Locals locals) {
