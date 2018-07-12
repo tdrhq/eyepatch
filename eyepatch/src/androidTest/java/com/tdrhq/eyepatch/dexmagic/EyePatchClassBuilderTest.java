@@ -6,10 +6,11 @@ import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.SmaliPrinter;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
+import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.Matchers;
@@ -34,6 +35,15 @@ public class EyePatchClassBuilderTest {
         classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
         handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
+        final SmaliPrinter smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smali"));
+
+        DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
+                @Override
+                public void print(Class klass, File file) {
+                    smaliPrinter.printFromFile(file, klass.getName());
+                }
+            };
+
     }
 
     public static class SimpleConstructorGeneratorFactory extends ConstructorGeneratorFactory {
@@ -62,6 +72,7 @@ public class EyePatchClassBuilderTest {
     @After
     public void after() throws Throwable {
         Dispatcher.setDefaultHandler();
+        DexFileGenerator.debugPrinter = null;
     }
 
     @Test

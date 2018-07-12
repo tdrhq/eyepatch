@@ -19,7 +19,12 @@ import java.util.List;
 
 public class DexFileGenerator {
 
-    public static int UNUSED_REGISTER_COUNT = 256;
+    public static DebugPrinter debugPrinter = null;
+
+    public interface DebugPrinter {
+        public void print(Class klass, File dexFile);
+    }
+
     private File mDataDir;
     private int counter = 0;
     private ConstructorGeneratorFactory constructorGeneratorFactory;
@@ -50,6 +55,11 @@ public class DexFileGenerator {
                 template.close();
                 real.close();
             }
+
+            if (debugPrinter != null) {
+                debugPrinter.print(realClass, mergedOf);
+            }
+
             return Util.loadDexFile(mergedOf);
         } catch (IOException e) {
             throw new RuntimeException(e);
