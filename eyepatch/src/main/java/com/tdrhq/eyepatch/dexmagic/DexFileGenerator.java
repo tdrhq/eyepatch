@@ -136,7 +136,16 @@ public class DexFileGenerator {
                 handledParams);
         code.returnVoid();
 
-        generateUnsupportedLabel(code, locals);
+        arguments = Arrays.copyOf(arguments, arguments.length - 1);
+        generateBypassLabel(
+                code,
+                typeId,
+                TypeId.VOID,
+                "<init>",
+                arguments,
+                false,
+                locals);
+
     }
 
     private void generateHandledConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
@@ -218,7 +227,13 @@ public class DexFileGenerator {
             returnValue = locals.castedReturnValue;
         }
 
-        if (isStatic) {
+        if (methodName.equals("<init>")) {
+            code.invokeDirect(
+                    methodId,
+                    null,
+                    code.getThis(typeId),
+                    params);
+        } else if (isStatic) {
             code.invokeStatic(
                     methodId,
                     returnValue,
