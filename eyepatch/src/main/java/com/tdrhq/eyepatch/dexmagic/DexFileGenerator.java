@@ -109,10 +109,6 @@ public class DexFileGenerator {
         Local<SuperInvocation> superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
         Local<Class> thisClass = code.newLocal(TypeId.get(Class.class));
 
-        ConstructorGenerator constructorGenerator = constructorGeneratorFactory
-                .newInstance(typeId, original.getSuperclass(), superInvocation, code);
-        constructorGenerator.declareLocals();
-
         code.loadConstant(thisClass, original.getSuperclass());
         MethodId getEasiestInvocation = TypeId.get(SuperInvocation.class)
                 .getMethod(
@@ -123,14 +119,56 @@ public class DexFileGenerator {
         code.invokeStatic(getEasiestInvocation, superInvocation, thisClass);
 
         generateInvokeWithoutReturn(code, typeId, returnType, parameterTypes, original, modifiers | Modifier.STATIC, EyePatchClassBuilder.PRE_CONSTRUCT, locals);
-        constructorGenerator.invokeSuper();
 
-        generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, EyePatchClassBuilder.CONSTRUCT, locals);
+        arguments = Arrays.copyOf(arguments, arguments.length + 1);
+        arguments[arguments.length - 1] = TypeId.get(SuperInvocation.class);
+        MethodId handledConstructor = typeId.getConstructor(arguments);
+
+        Local<?>[] handledParams = new Local<?>[arguments.length];
+        for (int i = 0; i < arguments.length -1; i ++) {
+            handledParams[i] = code.getParameter(i, arguments[i]);
+        }
+        handledParams[arguments.length -1] = superInvocation;
+        code.invokeDirect(
+                handledConstructor,
+                null,
+                code.getThis(typeId),
+                handledParams);
+        code.returnVoid();
+
         generateUnsupportedLabel(code, locals);
     }
 
     private void generateHandledConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+        int modifiers = constructor.getModifiers();
+        TypeId returnType = TypeId.VOID;
+        Class[] parameterTypes = constructor.getParameterTypes();
+        parameterTypes = Arrays.copyOf(parameterTypes, parameterTypes.length + 1);
+        parameterTypes[parameterTypes.length - 1] = SuperInvocation.class;
 
+        TypeId[] arguments = new TypeId[parameterTypes.length];
+        for (int i = 0 ;i < parameterTypes.length; i++) {
+            arguments[i] = TypeId.get(parameterTypes[i]);
+        }
+
+        MethodId cons = typeId.getConstructor(arguments);
+        Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
+        Locals locals = new Locals(code, returnType);
+        Local<SuperInvocation> superInvocation = code.getParameter(parameterTypes.length - 1, TypeId.get(SuperInvocation.class));
+        Local<Class> thisClass = code.newLocal(TypeId.get(Class.class));
+
+        ConstructorGenerator constructorGenerator = constructorGeneratorFactory
+                .newInstance(typeId, original.getSuperclass(), superInvocation, code);
+        constructorGenerator.declareLocals();
+
+        constructorGenerator.invokeSuper();
+
+        // funny... now before I actually make a __construct__
+        // invocation, let's hide that SuperInvocation argument
+        parameterTypes = Arrays.copyOf(parameterTypes, parameterTypes.length - 1);
+
+        generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, EyePatchClassBuilder.CONSTRUCT, locals);
+        generateUnsupportedLabel(code, locals);
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
