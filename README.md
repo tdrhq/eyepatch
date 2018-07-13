@@ -68,6 +68,13 @@ final methods, parent classes and what not) at runtime during the
 test. The API is surprisingly straightforward. For an example see:
 https://github.com/tdrhq/eyepatch/blob/master/eyepatch/src/androidTest/java/com/tdrhq/eyepatch/dexmagic/ShadowClassHandlerTest.java
 
+### Partial shadows
+
+You don't have to stub out all the methods of a class, you can stub
+out only specific methods if you want. In order to do this, use the
+Shadowing API, and return `Dispatcher.UNHANDLED` for every method
+other than the ones you're interested in.
+
 ## Limitations
 
 Many of these limitations are temporary, and we can eventually work
@@ -75,9 +82,6 @@ around them:
 
 1. You can't mock Android internal classes as of now. When we do build
 this, it's most likely going to have a slightly different API.
-
-2. You can't *spy* on classes. That means, you have to mock out all
-the methods on a class.
 
 3. There's support for mocking out final methods, but this isn't
 exposed as of yet. Hopefully I'll release this real quick. However,
