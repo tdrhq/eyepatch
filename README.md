@@ -114,7 +114,7 @@ EyePatch is available as in JCenter. You can install it as:
 ```groovy
 dependencies {
     // ...
-    androidTestImplementation 'com.tdrhq.eyepatch:eyepatch:0.1.0'
+    androidTestImplementation 'com.tdrhq.eyepatch:eyepatch:0.2.0'
 }
 ```
 
