@@ -272,15 +272,12 @@ public class DexFileGenerator {
         TypeId argArType = TypeId.get(Class[].class);
         TypeId objectArType = TypeId.get(Object[].class);
 
-
         MethodId invokeStaticMethod = staticInvoker.getMethod(
                 objectType,
                 "invokeStatic",
                 TypeId.get(GeneratedMethod.class),
                 objectType,
                 objectArType);
-
-
 
         code.loadConstant(locals.parameterLength, parameterTypes.length);
         code.loadConstant(locals.argTypes, null);
