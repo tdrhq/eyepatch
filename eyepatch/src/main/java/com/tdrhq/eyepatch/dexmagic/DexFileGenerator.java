@@ -78,6 +78,7 @@ public class DexFileGenerator {
 
         for (Constructor constructor : Sorter.sortConstructors(original.getDeclaredConstructors()) ){
             generateConstructor(dexmaker, constructor, typeId, original);
+            generateHandledConstructor(dexmaker, constructor, typeId, original);
         }
 
         for (Method methodTemplate : Sorter.sortMethods(original.getDeclaredMethods())) {
@@ -95,7 +96,6 @@ public class DexFileGenerator {
     }
 
     private void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
-        String methodName = EyePatchClassBuilder.CONSTRUCT;
         int modifiers = constructor.getModifiers();
         TypeId returnType = TypeId.VOID;
         Class[] parameterTypes = constructor.getParameterTypes();
@@ -125,8 +125,12 @@ public class DexFileGenerator {
         generateInvokeWithoutReturn(code, typeId, returnType, parameterTypes, original, modifiers | Modifier.STATIC, EyePatchClassBuilder.PRE_CONSTRUCT, locals);
         constructorGenerator.invokeSuper();
 
-        generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
+        generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, EyePatchClassBuilder.CONSTRUCT, locals);
         generateUnsupportedLabel(code, locals);
+    }
+
+    private void generateHandledConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+
     }
 
     private void generateMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
