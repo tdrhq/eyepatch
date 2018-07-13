@@ -95,7 +95,7 @@ public class DexFileGenerator {
         dexmaker.declare(fieldId, modifiers, null);
     }
 
-    private void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<?> typeId, Class original) {
+    private <D> void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<D> typeId, Class original) {
         int modifiers = constructor.getModifiers();
         TypeId returnType = TypeId.VOID;
         Class[] parameterTypes = constructor.getParameterTypes();
