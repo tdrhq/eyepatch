@@ -84,6 +84,7 @@ public class EyePatchClassBuilderTest {
 
     @Test
     public void testWrapping() throws Exception {
+        setupSmaliPrinter();
         wrappedClass = wrapClass(Bar.class);
         Object instance = null;
         String functionName = "foo";
