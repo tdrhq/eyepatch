@@ -14,12 +14,20 @@ public class ShadowClassHandlerTest {
         return ShadowClassHandler.newShadowClassHandler(klass, FooShadow.class);
     }
 
-
+    @ClassHandlerProvider(Partial.class)
+    public static ClassHandler createPartialClass(final Class klass) {
+        return ShadowClassHandler.newPartialClassHandler(klass, PartialShadow.class);
+    }
 
     @Test
     public void testShadowing() throws Throwable {
         Foo foo = new Foo(20);
         assertEquals(20, foo.number());
+    }
+
+    @Test
+    public void testPartialShadowing() throws Throwable {
+        assertEquals(6, Partial.twiceNumber());
     }
 
     public static class Foo {
@@ -42,6 +50,22 @@ public class ShadowClassHandlerTest {
 
         public int number() {
             return this.arg;
+        }
+    }
+
+    public static class Partial {
+        public static int number() {
+            return 2;
+        }
+
+        public static int twiceNumber() {
+            return 2 * number();
+        }
+    }
+
+    public static class PartialShadow {
+        public static int number() {
+            return 3;
         }
     }
 }
