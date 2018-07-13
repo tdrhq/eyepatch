@@ -32,12 +32,15 @@ public abstract class Dispatcher {
     }
 
     public static Object invokeStatic(
-            Class klass,
+            GeneratedMethod generatedMethod,
             Object instance,
-            String method,
-            Class[] argTypes,
             Object[] args) {
-        Invocation invocation = new Invocation(klass, instance, method, argTypes, args);
+        Invocation invocation = new Invocation(
+                generatedMethod.getTargetClass(),
+                instance,
+                generatedMethod.getMethod(),
+                generatedMethod.getArgTypes(),
+                args);
         if (sHandler != null) {
             return sHandler.handleInvocation(invocation);
         }

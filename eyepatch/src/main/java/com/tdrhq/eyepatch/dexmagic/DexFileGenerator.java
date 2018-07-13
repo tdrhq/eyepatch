@@ -272,13 +272,12 @@ public class DexFileGenerator {
         TypeId argArType = TypeId.get(Class[].class);
         TypeId objectArType = TypeId.get(Object[].class);
 
+
         MethodId invokeStaticMethod = staticInvoker.getMethod(
                 objectType,
                 "invokeStatic",
-                classType,
+                TypeId.get(GeneratedMethod.class),
                 objectType,
-                stringType,
-                argArType,
                 objectArType);
 
 
@@ -299,13 +298,22 @@ public class DexFileGenerator {
             instanceArg = code.getThis(typeId);
         }
         code.loadConstant(locals.callerMethod, methodName);
+        MethodId<GeneratedMethod, Void> generatedMethodCons = TypeId.get(GeneratedMethod.class)
+                .getConstructor(
+                        TypeId.get(Class.class),
+                        TypeId.STRING,
+                        TypeId.get(Class[].class));
+        code.newInstance(locals.generatedMethod,
+                         generatedMethodCons,
+                         locals.callerClass,
+                         locals.callerMethod,
+                         locals.argTypes);
+
         code.invokeStatic(
                 invokeStaticMethod,
                 locals.returnValue,
-                locals.callerClass,
+                locals.generatedMethod,
                 instanceArg,
-                locals.callerMethod,
-                locals.argTypes,
                 locals.callerArgs);
 
         FieldId<?, ?> unhandledValueField =
@@ -347,6 +355,7 @@ public class DexFileGenerator {
         Local boxedReturnValue;
         Local<UnsupportedOperationException> uoe;
         Local<Object> unhandledValue;
+        Local<GeneratedMethod> generatedMethod;
 
         public Locals(Code code, TypeId returnType) {
             defaultImplementation = new Label();
@@ -362,6 +371,7 @@ public class DexFileGenerator {
             tmp = code.newLocal(TypeId.OBJECT);
             uoe = code.newLocal(TypeId.get(UnsupportedOperationException.class));
             unhandledValue = code.newLocal(TypeId.OBJECT);
+            generatedMethod = code.newLocal(TypeId.get(GeneratedMethod.class));
 
             boxedReturnValue = null;
 
