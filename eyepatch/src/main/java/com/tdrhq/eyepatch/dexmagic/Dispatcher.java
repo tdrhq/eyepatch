@@ -36,10 +36,8 @@ public abstract class Dispatcher {
             Object instance,
             Object[] args) {
         Invocation invocation = new Invocation(
-                generatedMethod.getTargetClass(),
+                generatedMethod,
                 instance,
-                generatedMethod.getMethod(),
-                generatedMethod.getArgTypes(),
                 args);
         if (sHandler != null) {
             return sHandler.handleInvocation(invocation);
