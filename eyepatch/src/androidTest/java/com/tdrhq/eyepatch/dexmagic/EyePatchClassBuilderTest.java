@@ -523,6 +523,27 @@ public class EyePatchClassBuilderTest {
         }
     }
 
+    @Test
+    public void testUnhandledDefaultHandlerForPrivateMethod() throws Throwable {
+        wrappedClass = wrapClass(Foo3WithPrivate.class);
+        Object instance = wrappedClass.newInstance();
+
+        when(handler.handleInvocation(newInvocation(
+                                              instance,
+                                              "nonStatic")))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+        assertEquals("car", Whitebox.invoke(
+                             instance, "nonStatic"));
+
+    }
+
+    public static class Foo3WithPrivate {
+        private String nonStatic() {
+            return "car";
+        }
+    }
+
 
     @Test
     public void testUnhandledDefaultHandlerForVoidMethods() throws Throwable {

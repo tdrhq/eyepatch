@@ -143,7 +143,7 @@ public class DexFileGenerator {
                 TypeId.VOID,
                 "<init>",
                 arguments,
-                false,
+                modifiers,
                 locals);
 
     }
@@ -195,7 +195,7 @@ public class DexFileGenerator {
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
-        generateBypassLabel(code, typeId, returnType, methodName, arguments, Modifier.isStatic(modifiers), locals);
+        generateBypassLabel(code, typeId, returnType, methodName, arguments, modifiers, locals);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
@@ -206,7 +206,7 @@ public class DexFileGenerator {
         code.throwValue(locals.uoe);
     }
 
-    private <D,R> void generateBypassLabel(Code code, TypeId<D> typeId, TypeId<R> returnType, String methodName, TypeId<?>[] parameterTypes, boolean isStatic, Locals locals) {
+    private <D,R> void generateBypassLabel(Code code, TypeId<D> typeId, TypeId<R> returnType, String methodName, TypeId<?>[] parameterTypes, int modifiers, Locals locals) {
         parameterTypes = Arrays.copyOf(parameterTypes, parameterTypes.length + 1);
         parameterTypes[parameterTypes.length - 1] = TypeId.get(Token.class);
         MethodId<D, R>  methodId = typeId.getMethod(
@@ -227,13 +227,13 @@ public class DexFileGenerator {
             returnValue = locals.castedReturnValue;
         }
 
-        if (methodName.equals("<init>")) {
+        if (methodName.equals("<init>") || Modifier.isPrivate(modifiers)) {
             code.invokeDirect(
                     methodId,
-                    null,
+                    returnValue,
                     code.getThis(typeId),
                     params);
-        } else if (isStatic) {
+        } else if (Modifier.isStatic(modifiers)) {
             code.invokeStatic(
                     methodId,
                     returnValue,
