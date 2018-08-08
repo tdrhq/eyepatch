@@ -23,10 +23,10 @@ public class DelegatingInvocationHandlerTest {
         try {
             mHandler.handleInvocation(
                     new Invocation(
-                            Bar.class,
+                            new GeneratedMethod(Bar.class,
+                                                "foo",
+                                                new Class[] {}),
                             null,
-                            "foo",
-                            new Class[] {},
                             new Object[] {}));
             fail("expected exception");
         } catch (UnsupportedOperationException e) {
@@ -39,10 +39,11 @@ public class DelegatingInvocationHandlerTest {
         ClassLoader classLoader = new MyPathClassLoader();
         Class barWrapped = classLoader.loadClass(Bar.class.getName());
         Invocation invocation = new Invocation(
-                barWrapped,
+                new GeneratedMethod(
+                        barWrapped,
+                        "foo",
+                        new Class[] {}),
                 null,
-                "foo",
-                new Class[] {},
                 new Object[] {});
         mHandler.handleInvocation(
                 invocation);

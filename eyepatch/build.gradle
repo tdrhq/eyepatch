@@ -32,6 +32,10 @@ android {
         }
     }
 
+    lintOptions {
+         abortOnError false
+    }
+
 }
 
 dependencies {
@@ -45,12 +49,14 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.1'
     implementation 'com.jakewharton.android.repackaged:dalvik-dx:7.1.0_r7'
     implementation project(':iface')
+    implementation 'com.google.guava:guava:25.1-android'
 
     implementation 'junit:junit:4.12'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'org.mockito:mockito-core:1.10.19'
+    androidTestImplementation 'org.smali:baksmali:2.2.4'
 }
 
 

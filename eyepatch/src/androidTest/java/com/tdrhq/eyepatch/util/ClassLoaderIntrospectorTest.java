@@ -1,8 +1,8 @@
 package com.tdrhq.eyepatch.util;
 
-import dalvik.system.PathClassLoader;
-import java.util.ArrayList;
-import java.util.List;
+import dalvik.system.DexFile;
+import java.io.File;
+import java.util.Collections;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -28,6 +28,16 @@ public class ClassLoaderIntrospectorTest {
                 clonedClass.getClassLoader(),
                 not(sameInstance(getClass().getClassLoader())));
 
+    }
+
+    @Test
+    public void testDefiningDexFile() throws Throwable {
+        File definingFile = ClassLoaderIntrospector.getDefiningDexFile(Foo.class);
+        assertNotNull(definingFile);
+
+        DexFile dexFile = new DexFile(definingFile);
+
+        assertThat(Collections.list(dexFile.entries()), hasItem(Foo.class.getName()));
     }
 
     public static class Foo {

@@ -46,10 +46,11 @@ public class DefaultInvocationHandlerTest {
     @Test
     public void testHandleInvocationHappyPath() throws Throwable {
         Invocation invocation = new Invocation(
-                Foo.class,
+                new GeneratedMethod(
+                        Foo.class,
+                        "bar",
+                        new Class[] {}),
                 new Foo(),
-                "bar",
-                new Class[] {},
                 new Object[] {});
 
         assertEquals(null, handler.handleInvocation(invocation));

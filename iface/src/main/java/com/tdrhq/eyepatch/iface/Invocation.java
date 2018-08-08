@@ -5,10 +5,8 @@ package com.tdrhq.eyepatch.iface;
 import java.util.Arrays;
 
 public class Invocation {
-    private final Class mClass;
+    private final GeneratedMethod mGeneratedMethod;
     private Object mInstance;
-    private final String mMethod;
-    private Class[] argTypes;
     private Object[] mArgs;
 
     public Object[] getArgs() {
@@ -16,7 +14,7 @@ public class Invocation {
     }
 
     public Class[] getArgTypes() {
-        return argTypes;
+        return mGeneratedMethod.getArgTypes();
     }
 
 
@@ -25,22 +23,18 @@ public class Invocation {
     }
 
     public String getMethod() {
-        return mMethod;
+        return mGeneratedMethod.getMethod();
     }
 
     public Class getInstanceClass() {
-        return mClass;
+        return mGeneratedMethod.getTargetClass();
     }
 
-    public Invocation(Class klass,
+    public Invocation(GeneratedMethod generatedMethod,
                       Object instance,
-                      String method,
-                      Class[] argTypes,
                       Object[] args) {
-        mClass = klass;
-        mMethod = method;
+        mGeneratedMethod = generatedMethod;
         mInstance = instance;
-        this.argTypes = argTypes;
         mArgs = args;
     }
 
@@ -48,11 +42,8 @@ public class Invocation {
     public boolean equals(Object other) {
         if (!(other instanceof Invocation));
         Invocation otherInvocation = (Invocation) other;
-        return mClass.getName().equals(otherInvocation.mClass.getName())
-                && mClass.getClassLoader() == otherInvocation.mClass.getClassLoader()
+        return mGeneratedMethod.equals(otherInvocation.mGeneratedMethod)
                 && mInstance == otherInvocation.mInstance
-                && mMethod.equals(otherInvocation.mMethod)
-                && Arrays.equals(argTypes, otherInvocation.argTypes)
                 && Arrays.equals(mArgs, otherInvocation.mArgs);
 
     }
@@ -61,10 +52,10 @@ public class Invocation {
     public String toString() {
         return String.format(
                 "%s(from %s); %s; %s; %s",
-                mClass.toString(),
-                mClass.getClassLoader().toString(),
+                getInstanceClass().toString(),
+                getInstanceClass().getClassLoader().toString(),
                 String.valueOf(mInstance),
-                mMethod,
+                getMethod(),
                 Arrays.toString(mArgs));
     }
 

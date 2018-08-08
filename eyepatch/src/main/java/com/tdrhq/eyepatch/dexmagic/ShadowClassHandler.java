@@ -14,9 +14,12 @@ public class ShadowClassHandler implements ClassHandler {
     private Class shadowClass;
     private WeakHashMap objectToShadowMap = new WeakHashMap();
 
-    public ShadowClassHandler(Class originalClass, Class shadowClass) {
+    boolean isSpying;
+
+    public ShadowClassHandler(Class originalClass, Class shadowClass, boolean isSpying) {
         this.originalClass = Checks.notNull(originalClass);
         this.shadowClass = Checks.notNull(shadowClass);
+        this.isSpying = isSpying;
     }
 
     @Override
@@ -47,7 +50,11 @@ public class ShadowClassHandler implements ClassHandler {
                 // it's okay to skip this
                 return null;
             }
-            throw new RuntimeException(e);
+            if (!isSpying) {
+                throw new RuntimeException(e);
+            } else {
+                return Dispatcher.UNHANDLED;
+            }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -58,6 +65,14 @@ public class ShadowClassHandler implements ClassHandler {
     @Override
     public Class getResponsibility() {
         return originalClass;
+    }
+
+    public static ShadowClassHandler newShadowClassHandler(Class originalClass, Class shadowClass) {
+        return new ShadowClassHandler(originalClass, shadowClass, false);
+    }
+
+    public static ShadowClassHandler newPartialClassHandler(Class originalClass, Class shadowClass) {
+        return new ShadowClassHandler(originalClass, shadowClass, true);
     }
 
 }

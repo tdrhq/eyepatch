@@ -1,0 +1,8 @@
+
+* 0.2 07/13/2018
+
+  - The primary change is supporting sping/partial mocking.
+
+* 0.1
+
+  - Initial version, basic mocks

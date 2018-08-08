@@ -7,13 +7,18 @@ import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.SmaliPrinter;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.*;
+import org.junit.After;
+import org.junit.Test;
 import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -23,6 +28,7 @@ public class EyePatchClassBuilderTest {
     private Dispatcher oldHandler;
     private ClassLoader classLoader = ClassLoaderIntrospector.newChildClassLoader();
     private Class wrappedClass;
+    private SmaliPrinter smaliPrinter;
 
     @Rule
     public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
@@ -30,9 +36,22 @@ public class EyePatchClassBuilderTest {
 
     @Before
     public void before() throws Exception {
+        smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smali"));
         classBuilder = new EyePatchClassBuilder(tmpdir.getRoot(), new SimpleConstructorGeneratorFactory());
         handler = mock(StaticInvocationHandler.class);
         Dispatcher.setHandler(handler);
+    }
+
+    private void setupSmaliPrinter() throws IOException {
+        smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
+
+        DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
+                @Override
+                public void print(Class klass, File file) {
+                    smaliPrinter.printFromFile(file, klass.getName());
+                }
+            };
+
     }
 
     public static class SimpleConstructorGeneratorFactory extends ConstructorGeneratorFactory {
@@ -61,6 +80,7 @@ public class EyePatchClassBuilderTest {
     @After
     public void after() throws Throwable {
         Dispatcher.setDefaultHandler();
+        DexFileGenerator.debugPrinter = null;
     }
 
     @Test
@@ -87,10 +107,9 @@ public class EyePatchClassBuilderTest {
         }
 
         return new Invocation(
-                wrappedClass,
+                new GeneratedMethod(wrappedClass, functionName,
+                                    types.toArray(new Class[] {})),
                 instance,
-                functionName,
-                types.toArray(new Class[] {}),
                 values.toArray(new Object[] {}));
     }
 
@@ -467,20 +486,27 @@ public class EyePatchClassBuilderTest {
         assertEquals("String1", Whitebox.invokeStatic(wrappedClass, "bar", arg(String.class, "two")));
     }
 
-    private void testUnhandledDefaultHandler() throws Throwable {
+    @Test
+    public void testUnhandledDefaultHandler() throws Throwable {
         wrappedClass = wrapClass(Foo3.class);
+        Object instance = wrappedClass.newInstance();
+
         when(handler.handleInvocation(newInvocation(
                                               null,
                                               "bar",
                                               arg(int.class, 2))))
                 .thenReturn(Dispatcher.UNHANDLED);
+        when(handler.handleInvocation(newInvocation(
+                                              instance,
+                                              "nonStatic")))
+                .thenReturn(Dispatcher.UNHANDLED);
 
-        try {
-            Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2));
-            fail("expected exception");
-        } catch (UnsupportedOperationException e) {
-            // expected
-        }
+
+        assertEquals("int", Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2)));
+
+        assertEquals("car", Whitebox.invoke(
+                             instance, "nonStatic"));
+
     }
 
     public static class Foo3 {
@@ -489,6 +515,92 @@ public class EyePatchClassBuilderTest {
         }
         public static String bar(int arg) {
             return "int";
+        }
+
+        public String nonStatic() {
+            return "car";
+        }
+    }
+
+    @Test
+    public void testUnhandledDefaultHandlerForPrivateMethod() throws Throwable {
+        wrappedClass = wrapClass(Foo3WithPrivate.class);
+        Object instance = wrappedClass.newInstance();
+
+        when(handler.handleInvocation(newInvocation(
+                                              instance,
+                                              "nonStatic")))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+        assertEquals("car", Whitebox.invoke(
+                             instance, "nonStatic"));
+
+    }
+
+    public static class Foo3WithPrivate {
+        private String nonStatic() {
+            return "car";
+        }
+    }
+
+
+    @Test
+    public void testUnhandledDefaultHandlerForVoidMethods() throws Throwable {
+        wrappedClass = wrapClass(Foo3WithVoid.class);
+        Object instance = wrappedClass.newInstance();
+
+        when(handler.handleInvocation(newInvocation(
+                                              null,
+                                              "bar",
+                                              arg(int.class, 2))))
+                .thenReturn(Dispatcher.UNHANDLED);
+        when(handler.handleInvocation(newInvocation(
+                                              instance,
+                                              "nonStatic")))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+
+        Whitebox.invokeStatic(wrappedClass, "bar", arg(int.class, 2));
+        assertEquals("kirk", Whitebox.getField(null, wrappedClass, "sField"));
+
+        Whitebox.invoke(instance, "nonStatic");
+        assertEquals("aisha", Whitebox.getField(instance, wrappedClass, "field"));
+
+    }
+
+    public static class Foo3WithVoid {
+        static String sField = "zoidberg";
+        String field = "zoidberg";
+        public static void bar(int arg) {
+            sField = "kirk";
+        }
+
+        public void nonStatic() {
+            field = "aisha";
+        }
+    }
+
+    @Test
+    public void testUnhandledConstructor() throws Throwable {
+        wrappedClass = wrapClass(FooWithConstructor.class);
+
+        when(handler.handleInvocation(newInvocation(
+                                              null,
+                                              "__pre_construct__",
+                                              arg(int.class, 2))))
+                .thenReturn(Dispatcher.UNHANDLED);
+
+        Constructor cons = wrappedClass.getConstructor(int.class);
+        Object instance = cons.newInstance(2);
+
+        int num = (int) Whitebox.getField(instance, wrappedClass, "counter");
+        assertEquals(3, num);
+    }
+
+    public static class FooWithConstructor {
+        int counter = 0;
+        public FooWithConstructor(int i) {
+            counter = i + 1;
         }
     }
 }

@@ -9,6 +9,10 @@ import com.tdrhq.eyepatch.runner.ClassHandlerProvider;
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
 import com.tdrhq.eyepatch.util.Checks;
+import com.tdrhq.eyepatch.util.SmaliPrinter;
+import java.io.File;
+import java.io.IOException;
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +25,24 @@ import static org.junit.Assert.*;
 public class ConstructorsTests {
     @ClassRule
     public static EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
+    private SmaliPrinter smaliPrinter;
+
+    private void setupSmaliPrinter() throws IOException {
+        smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
+
+        DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
+                @Override
+                public void print(Class klass, File file) {
+                    smaliPrinter.printFromFile(file, klass.getName());
+                }
+            };
+
+    }
+
+    @After
+      public void after() throws Throwable {
+          DexFileGenerator.debugPrinter = null;
+      }
 
     @ClassHandlerProvider(FooChildWithPrimitive.class)
     public static ClassHandler createFooChildWithPrimitive(final Class klass) {
