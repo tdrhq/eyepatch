@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 public class DelegatingInvocationHandlerTest {
     private DelegatingInvocationHandler mHandler;

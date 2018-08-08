@@ -22,6 +22,7 @@ import org.junit.Test;
 import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder classBuilder;
