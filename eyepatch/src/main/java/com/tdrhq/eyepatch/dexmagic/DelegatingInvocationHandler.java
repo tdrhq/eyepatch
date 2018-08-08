@@ -2,6 +2,8 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.Invocation;
+
 /**
  * A Dispatcher that delegates to the
  * Dispatcher provided by the ClassLoader.

@@ -1,13 +1,15 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.Invocation;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class DefaultInvocationHandlerTest {
     private DefaultInvocationHandler handler;

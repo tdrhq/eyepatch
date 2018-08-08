@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.runner.ClassHandlerProvider;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
 import org.junit.Test;

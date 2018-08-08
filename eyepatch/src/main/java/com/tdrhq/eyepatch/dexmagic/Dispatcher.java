@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.util.Checks;
 
 /**

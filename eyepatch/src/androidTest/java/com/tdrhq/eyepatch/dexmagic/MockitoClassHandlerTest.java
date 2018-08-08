@@ -1,6 +1,8 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.iface.Invocation;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

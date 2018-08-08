@@ -2,6 +2,9 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.Invocation;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

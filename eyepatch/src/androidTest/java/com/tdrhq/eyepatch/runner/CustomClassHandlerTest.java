@@ -1,7 +1,7 @@
 package com.tdrhq.eyepatch.runner;
 
-import com.tdrhq.eyepatch.dexmagic.ClassHandler;
-import com.tdrhq.eyepatch.dexmagic.Invocation;
+import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.Invocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;

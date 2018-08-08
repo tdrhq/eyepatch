@@ -2,13 +2,13 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import android.util.Log;
+import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.util.Checks;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.reset;
 
 public class MockitoClassHandler implements ClassHandler {
     private Class klass;

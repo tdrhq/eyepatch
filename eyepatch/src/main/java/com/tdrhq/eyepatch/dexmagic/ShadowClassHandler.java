@@ -2,6 +2,8 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.util.Checks;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

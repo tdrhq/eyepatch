@@ -2,7 +2,7 @@ package com.tdrhq.eyepatch.runner;
 
 import android.support.annotation.NonNull;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
-import com.tdrhq.eyepatch.dexmagic.ClassHandler;
+import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
 import com.tdrhq.eyepatch.dexmagic.ConstructorGeneratorFactory;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;

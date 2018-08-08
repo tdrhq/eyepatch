@@ -3,7 +3,7 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
-import com.tdrhq.eyepatch.dexmagic.ClassHandler;
+import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
