@@ -2,8 +2,7 @@ package com.tdrhq.eyepatch.classloader;
 
 import android.os.Bundle;
 import android.view.View;
-import com.tdrhq.eyepatch.dexmagic.CompanionBuilder;
-import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
+import com.tdrhq.eyepatch.mockito.CompanionBuilder;
 import com.tdrhq.eyepatch.util.Whitebox;
 import org.junit.Before;
 import org.junit.Test;

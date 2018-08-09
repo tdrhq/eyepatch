@@ -1,6 +1,6 @@
 // (c) 2018 Arnold Noronha <arnold@tdrhq.com>
 
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.mockito;
 
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
@@ -106,7 +106,8 @@ public class CompanionBuilder {
 
     private String generateName() {
         synchronized (CompanionBuilder.class) {
-            return "com.tdrhq.eyepatch.dexmagic.Companion" + (++counter);
+            String pkg = CompanionBuilder.class.getPackage().getName();
+            return pkg + ".Companion" + (++counter);
         }
     }
 
