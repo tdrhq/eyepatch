@@ -4,10 +4,11 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import android.support.annotation.NonNull;
 import com.android.dx.*;
+import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Sorter;
-import com.tdrhq.eyepatch.util.Whitebox;
+
 import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -15,7 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.List;
+
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 public class DexFileGenerator {

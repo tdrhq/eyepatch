@@ -5,6 +5,7 @@ package com.tdrhq.eyepatch.dexmagic;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
+import com.tdrhq.eyepatch.iface.SuperInvocation;
 
 public class ConstructorGeneratorFactory {
     public ConstructorGenerator newInstance(TypeId<?> typeId,

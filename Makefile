@@ -11,3 +11,11 @@ fast-tests:
 
 class-builder-tests:
 	INST_ARGS="-e class com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilderTest" $(MAKE) fast-tests
+
+iface-tests:
+	./gradlew :iface:test
+
+core-tests:
+	./gradlew :eyepatch:connectedAndroidTest
+
+jenkins: iface-tests core-tests

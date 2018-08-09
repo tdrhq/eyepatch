@@ -2,15 +2,15 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import android.util.Log;
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
 import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
+import com.tdrhq.eyepatch.iface.SuperInvocation;
+
 import dalvik.system.DexFile;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ClassLoader;
 import java.lang.UnsupportedOperationException;

@@ -1,8 +1,7 @@
 // (c) 2018 Arnold Noronha <arnold@tdrhq.com>
 
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.iface;
 
-import android.util.Log;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;

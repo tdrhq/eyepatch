@@ -6,6 +6,8 @@ import com.android.dx.Label;
 import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
+import com.tdrhq.eyepatch.iface.SuperInvocation;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
