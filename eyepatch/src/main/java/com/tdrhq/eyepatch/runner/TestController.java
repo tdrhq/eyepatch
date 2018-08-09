@@ -6,7 +6,7 @@ import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.mockito.CompanionBuilder;
 import com.tdrhq.eyepatch.dexmagic.ConstructorGeneratorFactory;
 import com.tdrhq.eyepatch.dexmagic.EyePatchClassBuilder;
-import com.tdrhq.eyepatch.dexmagic.MockitoClassHandler;
+import com.tdrhq.eyepatch.mockito.MockitoClassHandler;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ExposedTemporaryFolder;
 import java.lang.reflect.InvocationTargetException;

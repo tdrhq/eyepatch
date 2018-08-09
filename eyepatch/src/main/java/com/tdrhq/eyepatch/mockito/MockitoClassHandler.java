@@ -1,6 +1,6 @@
 // (c) 2018 Arnold Noronha <arnold@tdrhq.com>
 
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.mockito;
 
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;

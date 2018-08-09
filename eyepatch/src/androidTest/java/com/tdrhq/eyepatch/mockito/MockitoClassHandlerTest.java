@@ -1,9 +1,10 @@
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.mockito;
 
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.mockito.CompanionBuilder;
+import com.tdrhq.eyepatch.mockito.MockitoClassHandler;
 
 import org.junit.Before;
 import org.junit.Rule;
