@@ -1,6 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 

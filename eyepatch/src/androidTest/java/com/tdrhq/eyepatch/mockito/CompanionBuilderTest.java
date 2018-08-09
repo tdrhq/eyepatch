@@ -1,6 +1,6 @@
 package com.tdrhq.eyepatch.mockito;
 
-import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

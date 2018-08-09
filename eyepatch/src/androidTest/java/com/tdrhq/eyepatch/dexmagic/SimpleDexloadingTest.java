@@ -2,7 +2,7 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;
-import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.Util;
 
 import dalvik.system.DexFile;

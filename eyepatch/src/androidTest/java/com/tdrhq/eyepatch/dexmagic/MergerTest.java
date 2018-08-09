@@ -5,7 +5,7 @@ package com.tdrhq.eyepatch.dexmagic;
 import android.util.Log;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.DexFileUtil;
 import com.tdrhq.eyepatch.util.Util;

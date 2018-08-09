@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
-import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
