@@ -1,15 +1,15 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import android.support.test.InstrumentationRegistry;
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.Util;
+
 import dalvik.system.DexFile;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Older API levels have some quirks with loading classes, this test

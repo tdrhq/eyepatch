@@ -18,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
+import com.tdrhq.eyepatch.util.Util;
 
 public class DexFileGenerator {
 

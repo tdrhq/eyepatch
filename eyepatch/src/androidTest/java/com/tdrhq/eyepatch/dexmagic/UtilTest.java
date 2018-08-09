@@ -4,6 +4,8 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.DexMaker;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.util.Util;
+
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.*;

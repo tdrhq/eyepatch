@@ -8,6 +8,7 @@ import com.android.dx.Local;
 import com.android.dx.MethodId;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
+import com.tdrhq.eyepatch.util.Util;
 
 import dalvik.system.DexFile;
 import java.io.File;

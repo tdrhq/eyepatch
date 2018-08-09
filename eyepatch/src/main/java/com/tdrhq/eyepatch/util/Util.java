@@ -1,6 +1,6 @@
 // (c) 2018 Arnold Noronha <arnold@tdrhq.com>
 
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.util;
 
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;

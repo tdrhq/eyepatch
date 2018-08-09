@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.DexFileUtil;
+import com.tdrhq.eyepatch.util.Util;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;

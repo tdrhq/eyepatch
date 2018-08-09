@@ -9,6 +9,8 @@ import com.tdrhq.eyepatch.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.Util;
+
 import dalvik.system.DexFile;
 import java.io.File;
 import java.io.IOException;
