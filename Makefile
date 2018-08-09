@@ -15,7 +15,10 @@ class-builder-tests:
 iface-tests:
 	./gradlew :iface:test
 
+runner-tests:
+	./gradlew :runner:connectedAndroidTest
+
 core-tests:
 	./gradlew :eyepatch:connectedAndroidTest
 
-jenkins: iface-tests core-tests
+jenkins: | iface-tests core-tests runner-tests
