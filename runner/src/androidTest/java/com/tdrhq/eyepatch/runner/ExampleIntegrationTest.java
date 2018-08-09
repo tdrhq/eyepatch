@@ -1,14 +1,18 @@
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.runner;
 
 import com.tdrhq.eyepatch.EyePatchMockito;
-import com.tdrhq.eyepatch.runner.EyePatchMockable;
-import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+
 
 @EyePatchMockable( { ExampleIntegrationTest.Foo.class } )
 @RunWith(EyePatchTestRunner.class)
@@ -21,8 +25,8 @@ public class ExampleIntegrationTest {
 
     @Test
     public void testDifferentArgs() throws Throwable {
-        when(Foo.bar("zoid")).thenReturn("berg");
-        when(Foo.bar("car")).thenReturn("toyota");
+        Mockito.when(Foo.bar("zoid")).thenReturn("berg");
+        Mockito.when(Foo.bar("car")).thenReturn("toyota");
 
         assertEquals("toyota", Foo.bar("car"));
         assertEquals("berg", Foo.bar("zoid"));
@@ -31,8 +35,8 @@ public class ExampleIntegrationTest {
 
     @Test
     public void testMatchers() throws Throwable {
-        when(Foo.bar(eq("zoid"))).thenReturn("berg");
-        when(Foo.bar("car")).thenReturn("toyota");
+        Mockito.when(Foo.bar(ArgumentMatchers.eq("zoid"))).thenReturn("berg");
+        Mockito.when(Foo.bar("car")).thenReturn("toyota");
 
         assertEquals("toyota", Foo.bar("car"));
         assertEquals("berg", Foo.bar("zoid"));
@@ -46,7 +50,7 @@ public class ExampleIntegrationTest {
         EyePatchMockito.verifyStatic(Foo.class);
         Foo.voidMethod(captor.capture());
 
-        assertEquals("blah", captor.getValue());
+        Assert.assertEquals("blah", captor.getValue());
     }
 
 
