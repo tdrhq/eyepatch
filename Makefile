@@ -18,6 +18,9 @@ iface-tests:
 runner-tests:
 	./gradlew :runner:connectedAndroidTest
 
+clean:
+	./gradlew :clean :eyepatch:clean :runner:clean :iface:clean
+
 core-tests:
 	./gradlew :eyepatch:connectedAndroidTest
 
