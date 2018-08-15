@@ -8,7 +8,7 @@ import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.mockito.MockitoClassHandler;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
-import com.tdrhq.eyepatch.dexmagic.StaticVerificationHandler;
+import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.DexFile;

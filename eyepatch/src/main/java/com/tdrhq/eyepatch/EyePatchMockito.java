@@ -1,6 +1,6 @@
 package com.tdrhq.eyepatch;
 
-import com.tdrhq.eyepatch.dexmagic.StaticVerificationHandler;
+import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
 
 public class EyePatchMockito {
     public static Class verifyStaticClass = null;
