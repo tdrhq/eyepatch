@@ -11,6 +11,8 @@ import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.Whitebox;
+
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.IOException;
@@ -158,10 +160,10 @@ public class EyePatchClassLoader extends ClassLoader
     public void verifyStatic(Class klass) {
         for (ClassHandler handler : classHandlers) {
             if (handler.getResponsibility() == klass) {
-                if (!(handler instanceof MockitoClassHandler)) {
+                if (!(isMockitoClassHandler(handler))) {
                     throw new RuntimeException("can't verify against this class");
                 }
-                ((MockitoClassHandler) handler).verifyStatic();
+                Whitebox.invoke(handler, "verifyStatic");
                 return;
             }
         }
@@ -174,15 +176,25 @@ public class EyePatchClassLoader extends ClassLoader
     public void resetStatic(Class klass) {
         for (ClassHandler handler : classHandlers) {
             if (handler.getResponsibility() == klass) {
-                if (!(handler instanceof MockitoClassHandler)) {
+                if (!isMockitoClassHandler(handler)) {
                     throw new RuntimeException("can't verify against this class");
                 }
-                ((MockitoClassHandler) handler).resetStatic();
+                Whitebox.invoke(handler, "resetStatic");
                 return;
             }
         }
 
         throw new IllegalStateException("Could not find handler for: " +
                                         klass.getName());
+    }
+
+    private boolean isMockitoClassHandler(ClassHandler handler) {
+        Class mockitoClassHandler = null;
+        try {
+            mockitoClassHandler = Class.forName("com.tdrhq.eyepatch.mockito.MockitoClassHandler");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("could not find MockitoClassHandler, this is a bad configuration", e);
+        }
+        return mockitoClassHandler.isAssignableFrom(handler.getClass());
     }
 }
