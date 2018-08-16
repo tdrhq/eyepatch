@@ -29,4 +29,9 @@ core-tests:
 
 device-tests: |	core-tests runner-tests integration-tests
 
-jenkins: iface-tests device-tests
+runner-jvm-tests:
+	./gradlew :eyepatch:test
+
+jvm-tests: iface-tests runner-jvm-tests
+
+jenkins: jvm-tests device-tests
