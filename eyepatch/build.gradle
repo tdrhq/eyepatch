@@ -45,7 +45,6 @@ dependencies {
 
     implementation 'com.linkedin.dexmaker:dexmaker-mockito:2.16.0'
     implementation 'com.android.support.test:runner:1.0.2'
-    implementation 'org.mockito:mockito-core:2.21.0'
     implementation project(':iface')
     implementation 'com.google.guava:guava:25.1-android'
 
