@@ -1,6 +1,5 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import android.support.annotation.NonNull;
 import com.android.dx.*;
 import com.tdrhq.eyepatch.util.Checks;
 import dalvik.system.DexFile;
@@ -51,7 +50,6 @@ public class EyePatchClassBuilder {
 
     }
 
-    @NonNull
     private DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
         Key key = new Key(realClass, classLoader);
         if (cache.containsKey(key)) {

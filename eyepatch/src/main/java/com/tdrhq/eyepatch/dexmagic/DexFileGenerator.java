@@ -2,7 +2,6 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import android.support.annotation.NonNull;
 import com.android.dx.*;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.Checks;
@@ -39,7 +38,6 @@ public class DexFileGenerator {
         constructorGeneratorFactory = mConstructorGeneratorFactory;
     }
 
-    @NonNull
     public DexFile generate(Class realClass) {
         DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
