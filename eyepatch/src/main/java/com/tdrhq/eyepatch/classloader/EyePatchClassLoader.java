@@ -6,7 +6,6 @@ import android.util.Log;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.dexmagic.HasStaticInvocationHandler;
-import com.tdrhq.eyepatch.mockito.MockitoClassHandler;
 import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;

@@ -6,6 +6,9 @@ import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.mockito.CompanionBuilder;
 import com.tdrhq.eyepatch.util.Checks;
+
+import org.mockito.Mockito;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static org.mockito.Mockito.mock;
@@ -44,7 +47,7 @@ public class MockitoClassHandler implements ClassHandler {
         this.companionBuilder = Checks.notNull(companionBuilder);
 
         companionClass = companionBuilder.build(klass, getClass().getClassLoader());
-        companionMock = mock(companionClass);
+        companionMock = Mockito.mock(companionClass);
     }
 
     @Override
@@ -78,7 +81,7 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     public void verifyStatic() {
-        Object result = verify(companionMock);
+        Object result = Mockito.verify(companionMock);
         if (result != companionMock) {
             throw new UnsupportedOperationException(
                     "uh oh, mockito returned another object on verify");
@@ -86,7 +89,7 @@ public class MockitoClassHandler implements ClassHandler {
     }
 
     public void resetStatic() {
-        companionMock = mock(companionClass);
+        companionMock = Mockito.mock(companionClass);
     }
 
 }
