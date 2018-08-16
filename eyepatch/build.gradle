@@ -48,9 +48,7 @@ dependencies {
     implementation 'org.mockito:mockito-core:2.21.0'
     implementation project(':iface')
     implementation 'com.google.guava:guava:25.1-android'
-
-    implementation 'junit:junit:4.12'
-
+    
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'org.mockito:mockito-core:2.21.0'
     androidTestImplementation 'org.smali:baksmali:2.2.4'
