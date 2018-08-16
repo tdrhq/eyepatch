@@ -43,11 +43,11 @@ dependencies {
     implementation 'com.linkedin.dexmaker:dexmaker:2.16.0'
     implementation 'org.smali:dexlib2:2.2.4'
 
-    implementation 'com.linkedin.dexmaker:dexmaker-mockito:2.16.0'
     implementation 'com.android.support.test:runner:1.0.2'
     implementation project(':iface')
     implementation 'com.google.guava:guava:25.1-android'
 
+    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.16.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'org.mockito:mockito-core:2.21.0'
     androidTestImplementation 'org.smali:baksmali:2.2.4'
