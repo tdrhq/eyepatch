@@ -18,10 +18,13 @@ iface-tests:
 runner-tests:
 	./gradlew :runner:connectedAndroidTest
 
+integration-tests:
+	./gradlew :integration:connectedAndroidTest
+
 clean:
 	./gradlew :clean :eyepatch:clean :runner:clean :iface:clean
 
 core-tests:
 	./gradlew :eyepatch:connectedAndroidTest
 
-jenkins: | iface-tests core-tests runner-tests
+jenkins: | iface-tests core-tests runner-tests integration-tests

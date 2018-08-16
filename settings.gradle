@@ -1,1 +1,1 @@
-include ':eyepatch', ':iface', ':runner'
+include ':eyepatch', ':iface', ':runner', ':integration'
