@@ -2,21 +2,20 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.runner.ClassHandlerProvider;
 import com.tdrhq.eyepatch.runner.EyePatchMockable;
 import com.tdrhq.eyepatch.runner.EyePatchTestRunner;
 import com.tdrhq.eyepatch.util.Checks;
-import com.tdrhq.eyepatch.util.SmaliPrinter;
-import java.io.File;
-import java.io.IOException;
+
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
 
 @EyePatchMockable({
   ConstructorsTests.FooChild.class,
@@ -24,20 +23,9 @@ import static org.junit.Assert.*;
 @RunWith(EyePatchTestRunner.class)
 public class ConstructorsTests {
     @ClassRule
-    public static EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
-    private SmaliPrinter smaliPrinter;
+    public static TemporaryFolder tmpdir = new TemporaryFolder();
 
-    private void setupSmaliPrinter() throws IOException {
-        smaliPrinter = new SmaliPrinter(tmpdir.newFolder("smalish"));
 
-        DexFileGenerator.debugPrinter = new DexFileGenerator.DebugPrinter() {
-                @Override
-                public void print(Class klass, File file) {
-                    smaliPrinter.printFromFile(file, klass.getName());
-                }
-            };
-
-    }
 
     @After
       public void after() throws Throwable {
