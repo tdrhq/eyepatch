@@ -19,6 +19,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+/**
+ * A "companion" class a class generated at runtime for another class, where all the static methods are made non-static.
+ *
+ * Technically, this is only required for mockito support. It's in the main eyepatch module because
+ * it doesn't have very many dependencies, and this package handles most of the dexmagic.
+ */
 public class CompanionBuilder {
     private File mDataDir;
     private static int counter = 0;
