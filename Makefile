@@ -27,4 +27,6 @@ clean:
 core-tests:
 	./gradlew :eyepatch:connectedAndroidTest
 
-jenkins: | iface-tests core-tests runner-tests integration-tests
+device-tests: |	core-tests runner-tests integration-tests
+
+jenkins: iface-tests device-tests
