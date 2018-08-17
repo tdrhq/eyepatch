@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.runner;
 
+import android.content.Context;
 import android.os.Build;
 
 public class DeviceValidator {
@@ -15,7 +16,7 @@ public class DeviceValidator {
             "YOu can do this by running: \n" +
             "  $ adb shell setprop " + DEXOPT_FLAG + " v=n,o=n";
 
-    public static void assertDeviceIsAcceptable() {
+    public static void assertDeviceIsAcceptable(Context context) {
         if (Build.VERSION.SDK_INT < 16) {
             throw new UnsupportedOperationException(
                     SDK_INT_MESSAGE);
@@ -25,7 +26,14 @@ public class DeviceValidator {
         if (Build.VERSION.SDK_INT < 21) {
             validateDexoptDisabled();
         }
-        
+
+        else if (Build.VERSION.SDK_INT <= 22) {
+            validateVmSafeMode();
+        }
+    }
+
+    private static void validateVmSafeMode() {
+
     }
 
     private static void validateDexoptDisabled() {

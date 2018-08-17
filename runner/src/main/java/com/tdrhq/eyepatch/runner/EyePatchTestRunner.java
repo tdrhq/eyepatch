@@ -11,6 +11,7 @@ import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.JUnit4;
 import org.junit.runners.model.InitializationError;
+import android.support.test.InstrumentationRegistry;
 
 /**
  * The main JUnit test runner used for all EyePatch tests.
@@ -21,7 +22,7 @@ public class EyePatchTestRunner extends Runner {
     private Runner delegate;
 
     public EyePatchTestRunner(Class<?> testClass) throws InitializationError {
-        DeviceValidator.assertDeviceIsAcceptable();
+        DeviceValidator.assertDeviceIsAcceptable(InstrumentationRegistry.getTargetContext());
         EyePatchMockable mockableAnnotation = testClass.getAnnotation(EyePatchMockable.class);
         List<Class> mockables = new ArrayList<>();
 
