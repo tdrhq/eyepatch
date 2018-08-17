@@ -35,5 +35,6 @@ runner-jvm-tests:
 jvm-tests: iface-tests runner-jvm-tests
 env:
 	env
+	adb shell pm list instrumentation
 
 jenkins: env jvm-tests device-tests
