@@ -21,15 +21,14 @@ public class DeviceValidator {
                     SDK_INT_MESSAGE);
         }
 
-        validateDexoptDisabled();
+
+        if (Build.VERSION.SDK_INT < 21) {
+            validateDexoptDisabled();
+        }
+        
     }
 
     private static void validateDexoptDisabled() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            return;
-        }
-
-
         if (!getDexOptFlag("v").equals("n") ||
             !getDexOptFlag("o").equals("n")) {
             throw new UnsupportedOperationException(DISABLE_DEXOPT_MESSAGE);
