@@ -17,6 +17,8 @@ public class DeviceValidator {
             "DexOpt needs to be disabled when running on KitKat or lower. " +
             "YOu can do this by running: \n" +
             "  $ adb shell setprop " + DEXOPT_FLAG + " v=n,o=n";
+    private static String VM_SAFE_MODE_MESSAGE =
+            "vmSafeMode needs to be enabled. In your manifest <application> tag add vmSafeMode=\"true\" attribute";
 
     public static void assertDeviceIsAcceptable(Context context) {
         if (Build.VERSION.SDK_INT < 16) {
@@ -29,9 +31,7 @@ public class DeviceValidator {
             validateDexoptDisabled();
         }
 
-        else if (Build.VERSION.SDK_INT <= 22) {
-            validateVmSafeMode(context);
-        }
+        validateVmSafeMode(context);
     }
 
     private static void validateVmSafeMode(Context context) {
@@ -41,7 +41,7 @@ public class DeviceValidator {
                     0
             );
             if ((appInfo.flags & ApplicationInfo.FLAG_VM_SAFE_MODE) == 0) {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException(VM_SAFE_MODE_MESSAGE);
             }
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);
