@@ -33,5 +33,7 @@ runner-jvm-tests:
 	./gradlew :eyepatch:test
 
 jvm-tests: iface-tests runner-jvm-tests
+env:
+	env
 
-jenkins: jvm-tests device-tests
+jenkins: env jvm-tests device-tests
