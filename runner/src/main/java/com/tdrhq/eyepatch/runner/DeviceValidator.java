@@ -3,6 +3,8 @@
 package com.tdrhq.eyepatch.runner;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 
 public class DeviceValidator {
@@ -28,12 +30,22 @@ public class DeviceValidator {
         }
 
         else if (Build.VERSION.SDK_INT <= 22) {
-            validateVmSafeMode();
+            validateVmSafeMode(context);
         }
     }
 
-    private static void validateVmSafeMode() {
-
+    private static void validateVmSafeMode(Context context) {
+        try {
+            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(
+                    context.getPackageName(),
+                    0
+            );
+            if ((appInfo.flags & ApplicationInfo.FLAG_VM_SAFE_MODE) == 0) {
+                throw new UnsupportedOperationException();
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void validateDexoptDisabled() {
