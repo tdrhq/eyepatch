@@ -27,7 +27,7 @@ clean:
 core-tests:
 	./gradlew :eyepatch:connectedAndroidTest
 
-device-tests: |	core-tests runner-tests integration-tests
+device-tests: |	env core-tests runner-tests integration-tests
 
 runner-jvm-tests:
 	./gradlew :eyepatch:test
@@ -37,4 +37,4 @@ env:
 	env
 	adb shell pm list instrumentation
 
-jenkins: env jvm-tests device-tests
+jenkins: jvm-tests device-tests
