@@ -157,30 +157,27 @@ public class EyePatchClassLoader extends ClassLoader
 
     @Override
     public void verifyStatic(Class klass) {
-        for (ClassHandler handler : classHandlerProvider.getClassHandlers()) {
-            if (handler.getResponsibility() == klass) {
-                if (!(isMockitoClassHandler(handler))) {
-                    throw new RuntimeException("can't verify against this class");
-                }
-                Whitebox.invoke(handler, "verifyStatic");
-                return;
+        ClassHandler handler = classHandlerProvider.getClassHandler(klass);
+        if (handler.getResponsibility() == klass) {
+            if (!(isMockitoClassHandler(handler))) {
+                throw new RuntimeException("can't verify against this class");
             }
+            Whitebox.invoke(handler, "verifyStatic");
+            return;
         }
-
         throw new IllegalStateException("Could not find handler for: " +
                                         klass.getName());
     }
 
     @Override
     public void resetStatic(Class klass) {
-        for (ClassHandler handler : classHandlerProvider.getClassHandlers()) {
-            if (handler.getResponsibility() == klass) {
-                if (!isMockitoClassHandler(handler)) {
-                    throw new RuntimeException("can't verify against this class");
-                }
-                Whitebox.invoke(handler, "resetStatic");
-                return;
+        ClassHandler handler = classHandlerProvider.getClassHandler(klass);
+        if (handler.getResponsibility() == klass) {
+            if (!isMockitoClassHandler(handler)) {
+                throw new RuntimeException("can't verify against this class");
             }
+            Whitebox.invoke(handler, "resetStatic");
+            return;
         }
 
         throw new IllegalStateException("Could not find handler for: " +
