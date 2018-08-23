@@ -32,7 +32,6 @@ public class EyePatchClassLoader extends ClassLoader
     private StaticInvocationHandler mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
-    Map<String, Class> mockedClasses = new HashMap<>();
     private ClassHandlerProvider classHandlerProvider;
 
 
@@ -44,10 +43,7 @@ public class EyePatchClassLoader extends ClassLoader
 
     public void setClassHandlers(List<ClassHandler> classHandlers) {
         classHandlerProvider = new ClassHandlerProvider(classHandlers);
-        for (ClassHandler classHandler : classHandlerProvider.getClassHandlers()) {
-            String className = classHandler.getResponsibility().getName();
-            mockedClasses.put(className, classHandler.getResponsibility());
-        }
+
         mStaticInvocationHandler = DefaultInvocationHandler
                 .newInstance(classHandlerProvider);
     }
