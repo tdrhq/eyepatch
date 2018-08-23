@@ -42,10 +42,14 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     public void setClassHandlers(List<ClassHandler> classHandlers) {
-        classHandlerProvider = new ClassHandlerProvider(classHandlers);
+        ClassHandlerProvider classHandlerProvider = new ClassHandlerProvider(classHandlers);
+        setClassHandlerProvider(classHandlerProvider);
+    }
 
+    private void setClassHandlerProvider(ClassHandlerProvider classHandlerProvider) {
+        this.classHandlerProvider = classHandlerProvider;
         mStaticInvocationHandler = DefaultInvocationHandler
-                .newInstance(classHandlerProvider);
+                .newInstance(this.classHandlerProvider);
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
