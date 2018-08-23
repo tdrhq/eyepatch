@@ -15,4 +15,18 @@ public class ClassHandlerProvider {
         this.classHandlers = Checks.notNull(classHandlers);
     }
 
+    /**
+     * Find the ClassHandler for the given class. Since the class is already pre-created, it's assumed that the ClassHandler already exists.
+     *
+     * @param klass
+     * @return
+     */
+    public ClassHandler getClassHandler(Class klass) {
+        for (ClassHandler classHandler : classHandlers) {
+            if (classHandler.getResponsibility() == klass) {
+                return classHandler;
+            }
+        }
+        throw new IllegalArgumentException("could not find handler for class: " + klass);
+    }
 }

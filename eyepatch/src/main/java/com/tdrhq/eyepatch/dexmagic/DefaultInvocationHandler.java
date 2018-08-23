@@ -6,24 +6,14 @@ import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class DefaultInvocationHandler implements StaticInvocationHandler {
 
-    private List<? extends ClassHandler> prebuiltHandlers;
-    private final Map<Class, ClassHandler> classHandlerMap = new HashMap<>();
+    private ClassHandlerProvider classHandlerProvider;
 
     DefaultInvocationHandler(
-            List<? extends ClassHandler> prebuiltHandlers) {
-        this.prebuiltHandlers = prebuiltHandlers;
+            ClassHandlerProvider classHandlerProvider) {
 
-        for (ClassHandler classHandler : prebuiltHandlers) {
-            classHandlerMap.put(
-                    classHandler.getResponsibility(),
-                    classHandler);
-        }
+        this.classHandlerProvider = classHandlerProvider;
     }
 
     @Override
@@ -33,7 +23,7 @@ public class DefaultInvocationHandler implements StaticInvocationHandler {
     }
 
     final ClassHandler getClassHandler(Class klass) {
-        ClassHandler ret = classHandlerMap.get(klass);
+        ClassHandler ret = classHandlerProvider.getClassHandler(klass);
 
         if (ret == null) {
             throw new RuntimeException("No class handler for class: " + klass.getName());
@@ -43,6 +33,6 @@ public class DefaultInvocationHandler implements StaticInvocationHandler {
     }
 
     public static DefaultInvocationHandler newInstance(ClassHandlerProvider provider) {
-        return new DefaultInvocationHandler(provider.getClassHandlers());
+        return new DefaultInvocationHandler(provider);
     }
 }
