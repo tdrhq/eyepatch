@@ -54,10 +54,6 @@ public class EyePatchClassLoader extends ClassLoader
                 .newInstance(classHandlerProvider);
     }
 
-    private Set<String> getMockables() {
-        return mockables;
-    }
-
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         if (mockedClasses.containsKey(name)) {
             return mockedClasses.get(name);
