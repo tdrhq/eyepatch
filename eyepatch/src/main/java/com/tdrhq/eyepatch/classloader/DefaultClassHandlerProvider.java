@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DefaultClassHandlerProvider {
+public class DefaultClassHandlerProvider implements ClassHandlerProvider {
     private Map<String, ClassHandler> mockedClasses = new HashMap<>();
     private List<ClassHandler> classHandlers;
 
@@ -22,20 +22,17 @@ public class DefaultClassHandlerProvider {
         }
     }
 
-    /**
-     * Find the ClassHandler for the given class. Since the class is already pre-created, it's assumed that the ClassHandler already exists.
-     *
-     * @param klass
-     * @return
-     */
+    @Override
     public ClassHandler getClassHandler(Class klass) {
        return getClassHandler(klass.getName());
     }
 
+    @Override
     public boolean hasClassHandler(String name) {
         return mockedClasses.containsKey(name);
     }
 
+    @Override
     public ClassHandler getClassHandler(String name) {
         return mockedClasses.get(name);
     }

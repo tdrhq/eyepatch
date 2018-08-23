@@ -28,7 +28,7 @@ public class EyePatchClassLoader extends ClassLoader
     private StaticInvocationHandler mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
-    private DefaultClassHandlerProvider classHandlerProvider;
+    private ClassHandlerProvider classHandlerProvider;
 
 
     public EyePatchClassLoader(ClassLoader realClassLoader) {
@@ -42,7 +42,7 @@ public class EyePatchClassLoader extends ClassLoader
         setClassHandlerProvider(classHandlerProvider);
     }
 
-    public void setClassHandlerProvider(DefaultClassHandlerProvider classHandlerProvider) {
+    public void setClassHandlerProvider(ClassHandlerProvider classHandlerProvider) {
         this.classHandlerProvider = classHandlerProvider;
         mStaticInvocationHandler = DefaultInvocationHandler
                 .newInstance(this.classHandlerProvider);
