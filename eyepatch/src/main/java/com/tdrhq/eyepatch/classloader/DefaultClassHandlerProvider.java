@@ -9,15 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ClassHandlerProvider {
-    public List<ClassHandler> getClassHandlers() {
-        return classHandlers;
-    }
-
+public class DefaultClassHandlerProvider {
     private Map<String, ClassHandler> mockedClasses = new HashMap<>();
+    private List<ClassHandler> classHandlers;
 
-    List<ClassHandler> classHandlers;
-    public ClassHandlerProvider(List<ClassHandler> classHandlers) {
+    public DefaultClassHandlerProvider(List<ClassHandler> classHandlers) {
         this.classHandlers = Checks.notNull(classHandlers);
 
         for (ClassHandler classHandler : classHandlers) {
@@ -33,12 +29,7 @@ public class ClassHandlerProvider {
      * @return
      */
     public ClassHandler getClassHandler(Class klass) {
-        for (ClassHandler classHandler : classHandlers) {
-            if (classHandler.getResponsibility() == klass) {
-                return classHandler;
-            }
-        }
-        throw new IllegalArgumentException("could not find handler for class: " + klass);
+       return getClassHandler(klass.getName());
     }
 
     public boolean hasClassHandler(String name) {

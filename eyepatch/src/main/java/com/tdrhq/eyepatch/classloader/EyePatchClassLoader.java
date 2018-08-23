@@ -16,11 +16,7 @@ import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A class-loader that's kind of like the build-in Android class
@@ -32,21 +28,21 @@ public class EyePatchClassLoader extends ClassLoader
     private StaticInvocationHandler mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
-    private ClassHandlerProvider classHandlerProvider;
+    private DefaultClassHandlerProvider classHandlerProvider;
 
 
     public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
-        classHandlerProvider = new ClassHandlerProvider(new ArrayList<ClassHandler>());
+        classHandlerProvider = new DefaultClassHandlerProvider(new ArrayList<ClassHandler>());
     }
 
     public void setClassHandlers(List<ClassHandler> classHandlers) {
-        ClassHandlerProvider classHandlerProvider = new ClassHandlerProvider(classHandlers);
+        DefaultClassHandlerProvider classHandlerProvider = new DefaultClassHandlerProvider(classHandlers);
         setClassHandlerProvider(classHandlerProvider);
     }
 
-    private void setClassHandlerProvider(ClassHandlerProvider classHandlerProvider) {
+    public void setClassHandlerProvider(DefaultClassHandlerProvider classHandlerProvider) {
         this.classHandlerProvider = classHandlerProvider;
         mStaticInvocationHandler = DefaultInvocationHandler
                 .newInstance(this.classHandlerProvider);

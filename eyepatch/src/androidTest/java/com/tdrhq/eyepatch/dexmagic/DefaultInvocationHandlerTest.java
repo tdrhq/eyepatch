@@ -1,6 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
+import com.tdrhq.eyepatch.classloader.DefaultClassHandlerProvider;
 import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
@@ -25,7 +25,7 @@ public class DefaultInvocationHandlerTest {
         handlers.add(new SimpleClassHandler(Foo.class));
         handlers.add(new SimpleClassHandler(Bar.class));
 
-        handler = new DefaultInvocationHandler(new ClassHandlerProvider(handlers));
+        handler = new DefaultInvocationHandler(new DefaultClassHandlerProvider(handlers));
     }
 
     static class SimpleClassHandler implements ClassHandler {
