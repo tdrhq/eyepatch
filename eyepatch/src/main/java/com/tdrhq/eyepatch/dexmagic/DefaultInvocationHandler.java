@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 
@@ -41,7 +42,7 @@ public class DefaultInvocationHandler implements StaticInvocationHandler {
         return ret;
     }
 
-    public static DefaultInvocationHandler newInstance(List<? extends ClassHandler> handlers) {
-        return new DefaultInvocationHandler(handlers);
+    public static DefaultInvocationHandler newInstance(ClassHandlerProvider provider) {
+        return new DefaultInvocationHandler(provider.getClassHandlers());
     }
 }

@@ -32,9 +32,9 @@ public class EyePatchClassLoader extends ClassLoader
     private StaticInvocationHandler mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
-    List<ClassHandler> classHandlers;
     Set<String> mockables = new HashSet<>();
     Map<String, Class> mockedClasses = new HashMap<>();
+    private ClassHandlerProvider classHandlerProvider;
 
 
     public EyePatchClassLoader(ClassLoader realClassLoader) {
@@ -43,15 +43,15 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     public void setClassHandlers(List<ClassHandler> classHandlers) {
-        this.classHandlers = Checks.notNull(classHandlers);
+        classHandlerProvider = new ClassHandlerProvider(classHandlers);
         this.mockables = new HashSet<>(mockables);
-        for (ClassHandler classHandler : classHandlers) {
+        for (ClassHandler classHandler : classHandlerProvider.getClassHandlers()) {
             String className = classHandler.getResponsibility().getName();
             this.mockables.add(className);
             mockedClasses.put(className, classHandler.getResponsibility());
         }
         mStaticInvocationHandler = DefaultInvocationHandler
-                .newInstance(classHandlers);
+                .newInstance(classHandlerProvider);
     }
 
     public Set<String> getMockables() {
@@ -157,7 +157,7 @@ public class EyePatchClassLoader extends ClassLoader
 
     @Override
     public void verifyStatic(Class klass) {
-        for (ClassHandler handler : classHandlers) {
+        for (ClassHandler handler : classHandlerProvider.getClassHandlers()) {
             if (handler.getResponsibility() == klass) {
                 if (!(isMockitoClassHandler(handler))) {
                     throw new RuntimeException("can't verify against this class");
@@ -173,7 +173,7 @@ public class EyePatchClassLoader extends ClassLoader
 
     @Override
     public void resetStatic(Class klass) {
-        for (ClassHandler handler : classHandlers) {
+        for (ClassHandler handler : classHandlerProvider.getClassHandlers()) {
             if (handler.getResponsibility() == klass) {
                 if (!isMockitoClassHandler(handler)) {
                     throw new RuntimeException("can't verify against this class");
