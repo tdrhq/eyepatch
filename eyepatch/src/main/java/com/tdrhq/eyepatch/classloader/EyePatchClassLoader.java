@@ -54,7 +54,7 @@ public class EyePatchClassLoader extends ClassLoader
                 .newInstance(classHandlerProvider);
     }
 
-    public Set<String> getMockables() {
+    private Set<String> getMockables() {
         return mockables;
     }
 
