@@ -32,7 +32,6 @@ public class EyePatchClassLoader extends ClassLoader
     private StaticInvocationHandler mStaticInvocationHandler;
 
     List<DexFile> dexFiles = new ArrayList<>();
-    Set<String> mockables = new HashSet<>();
     Map<String, Class> mockedClasses = new HashMap<>();
     private ClassHandlerProvider classHandlerProvider;
 
@@ -40,14 +39,13 @@ public class EyePatchClassLoader extends ClassLoader
     public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
+        classHandlerProvider = new ClassHandlerProvider(new ArrayList<ClassHandler>());
     }
 
     public void setClassHandlers(List<ClassHandler> classHandlers) {
         classHandlerProvider = new ClassHandlerProvider(classHandlers);
-        this.mockables = new HashSet<>(mockables);
         for (ClassHandler classHandler : classHandlerProvider.getClassHandlers()) {
             String className = classHandler.getResponsibility().getName();
-            this.mockables.add(className);
             mockedClasses.put(className, classHandler.getResponsibility());
         }
         mStaticInvocationHandler = DefaultInvocationHandler
@@ -55,8 +53,8 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (mockedClasses.containsKey(name)) {
-            return mockedClasses.get(name);
+        if (classHandlerProvider.hasClassHandler(name)) {
+            return classHandlerProvider.getClassHandler(name).getResponsibility();
         }
 
         if (isBlacklisted(name)) {
@@ -72,9 +70,6 @@ public class EyePatchClassLoader extends ClassLoader
         }
     }
 
-    private boolean isMockable(String name) {
-        return mockables.contains(name);
-    }
 
     /**
      * If anything is blacklisted, all its dependencies *must* be
