@@ -94,13 +94,6 @@ public class EyePatchTestRunnerTest {
         return (EyePatchClassLoader) getClass().getClassLoader();
     }
 
-    @Test
-    public void testGetMockables() throws Throwable {
-        assertThat(
-                getTestClassLoader().getMockables(),
-                containsInAnyOrder(Mockable.class.getName(),
-                                   AnotherMockable.class.getName()));
-    }
 
     @Test
     public void testHandlerWithAnnotation() throws Throwable {
