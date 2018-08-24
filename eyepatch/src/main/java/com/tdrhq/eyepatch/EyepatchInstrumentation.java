@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.os.Bundle;
 
+import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
 import com.tdrhq.eyepatch.classloader.DefaultClassHandlerProvider;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 
@@ -18,14 +19,14 @@ public class EyepatchInstrumentation extends Instrumentation {
 
     private EyePatchClassLoader classLoader;
 
-    public void setClassHandlerProvider(DefaultClassHandlerProvider classHandlerProvider) {
+    public void setClassHandlerProvider(ClassHandlerProvider classHandlerProvider) {
         if (classHandlerProvider != null) {
             throw new IllegalStateException("cannot set class handler provider multiple times");
         }
         this.classHandlerProvider = classHandlerProvider;
     }
 
-    private DefaultClassHandlerProvider classHandlerProvider;
+    private ClassHandlerProvider classHandlerProvider;
 
     @Override
     public void onCreate(Bundle arguments) {
