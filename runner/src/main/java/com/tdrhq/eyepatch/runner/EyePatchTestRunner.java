@@ -13,6 +13,8 @@ import org.junit.runners.JUnit4;
 import org.junit.runners.model.InitializationError;
 import android.support.test.InstrumentationRegistry;
 
+import com.tdrhq.eyepatch.util.DeviceValidator;
+
 /**
  * The main JUnit test runner used for all EyePatch tests.
  *

@@ -1,4 +1,6 @@
-package com.tdrhq.eyepatch.runner;
+package com.tdrhq.eyepatch.util;
+
+import com.tdrhq.eyepatch.util.DeviceValidator;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
