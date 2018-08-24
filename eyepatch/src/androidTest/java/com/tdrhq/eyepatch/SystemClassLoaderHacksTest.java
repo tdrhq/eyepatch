@@ -21,5 +21,8 @@ public class SystemClassLoaderHacksTest {
 
     @Test
     public void testPreconditions() {
+        // in theory this should do nothing, but at least it verifies all
+        // our reflection is in order.
+        SystemClassLoaderHacks.registerSystemClassLoader(oldClassLoader);
     }
 }
