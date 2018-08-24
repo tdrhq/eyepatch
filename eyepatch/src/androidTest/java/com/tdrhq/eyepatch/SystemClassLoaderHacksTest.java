@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch;
 
+import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import org.junit.After;
@@ -36,7 +37,17 @@ public class SystemClassLoaderHacksTest {
     }
 
     @Test
-    public void validate() {
-        SystemClassLoaderHacks.validateClassLoaderCaches(InstrumentationRegistry.getTargetContext());
+    public void validate() throws ClassNotFoundException {
+        assertNotNull(InstrumentationRegistry.getTargetContext().getClassLoader().loadClass("org.junit.Test"));
+    }
+
+    @Test
+    public void systemClassLoaderCantLoadClass() {
+        try {
+            ClassLoader.getSystemClassLoader().loadClass("org.junit.Test");
+            fail("expected exception");
+        } catch (ClassNotFoundException e) {
+            // expected
+        }
     }
 }

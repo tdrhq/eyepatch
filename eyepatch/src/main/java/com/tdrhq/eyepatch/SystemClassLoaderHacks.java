@@ -19,11 +19,21 @@ public class SystemClassLoaderHacks {
         try {
             Class contextImpl = Class.forName("android.app.ContextImpl");
 
+            String loadedApkFieldName = "mPackageInfo";
             if (Build.VERSION.SDK_INT >= 26) {
                 ClassLoader actual = (ClassLoader) Whitebox.getField(context, contextImpl, "mClassLoader");
                 if (actual != null && expected != actual) {
                     throw new RuntimeException("ContextImpl/mClassLoader is out of sync");
                 }
+
+                loadedApkFieldName = "mLoadedApk";
+            }
+
+            Object loadedApk = Whitebox.getField(context, contextImpl, loadedApkFieldName);
+            Class loadedApkClass = Class.forName("android.app.LoadedApk");
+            ClassLoader actual = (ClassLoader) Whitebox.getField(loadedApk, loadedApkClass, "mClassLoader");
+            if (actual != null && expected != actual) {
+                throw new RuntimeException("LoadedApk/mClassLoader is out of sync: " + actual + " vs " + expected);
             }
 
         } catch (ClassNotFoundException e) {
