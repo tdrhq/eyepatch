@@ -92,6 +92,21 @@ public class Whitebox {
         }
     }
 
+    public static void setField(Object instance, Class type, String fieldName, Object value) {
+        try {
+            Field field = type.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(instance, value);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(
+                    "No such field, should be one of: " +
+                            getFieldList(type),
+                    e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static String getFieldList(Class type) {
         Field[] fields = type.getDeclaredFields();
         String ret = "";

@@ -6,22 +6,30 @@ import android.os.Build;
 import com.tdrhq.eyepatch.util.Whitebox;
 
 public class SystemClassLoaderHacks {
-    public static void registerSystemClassLoader(ClassLoader classLoader) {
-        setSystemClassLoader(classLoader);
+
+    public static void validateSystemClassLoader(Context context, ClassLoader classLoader) {
+        registerSystemClassLoader(context, classLoader, true);
     }
 
-    public static void validateClassLoaderCaches(Context context) {
-        ClassLoader expected = (ClassLoader) Whitebox.getStaticField(
-                SYSTEM_CLASS_LOADER(),
-                "loader"
-        );
+    public static void registerSystemClassLoader(Context context, ClassLoader classLoader) {
+        registerSystemClassLoader(context, classLoader, false);
+    }
+
+    private static void registerSystemClassLoader(Context context, ClassLoader classLoader, boolean validate) {
+        ClassLoader expected = classLoader;
 
         try {
             Class contextImpl = Class.forName("android.app.ContextImpl");
 
             String loadedApkFieldName = "mPackageInfo";
+            String M_CLASS_LOADER = "mClassLoader";
             if (Build.VERSION.SDK_INT >= 26) {
-                ClassLoader actual = (ClassLoader) Whitebox.getField(context, contextImpl, "mClassLoader");
+
+                if (!validate) {
+                    Whitebox.setField(context, contextImpl, M_CLASS_LOADER, classLoader);
+                }
+
+                ClassLoader actual = (ClassLoader) Whitebox.getField(context, contextImpl, M_CLASS_LOADER);
                 if (actual != null && expected != actual) {
                     throw new RuntimeException("ContextImpl/mClassLoader is out of sync");
                 }
@@ -31,7 +39,12 @@ public class SystemClassLoaderHacks {
 
             Object loadedApk = Whitebox.getField(context, contextImpl, loadedApkFieldName);
             Class loadedApkClass = Class.forName("android.app.LoadedApk");
-            ClassLoader actual = (ClassLoader) Whitebox.getField(loadedApk, loadedApkClass, "mClassLoader");
+
+            if (!validate) {
+                Whitebox.setField(loadedApk, loadedApkClass, M_CLASS_LOADER, classLoader);
+            }
+
+            ClassLoader actual = (ClassLoader) Whitebox.getField(loadedApk, loadedApkClass, M_CLASS_LOADER);
             if (actual != null && expected != actual) {
                 throw new RuntimeException("LoadedApk/mClassLoader is out of sync: " + actual + " vs " + expected);
             }
@@ -43,12 +56,6 @@ public class SystemClassLoaderHacks {
 
     }
 
-    static void setSystemClassLoader(ClassLoader classLoader) {
-
-            Class klass = SYSTEM_CLASS_LOADER();
-            Whitebox.setStaticField(klass, "loader", classLoader);
-
-    }
 
     private static Class<?> SYSTEM_CLASS_LOADER() {
         try {
