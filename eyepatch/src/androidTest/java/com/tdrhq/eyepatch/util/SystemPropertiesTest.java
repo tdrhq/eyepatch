@@ -1,4 +1,4 @@
-package com.tdrhq.eyepatch.runner;
+package com.tdrhq.eyepatch.util;
 
 import com.tdrhq.eyepatch.util.SystemProperties;
 
