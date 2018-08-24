@@ -1,5 +1,7 @@
 package com.tdrhq.eyepatch;
 
+import android.support.test.InstrumentationRegistry;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,5 +33,10 @@ public class SystemClassLoaderHacksTest {
     @Test
     public void testTypeOfSystemCL() {
         assertEquals(PathClassLoader.class, ClassLoader.getSystemClassLoader().getClass());
+    }
+
+    @Test
+    public void validate() {
+        SystemClassLoaderHacks.validateClassLoaderCaches(InstrumentationRegistry.getTargetContext());
     }
 }
