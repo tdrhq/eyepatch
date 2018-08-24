@@ -20,7 +20,7 @@ public class EyepatchInstrumentation extends Instrumentation {
     private EyePatchClassLoader classLoader;
 
     public void setClassHandlerProvider(ClassHandlerProvider classHandlerProvider) {
-        if (classHandlerProvider != null) {
+        if (this.classHandlerProvider != null) {
             throw new IllegalStateException("cannot set class handler provider multiple times");
         }
         this.classHandlerProvider = classHandlerProvider;
