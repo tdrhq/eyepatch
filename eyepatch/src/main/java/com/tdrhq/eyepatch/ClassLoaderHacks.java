@@ -5,17 +5,17 @@ import android.os.Build;
 
 import com.tdrhq.eyepatch.util.Whitebox;
 
-public class SystemClassLoaderHacks {
+public class ClassLoaderHacks {
 
-    public static void validateSystemClassLoader(Context context, ClassLoader classLoader) {
-        registerSystemClassLoader(context, classLoader, true);
+    public static void validateAppClassLoader(Context context, ClassLoader classLoader) {
+        registerAppClassLoader(context, classLoader, true);
     }
 
-    public static void registerSystemClassLoader(Context context, ClassLoader classLoader) {
-        registerSystemClassLoader(context, classLoader, false);
+    public static void registerAppClassLoader(Context context, ClassLoader classLoader) {
+        registerAppClassLoader(context, classLoader, false);
     }
 
-    private static void registerSystemClassLoader(Context context, ClassLoader classLoader, boolean validate) {
+    private static void registerAppClassLoader(Context context, ClassLoader classLoader, boolean validate) {
         ClassLoader expected = classLoader;
 
         try {

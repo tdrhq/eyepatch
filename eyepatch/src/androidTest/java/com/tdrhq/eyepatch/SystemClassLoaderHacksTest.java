@@ -29,7 +29,7 @@ public class SystemClassLoaderHacksTest {
     public void testPreconditions() {
         // in theory this should do nothing, but at least it verifies all
         // our reflection is in order.
-        SystemClassLoaderHacks.validateSystemClassLoader(context, context.getClassLoader());
+        ClassLoaderHacks.validateAppClassLoader(context, context.getClassLoader());
     }
 
     @Test
