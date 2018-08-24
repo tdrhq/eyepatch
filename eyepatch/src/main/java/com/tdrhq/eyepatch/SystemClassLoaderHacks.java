@@ -7,7 +7,7 @@ public class SystemClassLoaderHacks {
         setSystemClassLoader(classLoader);
     }
 
-    private static void setSystemClassLoader(ClassLoader classLoader) {
+    static void setSystemClassLoader(ClassLoader classLoader) {
 
         try {
             Class klass = Class.forName("java.lang.ClassLoader$SystemClassLoader");
