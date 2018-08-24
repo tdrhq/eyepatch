@@ -3,6 +3,7 @@ package com.tdrhq.eyepatch;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
 import com.tdrhq.eyepatch.classloader.DefaultClassHandlerProvider;
@@ -33,7 +34,11 @@ public class EyepatchInstrumentation extends Instrumentation {
         if (classHandlerProvider == null) {
             throw new RuntimeException("need to set classHandlerProvider before calling onCreate");
         }
-        classLoader = new EyePatchClassLoader(getClass().getClassLoader());
+
+        ClassLoader oldClassLoader = getTargetContext().getClassLoader();
+        Log.i("EyePatchClassLoader", "Old classloader is: " + oldClassLoader);
+        classLoader = new EyePatchClassLoader(oldClassLoader);
+        Log.i("EyePatchClassLoader", "New classloader is: " + classLoader);
         classLoader.setClassHandlerProvider(classHandlerProvider);
         ClassLoaderHacks.registerAppClassLoader(
                 getTargetContext(),
