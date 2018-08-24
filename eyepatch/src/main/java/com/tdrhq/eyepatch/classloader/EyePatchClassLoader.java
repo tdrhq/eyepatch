@@ -105,7 +105,6 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     public Class<?> findClass(String name) throws ClassNotFoundException {
-        Log.i("EyePatchClassLoader", "totally getting there");
         if (dexFiles.size() == 0) {
             try {
                 buildDexFiles();
@@ -115,17 +114,14 @@ public class EyePatchClassLoader extends ClassLoader
             }
         }
 
-        Log.i("EyePatchClassLoader", "Getting started");
         for (DexFile dexFile : dexFiles) {
             Class klass;
             klass = dexFile.loadClass(name, this);
             if (klass != null) {
-                Log.i("EyePatchClassLoader", "found stuff");
                 return klass;
             }
         }
 
-        Log.i("EyePatchClassLoader", "did not find the stuff");
         throw new ClassNotFoundException(name);
     }
 
