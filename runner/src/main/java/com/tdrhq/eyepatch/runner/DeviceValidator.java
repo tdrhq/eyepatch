@@ -7,6 +7,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import com.tdrhq.eyepatch.util.SystemProperties;
+
 public class DeviceValidator {
     private static final String SDK_INT_MESSAGE =
             "EyePatch is only supported on Jellybean or higher devices.\n";

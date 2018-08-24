@@ -1,5 +1,7 @@
 package com.tdrhq.eyepatch.runner;
 
+import com.tdrhq.eyepatch.util.SystemProperties;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
