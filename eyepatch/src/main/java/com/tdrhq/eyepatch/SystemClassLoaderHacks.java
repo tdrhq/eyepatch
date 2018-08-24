@@ -26,7 +26,9 @@ public class SystemClassLoaderHacks {
             if (Build.VERSION.SDK_INT >= 26) {
 
                 if (!validate) {
-                    Whitebox.setField(context, contextImpl, M_CLASS_LOADER, classLoader);
+                    if (Whitebox.getField(context, contextImpl, M_CLASS_LOADER) != null) {
+                        Whitebox.setField(context, contextImpl, M_CLASS_LOADER, classLoader);
+                    }
                 }
 
                 ClassLoader actual = (ClassLoader) Whitebox.getField(context, contextImpl, M_CLASS_LOADER);
