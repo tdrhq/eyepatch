@@ -44,9 +44,9 @@ public class EyepatchInstrumentation extends Instrumentation {
 
         if (classLoader != null) {
             classLoader = new EyePatchClassLoader(oldClassLoader);
+            Log.i("EyePatchClassLoader", "New classloader is: " + classLoader);
+            classLoader.setClassHandlerProvider(classHandlerProvider);
         }
-        Log.i("EyePatchClassLoader", "New classloader is: " + classLoader);
-        classLoader.setClassHandlerProvider(classHandlerProvider);
         ClassLoaderHacks.registerAppClassLoader(
                 getTargetContext(),
                 classLoader
