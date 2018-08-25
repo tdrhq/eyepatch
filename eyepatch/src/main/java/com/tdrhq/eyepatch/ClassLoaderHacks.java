@@ -35,7 +35,9 @@ public class ClassLoaderHacks {
                 if (actual != null && expected != actual) {
                     throw new RuntimeException("ContextImpl/mClassLoader is out of sync");
                 }
+            }
 
+            if (Build.VERSION.SDK_INT >= 27) {
                 loadedApkFieldName = "mLoadedApk";
             }
 
