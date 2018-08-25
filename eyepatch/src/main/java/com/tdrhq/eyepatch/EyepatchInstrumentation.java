@@ -28,6 +28,9 @@ public class EyepatchInstrumentation extends Instrumentation {
     }
 
     public void setClassLoader(EyePatchClassLoader classLoader) {
+        if (this.classLoader != null) {
+            throw new IllegalStateException("cannot multiply set classloader");
+        }
         this.classLoader = classLoader;
     }
 

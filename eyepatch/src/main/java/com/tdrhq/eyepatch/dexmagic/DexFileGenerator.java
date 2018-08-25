@@ -22,6 +22,7 @@ import com.tdrhq.eyepatch.util.Util;
 public class DexFileGenerator {
 
     public static DebugPrinter debugPrinter = null;
+    public static int SYNTHETIC = 0x1000; // hidden in Modifiers
 
     public interface DebugPrinter {
         public void print(Class klass, File dexFile);
@@ -74,6 +75,9 @@ public class DexFileGenerator {
         dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.get(original.getSuperclass()));
 
         for (Field field : original.getDeclaredFields()) {
+            if ((field.getModifiers() & SYNTHETIC) != 0) {
+                continue;
+            }
             generateField(dexmaker, field, typeId);
         }
 
@@ -83,7 +87,6 @@ public class DexFileGenerator {
         }
 
         for (Method methodTemplate : Sorter.sortMethods(original.getDeclaredMethods())) {
-            int SYNTHETIC = 0x1000; // hidden in Modifiers
             if ((methodTemplate.getModifiers() & SYNTHETIC) != 0) {
                 // unsupported, we'll let the merge phase fix it
                 continue;
