@@ -27,6 +27,10 @@ public class EyepatchInstrumentation extends Instrumentation {
         this.classHandlerProvider = classHandlerProvider;
     }
 
+    public void setClassLoader(EyePatchClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
     private ClassHandlerProvider classHandlerProvider;
 
     @Override
@@ -37,7 +41,10 @@ public class EyepatchInstrumentation extends Instrumentation {
 
         ClassLoader oldClassLoader = getTargetContext().getClassLoader();
         Log.i("EyePatchClassLoader", "Old classloader is: " + oldClassLoader);
-        classLoader = new EyePatchClassLoader(oldClassLoader);
+
+        if (classLoader != null) {
+            classLoader = new EyePatchClassLoader(oldClassLoader);
+        }
         Log.i("EyePatchClassLoader", "New classloader is: " + classLoader);
         classLoader.setClassHandlerProvider(classHandlerProvider);
         ClassLoaderHacks.registerAppClassLoader(
