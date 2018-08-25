@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
@@ -38,6 +39,7 @@ import org.jf.dexlib2.writer.pool.DexPool;
  * implementation.
  */
 public class Merger {
+
     public Merger() {
     }
 
@@ -97,6 +99,12 @@ public class Merger {
             List<Method> methods = Sorter.sortDexlibMethods(Lists.newArrayList(template.getMethods()));
             for (Method method : realClass.getMethods()) {
                 if (method.getName().equals("<clinit>")) {
+                    continue;
+                }
+
+                if ((method.getAccessFlags() & AccessFlags.SYNTHETIC.getValue()) != 0) {
+                    // leave synthetic method as is
+                    methods.add(method);
                     continue;
                 }
 
