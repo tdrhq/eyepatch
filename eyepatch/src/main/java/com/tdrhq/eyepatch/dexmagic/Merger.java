@@ -16,6 +16,7 @@ import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
+import org.jf.dexlib2.iface.Field;
 import org.jf.dexlib2.iface.Method;
 import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.MethodParameter;
@@ -96,9 +97,19 @@ public class Merger {
                 }
             }
 
+            List<Field> fields = Lists.newArrayList(template.getFields());
+
+            for (Field field : realClass.getFields()) {
+                if ((field.getAccessFlags() & AccessFlags.SYNTHETIC.getValue()) != 0) {
+                    // Add back synthetic fields
+                    fields.add(field);
+                }
+            }
+
             List<Method> methods = Sorter.sortDexlibMethods(Lists.newArrayList(template.getMethods()));
             for (Method method : realClass.getMethods()) {
                 if (method.getName().equals("<clinit>")) {
+                    methods.add(method);
                     continue;
                 }
 
@@ -139,7 +150,7 @@ public class Merger {
                     template.getInterfaces(),
                     template.getSourceFile(),
                     template.getAnnotations(),
-                    template.getFields(),
+                    fields,
                     methods);
         }
 

@@ -619,4 +619,28 @@ public class EyePatchClassBuilderTest {
         public void onClick(View view) {
         }
     }
+
+
+    // TODO: make this test pass
+    //    @Test
+    public void testNonStaticAccess() throws Throwable {
+        wrappedClass = wrapClass(MyCallable.class);
+
+        Constructor cons = wrappedClass.getConstructor(getClass());
+        Object instance = cons.newInstance(this);
+
+        assertEquals(
+                "zoidberg",
+                Whitebox.invoke(instance, "call"));
+    }
+
+    public String foo() {
+        return "zoidberg";
+    }
+
+    public class MyCallable {
+        public String call() {
+            return foo();
+        }
+    }
 }
