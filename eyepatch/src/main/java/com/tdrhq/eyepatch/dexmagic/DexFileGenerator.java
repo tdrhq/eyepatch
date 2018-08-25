@@ -83,6 +83,11 @@ public class DexFileGenerator {
         }
 
         for (Method methodTemplate : Sorter.sortMethods(original.getDeclaredMethods())) {
+            int SYNTHETIC = 0x1000; // hidden in Modifiers
+            if ((methodTemplate.getModifiers() & SYNTHETIC) != 0) {
+                // unsupported, we'll let the merge phase fix it
+                continue;
+            }
             generateMethod(dexmaker, methodTemplate, typeId, original);
         }
         return dexmaker;
@@ -191,6 +196,7 @@ public class DexFileGenerator {
             arguments[i] = TypeId.get(parameterTypes[i]);
         }
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
+
         Code code = dexmaker.declare(foo, modifiers);
         Locals locals = new Locals(code, returnType);
 
