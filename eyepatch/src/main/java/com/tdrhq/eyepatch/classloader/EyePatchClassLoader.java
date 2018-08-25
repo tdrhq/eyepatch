@@ -76,6 +76,10 @@ public class EyePatchClassLoader extends ClassLoader
             return true;
         }
 
+        if (name.startsWith("android.") && !name.startsWith("android.support.")) {
+            return true;
+        }
+
         if (name.startsWith("org.hamcrest")) {
             return true;
         }

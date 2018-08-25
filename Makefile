@@ -34,7 +34,7 @@ runner-jvm-tests:
 
 jvm-tests: iface-tests runner-jvm-tests
 env:
-	env
+	env | grep -v GPG_AGENT
 	adb shell pm list instrumentation
 
 jenkins: jvm-tests device-tests

@@ -1,13 +1,16 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.view.View;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
-import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
+import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
+import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.util.SmaliPrinter;
 import com.tdrhq.eyepatch.util.Whitebox;
 import dalvik.system.PathClassLoader;
@@ -23,7 +26,6 @@ import org.junit.Test;
 import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder classBuilder;
@@ -603,6 +605,18 @@ public class EyePatchClassBuilderTest {
         int counter = 0;
         public FooWithConstructor(int i) {
             counter = i + 1;
+        }
+    }
+
+    @Test
+    public void testImplementsInterfaces() throws Throwable {
+        wrappedClass = wrapClass(FooWithInterface.class);
+        assertTrue(View.OnClickListener.class.isAssignableFrom(wrappedClass));
+    }
+
+    public static class FooWithInterface implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
         }
     }
 }

@@ -3,21 +3,22 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.*;
+import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Sorter;
-
+import com.tdrhq.eyepatch.util.Util;
 import dalvik.system.DexFile;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.tdrhq.eyepatch.iface.GeneratedMethod;
-import com.tdrhq.eyepatch.util.Util;
+import java.util.List;
 
 public class DexFileGenerator {
 
@@ -72,7 +73,20 @@ public class DexFileGenerator {
     private DexMaker buildDexMaker(String name, Class original) {
         DexMaker dexmaker = new DexMaker();
         TypeId<?> typeId = Util.createTypeIdForName(name);
-        dexmaker.declare(typeId, name + ".generated", Modifier.PUBLIC, TypeId.get(original.getSuperclass()));
+        List<TypeId<?>> interfaces = new ArrayList<>();
+        for (Type iface : original.getGenericInterfaces()) {
+            if (!(iface instanceof Class)) {
+                continue;
+            }
+
+            interfaces.add(TypeId.get((Class) iface));
+        }
+        dexmaker.declare(
+                typeId,
+                name + ".generated",
+                Modifier.PUBLIC,
+                TypeId.get(original.getSuperclass()),
+                interfaces.toArray(new TypeId<?>[0]));
 
         for (Field field : original.getDeclaredFields()) {
             if ((field.getModifiers() & SYNTHETIC) != 0) {
