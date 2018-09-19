@@ -17,7 +17,7 @@ public class DefaultInvocationHandler implements StaticInvocationHandler {
     }
 
     @Override
-    public Object handleInvocation(Invocation invocation) {
+    public Object handleInvocation(Invocation invocation) throws Exception {
         return getClassHandler(invocation.getInstanceClass())
                 .handleInvocation(invocation);
     }

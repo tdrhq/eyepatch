@@ -36,7 +36,7 @@ public abstract class Dispatcher {
     public static Object invokeStatic(
             GeneratedMethod generatedMethod,
             Object instance,
-            Object[] args) {
+            Object[] args) throws Exception {
         Invocation invocation = new Invocation(
                 generatedMethod,
                 instance,

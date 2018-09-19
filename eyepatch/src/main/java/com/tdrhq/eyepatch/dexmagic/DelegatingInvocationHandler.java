@@ -10,7 +10,7 @@ import com.tdrhq.eyepatch.iface.Invocation;
  */
 public class DelegatingInvocationHandler implements StaticInvocationHandler {
     @Override
-    public Object handleInvocation(Invocation invocation) {
+    public Object handleInvocation(Invocation invocation) throws Exception {
         ClassLoader classLoader = invocation.getInstanceClass().getClassLoader();
         if (!(classLoader instanceof HasStaticInvocationHandler)) {
             throw new UnsupportedOperationException("");
