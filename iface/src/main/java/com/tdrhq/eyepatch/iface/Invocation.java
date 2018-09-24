@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 public class Invocation {
     private final GeneratedMethod mGeneratedMethod;
-    private Object mInstance;
-    private Object[] mArgs;
+    private final Object mInstance;
+    private final Object[] mArgs;
 
     public Object[] getArgs() {
         return mArgs;
