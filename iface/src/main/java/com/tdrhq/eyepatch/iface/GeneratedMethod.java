@@ -5,11 +5,11 @@ package com.tdrhq.eyepatch.iface;
 import java.util.Arrays;
 
 public class GeneratedMethod {
-    private Class klass;
-    private String method;
-    private Class[] argTypes;
+    private final Class klass;
+    private final String method;
+    private final Class[] argTypes;
 
-    public GeneratedMethod(Class klass, String method, Class[] argTypes) {
+    private GeneratedMethod(Class klass, String method, Class[] argTypes) {
         this.klass = klass;
         this.method = method;
         this.argTypes = argTypes;
@@ -42,5 +42,9 @@ public class GeneratedMethod {
         return klass.equals(otherMethod.klass) &&
                 method.equals(otherMethod.method) &&
                 Arrays.equals(argTypes, otherMethod.argTypes);
+    }
+
+    public static GeneratedMethod create(Class klass, String method, Class[] args) {
+        return new GeneratedMethod(klass, method, args);
     }
 }

@@ -49,7 +49,7 @@ public class DefaultInvocationHandlerTest {
     @Test
     public void testHandleInvocationHappyPath() throws Throwable {
         Invocation invocation = new Invocation(
-                new GeneratedMethod(
+                GeneratedMethod.create(
                         Foo.class,
                         "bar",
                         new Class[] {}),

@@ -30,7 +30,7 @@ public class MockitoClassHandlerTest {
 
     private void testVerifyOn(Class fooClass) {
         Invocation invocation = new Invocation(
-                new GeneratedMethod(fooClass, "bar", new Class[] { String.class }),
+                GeneratedMethod.create(fooClass, "bar", new Class[] { String.class }),
                 null,
                 new Object[] { "car" });
 
@@ -41,7 +41,7 @@ public class MockitoClassHandlerTest {
         mMockitoClassHandler.verifyStatic();
 
         invocation = new Invocation(
-                new GeneratedMethod(fooClass, "bar", new Class[] { String.class }),
+                GeneratedMethod.create(fooClass, "bar", new Class[] { String.class }),
                 null,
                 new Object[] { captor.capture() });
 

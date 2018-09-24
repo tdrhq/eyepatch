@@ -24,9 +24,9 @@ public class DelegatingInvocationHandlerTest {
         try {
             mHandler.handleInvocation(
                     new Invocation(
-                            new GeneratedMethod(Bar.class,
-                                                "foo",
-                                                new Class[] {}),
+                            GeneratedMethod.create(Bar.class,
+                                                   "foo",
+                                                   new Class[] {}),
                             null,
                             new Object[] {}));
             fail("expected exception");
@@ -40,7 +40,7 @@ public class DelegatingInvocationHandlerTest {
         ClassLoader classLoader = new MyPathClassLoader();
         Class barWrapped = classLoader.loadClass(Bar.class.getName());
         Invocation invocation = new Invocation(
-                new GeneratedMethod(
+                GeneratedMethod.create(
                         barWrapped,
                         "foo",
                         new Class[] {}),

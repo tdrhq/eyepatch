@@ -111,8 +111,8 @@ public class EyePatchClassBuilderTest {
         }
 
         return new Invocation(
-                new GeneratedMethod(wrappedClass, functionName,
-                                    types.toArray(new Class[] {})),
+                GeneratedMethod.create(wrappedClass, functionName,
+                                        types.toArray(new Class[] {})),
                 instance,
                 values.toArray(new Object[] {}));
     }

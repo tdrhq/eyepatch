@@ -319,16 +319,18 @@ public class DexFileGenerator {
             instanceArg = code.getThis(typeId);
         }
         code.loadConstant(locals.callerMethod, methodName);
-        MethodId<GeneratedMethod, Void> generatedMethodCons = TypeId.get(GeneratedMethod.class)
-                .getConstructor(
+        MethodId<GeneratedMethod, GeneratedMethod> generatedMethodCreate = TypeId.get(GeneratedMethod.class)
+                .getMethod(
+                        TypeId.get(GeneratedMethod.class),
+                        "create",
                         TypeId.get(Class.class),
                         TypeId.STRING,
                         TypeId.get(Class[].class));
-        code.newInstance(locals.generatedMethod,
-                         generatedMethodCons,
-                         locals.callerClass,
-                         locals.callerMethod,
-                         locals.argTypes);
+        code.invokeStatic(generatedMethodCreate,
+                          locals.generatedMethod,
+                          locals.callerClass,
+                          locals.callerMethod,
+                          locals.argTypes);
 
         code.invokeStatic(
                 invokeStaticMethod,
