@@ -25,6 +25,10 @@ public class GeneratedMethod {
         return signature.methodName;
     }
 
+    public Signature getSignature() {
+        return signature;
+    }
+
     public Class[] getArgTypes() {
         return signature.args;
     }

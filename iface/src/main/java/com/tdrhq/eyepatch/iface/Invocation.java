@@ -22,6 +22,10 @@ public class Invocation {
         return mInstance;
     }
 
+    public Signature getSignature() {
+        return mGeneratedMethod.getSignature();
+    }
+
     public String getMethod() {
         return mGeneratedMethod.getMethod();
     }
