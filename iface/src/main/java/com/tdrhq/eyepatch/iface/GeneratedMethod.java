@@ -8,15 +8,13 @@ import java.util.Map;
 
 public class GeneratedMethod {
     private final Class klass;
-    private final String method;
-    private final Class[] argTypes;
+    private final Signature signature;
 
     private static Map<GeneratedMethod, GeneratedMethod> map = new HashMap<>();
 
-    private GeneratedMethod(Class klass, String method, Class[] argTypes) {
+    private GeneratedMethod(Class klass, Signature signature) {
         this.klass = klass;
-        this.method = method;
-        this.argTypes = argTypes;
+        this.signature = signature;
     }
 
     public Class getTargetClass() {
@@ -24,16 +22,16 @@ public class GeneratedMethod {
     }
 
     public String getMethod() {
-        return method;
+        return signature.methodName;
     }
 
     public Class[] getArgTypes() {
-        return argTypes;
+        return signature.args;
     }
 
     @Override
     public int hashCode() {
-        return method.hashCode();
+        return signature.hashCode();
     }
 
     @Override
@@ -44,12 +42,11 @@ public class GeneratedMethod {
 
         GeneratedMethod otherMethod = (GeneratedMethod) other;
         return klass.equals(otherMethod.klass) &&
-                method.equals(otherMethod.method) &&
-                Arrays.equals(argTypes, otherMethod.argTypes);
+                signature == otherMethod.signature;
     }
 
     public static GeneratedMethod create(Class klass, String method, Class[] args) {
-        GeneratedMethod ret =  new GeneratedMethod(klass, method, args);
+        GeneratedMethod ret =  new GeneratedMethod(klass, Signature.create(method, args));
         GeneratedMethod orig = map.get(ret);
         if (orig != null) {
             return orig;
