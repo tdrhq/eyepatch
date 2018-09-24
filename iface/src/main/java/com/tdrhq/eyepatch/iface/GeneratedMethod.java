@@ -3,11 +3,15 @@
 package com.tdrhq.eyepatch.iface;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GeneratedMethod {
     private final Class klass;
     private final String method;
     private final Class[] argTypes;
+
+    private static Map<GeneratedMethod, GeneratedMethod> map = new HashMap<>();
 
     private GeneratedMethod(Class klass, String method, Class[] argTypes) {
         this.klass = klass;
@@ -45,6 +49,13 @@ public class GeneratedMethod {
     }
 
     public static GeneratedMethod create(Class klass, String method, Class[] args) {
-        return new GeneratedMethod(klass, method, args);
+        GeneratedMethod ret =  new GeneratedMethod(klass, method, args);
+        GeneratedMethod orig = map.get(ret);
+        if (orig != null) {
+            return orig;
+        }
+
+        map.put(ret, ret);
+        return ret;
     }
 }
