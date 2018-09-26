@@ -15,7 +15,7 @@ public class Pair {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(first) * 31 + Objects.hashCode(second);
+        return oHashCode(first) * 31 + oHashCode(second);
     }
 
     @Override
@@ -25,8 +25,23 @@ public class Pair {
         }
 
         Pair other = (Pair) _other;
-        return Objects.equals(first, other.first) &&
-                Objects.equals(second, other.second);
+        return oEquals(first, other.first) &&
+                oEquals(second, other.second);
+    }
+
+    private static int oHashCode(Object o) {
+        if (o == null) {
+            return 10;
+        }
+        return o.hashCode();
+    }
+
+    private static boolean oEquals(Object one, Object two) {
+        if (one == null) {
+            return two == null;
+        }
+
+        return one.equals(two);
     }
 
     public static Pair create(Object first, Object second) {
