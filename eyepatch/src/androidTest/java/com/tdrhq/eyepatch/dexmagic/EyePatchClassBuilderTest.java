@@ -662,6 +662,14 @@ public class EyePatchClassBuilderTest {
         assertEquals(1, Whitebox.getField(instance, wrappedClass.getSuperclass(), "voidMethodCalled"));
     }
 
+    @Test
+    public void testSuperClassPrimitiveMethod() throws Throwable {
+        wrappedClass = wrapClass(ChildClass.class);
+
+        Object instance = wrappedClass.newInstance();
+        assertEquals(1, Whitebox.invoke(instance, "__super__primitiveMethod"));
+    }
+
     public static class ParentClass {
         int voidMethodCalled = 0;
         public String foo() {
@@ -670,6 +678,10 @@ public class EyePatchClassBuilderTest {
 
         public void voidMethod() {
             voidMethodCalled ++;
+        }
+
+        public int primitiveMethod() {
+            return 1;
         }
     }
 
@@ -682,6 +694,11 @@ public class EyePatchClassBuilderTest {
         @Override
         public void voidMethod() {
             voidMethodCalled = -10;
+        }
+
+        @Override
+        public int primitiveMethod() {
+            return 2;
         }
     }
 }
