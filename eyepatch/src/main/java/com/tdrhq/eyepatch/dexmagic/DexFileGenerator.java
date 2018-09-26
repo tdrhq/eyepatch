@@ -262,13 +262,13 @@ public class DexFileGenerator {
             argumentLocals[i] = code.getParameter(i, arguments[i]);
         }
 
-        if (Primitives.isPrimitive(returnType) || returnType.equals(TypeId.VOID)) {
+        if (Primitives.isPrimitive(returnType)) {
             generateUnsupportedLabel(code, locals);
             return;
         }
 
         code.invokeSuper(originalFoo,
-                         locals.castedReturnValue,
+                         returnType == TypeId.VOID ? null : locals.castedReturnValue,
                          code.getThis(typeId),
                          argumentLocals);
 
