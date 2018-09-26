@@ -643,4 +643,26 @@ public class EyePatchClassBuilderTest {
             return foo();
         }
     }
+
+    @Test
+    public void testSuperClassMethod() throws Throwable {
+        wrappedClass = wrapClass(ChildClass.class);
+
+        Object instance = wrappedClass.newInstance();
+        assertEquals(null, Whitebox.invoke(instance, "foo"));
+        assertEquals("parent", Whitebox.invoke(instance, "__super__foo"));
+    }
+
+    public static class ParentClass {
+        public String foo() {
+            return "parent";
+        }
+    }
+
+    public static class ChildClass extends ParentClass {
+        @Override
+        public String foo() {
+            return "child";
+        }
+    }
 }

@@ -107,7 +107,23 @@ public class DexFileGenerator {
             }
             generateMethod(dexmaker, methodTemplate, typeId, original);
         }
+
+        for (Method superMethod : Sorter.sortMethods(getSuperMethodsToDeclare(original))) {
+            generateSuperMethod(dexmaker, superMethod, typeId, original);
+        }
         return dexmaker;
+    }
+
+    public List<Method> getSuperMethodsToDeclare(Class klass) {
+        List<Method> ret = new ArrayList<>();
+        for (Method method : klass.getDeclaredMethods()) {
+            if (!Modifier.isStatic(method.getModifiers()) &&
+                !Modifier.isPrivate(method.getModifiers())) {
+                ret.add(method);
+            }
+        }
+
+        return ret;
     }
 
     private static void generateField(DexMaker dexmaker, Field field, TypeId<?> typeId) {
@@ -220,6 +236,47 @@ public class DexFileGenerator {
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
 
         generateBypassLabel(code, typeId, returnType, methodName, arguments, modifiers, locals);
+    }
+
+    /**
+     * For a method foo(), generate __super__foo() that does nothing but call super.foo().
+     */
+    private void generateSuperMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
+        String methodName = "__super__" + methodTemplate.getName();
+        int modifiers = methodTemplate.getModifiers();
+        TypeId returnType = TypeId.get(methodTemplate.getReturnType());
+        Class[] parameterTypes = methodTemplate.getParameterTypes();
+        TypeId[] arguments = new TypeId[parameterTypes.length];
+        for (int i = 0 ;i < parameterTypes.length; i++) {
+            arguments[i] = TypeId.get(parameterTypes[i]);
+        }
+        MethodId foo = typeId.getMethod(returnType, methodName, arguments);
+        MethodId originalFoo = typeId.getMethod(returnType, methodTemplate.getName(), arguments);
+
+        Code code = dexmaker.declare(foo, modifiers);
+        Locals locals = new Locals(code, returnType);
+
+        Local[] argumentLocals = new Local[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            argumentLocals[i] = code.newLocal(arguments[i]);
+            argumentLocals[i] = code.getParameter(i, arguments[i]);
+        }
+
+        if (Primitives.isPrimitive(returnType) || returnType.equals(TypeId.VOID)) {
+            generateUnsupportedLabel(code, locals);
+            return;
+        }
+
+        code.invokeSuper(originalFoo,
+                         locals.castedReturnValue,
+                         code.getThis(typeId),
+                         argumentLocals);
+
+        if (returnType.equals(TypeId.VOID)) {
+            code.returnVoid();
+        } else {
+            code.returnValue(locals.castedReturnValue);
+        }
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
