@@ -131,7 +131,17 @@ public class DexFileGenerator {
                 TypeId.get(field.getType()),
                 field.getName());
         int modifiers = field.getModifiers();
-        dexmaker.declare(fieldId, modifiers, null);
+        Object initialValue = null;
+        if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)) {
+            field.setAccessible(true);
+            try {
+                initialValue = field.get(null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        dexmaker.declare(fieldId, modifiers, initialValue);
     }
 
     private <D> void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<D> typeId, Class original) {
