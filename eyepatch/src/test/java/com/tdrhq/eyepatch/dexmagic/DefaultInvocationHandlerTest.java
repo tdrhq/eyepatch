@@ -1,6 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.classloader.DefaultClassHandlerProvider;
+import com.tdrhq.eyepatch.iface.DefaultClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.Invocation;

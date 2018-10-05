@@ -2,7 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
+import com.tdrhq.eyepatch.iface.ClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;

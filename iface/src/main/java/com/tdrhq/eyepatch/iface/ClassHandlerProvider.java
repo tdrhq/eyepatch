@@ -1,4 +1,4 @@
-package com.tdrhq.eyepatch.classloader;
+package com.tdrhq.eyepatch.iface;
 
 import com.tdrhq.eyepatch.iface.ClassHandler;
 

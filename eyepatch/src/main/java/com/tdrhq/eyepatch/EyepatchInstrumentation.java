@@ -5,8 +5,7 @@ import android.app.Instrumentation;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.tdrhq.eyepatch.classloader.ClassHandlerProvider;
-import com.tdrhq.eyepatch.classloader.DefaultClassHandlerProvider;
+import com.tdrhq.eyepatch.iface.ClassHandlerProvider;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 
 /**

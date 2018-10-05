@@ -5,6 +5,8 @@ package com.tdrhq.eyepatch.classloader;
 import android.util.Log;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.DefaultInvocationHandler;
+import com.tdrhq.eyepatch.iface.ClassHandlerProvider;
+import com.tdrhq.eyepatch.iface.DefaultClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
