@@ -1,23 +1,22 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.classloader.DefaultClassHandlerProvider;
-import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;
 import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.Invocation;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
-import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 public class DefaultInvocationHandlerTest {
     private DefaultInvocationHandler handler;
 
     @Rule
-    public EyePatchTemporaryFolder tmpdir = new EyePatchTemporaryFolder();
+    public TemporaryFolder tmpdir = new TemporaryFolder();
 
     @Before
     public void before() throws Throwable {

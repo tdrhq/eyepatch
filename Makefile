@@ -25,7 +25,7 @@ clean:
 	./gradlew :clean :eyepatch:clean :runner:clean :iface:clean
 
 core-tests:
-	./gradlew :eyepatch:connectedAndroidTest
+	./gradlew :eyepatch:connectedAndroidTest :eyepatch:test
 
 device-tests: |	env core-tests runner-tests integration-tests
 
