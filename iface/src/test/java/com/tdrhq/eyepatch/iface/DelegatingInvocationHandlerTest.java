@@ -1,4 +1,4 @@
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.iface;
 
 import com.tdrhq.eyepatch.iface.DelegatingInvocationHandler;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
