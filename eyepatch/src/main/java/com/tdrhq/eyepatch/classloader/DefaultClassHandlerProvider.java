@@ -1,7 +1,6 @@
 package com.tdrhq.eyepatch.classloader;
 
 import com.tdrhq.eyepatch.iface.ClassHandler;
-import com.tdrhq.eyepatch.util.Checks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +11,10 @@ public class DefaultClassHandlerProvider implements ClassHandlerProvider {
     private List<ClassHandler> classHandlers;
 
     public DefaultClassHandlerProvider(List<ClassHandler> classHandlers) {
-        this.classHandlers = Checks.notNull(classHandlers);
+        if (classHandlers == null) {
+            throw new NullPointerException("null classHandlers");
+        }
+        this.classHandlers = classHandlers;
 
         for (ClassHandler classHandler : classHandlers) {
             handledClasses.put(classHandler.getResponsibility().getName(),
