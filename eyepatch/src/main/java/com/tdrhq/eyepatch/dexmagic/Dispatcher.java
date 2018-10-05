@@ -4,7 +4,6 @@ package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
-import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 /**
@@ -28,7 +27,10 @@ public abstract class Dispatcher {
     }
 
     public static void setHandler(StaticInvocationHandler handler) {
-        sHandler = Checks.notNull(handler);
+        if (handler == null) {
+            throw new NullPointerException("null handler");
+        }
+        sHandler = handler;
     }
 
     public Dispatcher() {
