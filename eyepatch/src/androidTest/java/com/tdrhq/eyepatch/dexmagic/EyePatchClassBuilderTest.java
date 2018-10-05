@@ -5,6 +5,7 @@ import android.view.View;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
+import com.tdrhq.eyepatch.iface.Dispatcher;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;

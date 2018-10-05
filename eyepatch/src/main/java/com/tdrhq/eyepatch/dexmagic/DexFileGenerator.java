@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.*;
+import com.tdrhq.eyepatch.iface.Dispatcher;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.Checks;

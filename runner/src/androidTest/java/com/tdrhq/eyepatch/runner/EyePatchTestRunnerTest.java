@@ -3,7 +3,7 @@ package com.tdrhq.eyepatch.runner;
 import com.android.dx.Code;
 import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.iface.ClassHandler;
-import com.tdrhq.eyepatch.dexmagic.Dispatcher;
+import com.tdrhq.eyepatch.iface.Dispatcher;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import dalvik.system.PathClassLoader;
