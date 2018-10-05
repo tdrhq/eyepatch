@@ -1,16 +1,15 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.tdrhq.eyepatch.iface.DelegatingInvocationHandler;
+import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
-import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
-import dalvik.system.PathClassLoader;
+import java.net.URLClassLoader;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import com.tdrhq.eyepatch.iface.GeneratedMethod;
 
 public class DelegatingInvocationHandlerTest {
     private DelegatingInvocationHandler mHandler;
@@ -55,13 +54,9 @@ public class DelegatingInvocationHandlerTest {
         verify(staticHandler).handleInvocation(invocation);
     }
 
-    public class MyPathClassLoader extends PathClassLoader implements HasStaticInvocationHandler {
+    public class MyPathClassLoader extends URLClassLoader implements HasStaticInvocationHandler {
         public MyPathClassLoader() {
-            super(
-                    ClassLoaderIntrospector.getOriginalDexPathAsStr(
-                            MyPathClassLoader.class.getClassLoader()),
-                    null,
-                    MyPathClassLoader.class.getClassLoader().getParent());
+            super(((URLClassLoader) MyPathClassLoader.class.getClassLoader()).getURLs(), MyPathClassLoader.class.getClassLoader().getParent());
         }
 
         @Override
