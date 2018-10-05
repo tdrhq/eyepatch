@@ -1,11 +1,6 @@
 // (c) 2018 Arnold Noronha <arnold@tdrhq.com>
 
-package com.tdrhq.eyepatch.dexmagic;
-
-import com.tdrhq.eyepatch.iface.ClassHandlerProvider;
-import com.tdrhq.eyepatch.iface.ClassHandler;
-import com.tdrhq.eyepatch.iface.Invocation;
-import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
+package com.tdrhq.eyepatch.iface;
 
 public class DefaultInvocationHandler implements StaticInvocationHandler {
 

@@ -1,7 +1,8 @@
-package com.tdrhq.eyepatch.dexmagic;
+package com.tdrhq.eyepatch.iface;
 
 import com.tdrhq.eyepatch.iface.DefaultClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.ClassHandler;
+import com.tdrhq.eyepatch.iface.DefaultInvocationHandler;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.Invocation;
 import java.util.ArrayList;
