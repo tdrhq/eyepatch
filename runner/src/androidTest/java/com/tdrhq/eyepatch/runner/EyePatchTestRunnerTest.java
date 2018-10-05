@@ -5,13 +5,13 @@ import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.dexmagic.Dispatcher;
 import com.tdrhq.eyepatch.iface.Invocation;
-import com.tdrhq.eyepatch.dexmagic.StaticInvocationHandler;
+import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import dalvik.system.PathClassLoader;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import static org.hamcrest.Matchers.*;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 

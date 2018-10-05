@@ -1,13 +1,13 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import com.android.dx.Code;
 import com.android.dx.Local;
 import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.Invocation;
+import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.EyePatchTemporaryFolder;

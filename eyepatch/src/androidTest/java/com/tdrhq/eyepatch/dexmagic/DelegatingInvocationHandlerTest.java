@@ -1,6 +1,8 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
+import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import dalvik.system.PathClassLoader;
 import org.junit.Before;
