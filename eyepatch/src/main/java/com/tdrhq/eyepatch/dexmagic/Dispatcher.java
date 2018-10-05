@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.DelegatingInvocationHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;

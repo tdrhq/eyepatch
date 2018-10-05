@@ -1,5 +1,6 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.iface.DelegatingInvocationHandler;
 import com.tdrhq.eyepatch.iface.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.Invocation;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
