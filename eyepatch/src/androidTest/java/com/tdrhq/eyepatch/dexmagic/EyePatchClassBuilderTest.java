@@ -701,4 +701,15 @@ public class EyePatchClassBuilderTest {
             return 2;
         }
     }
+
+    @Test
+    public void testStaticFinalEncodedValue() throws Throwable {
+        wrappedClass = wrapClass(StaticFinalExample.class);
+
+        assertEquals(10, wrappedClass.getField("SOME_CONST").get(null));
+    }
+
+    public static class StaticFinalExample {
+        public static final int SOME_CONST = 10;
+    }
 }
