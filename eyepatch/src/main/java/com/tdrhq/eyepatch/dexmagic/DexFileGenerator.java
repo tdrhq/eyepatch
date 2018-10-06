@@ -3,6 +3,7 @@
 package com.tdrhq.eyepatch.dexmagic;
 
 import com.android.dx.*;
+import com.android.dx.rop.code.AccessFlags;
 import com.tdrhq.eyepatch.iface.Dispatcher;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
@@ -116,7 +117,7 @@ public class DexFileGenerator {
     }
 
     private void dexmakerDeclare(DexMaker dexmaker, TypeId<?> typeId, String s, int modifiers, TypeId parentClass, TypeId<?>[] interfaces) {
-        dexmaker.declare(typeId, s, modifiers, parentClass, interfaces);
+        dexmaker.declare(typeId, s, fixModifiers(modifiers), parentClass, interfaces);
     }
 
     public List<Method> getSuperMethodsToDeclare(Class klass) {
@@ -150,7 +151,7 @@ public class DexFileGenerator {
     }
 
     private static void dexmakerDeclareField(DexMaker dexmaker, FieldId<?, ?> fieldId, int modifiers, Object initialValue) {
-        dexmaker.declare(fieldId, modifiers, initialValue);
+        dexmaker.declare(fieldId, fixModifiers(modifiers), initialValue);
     }
 
     private <D> void generateConstructor(DexMaker dexmaker, Constructor constructor, final TypeId<D> typeId, Class original) {
@@ -295,7 +296,11 @@ public class DexFileGenerator {
     }
 
     private Code declareMethod(DexMaker dexmaker, MethodId foo, int modifiers) {
-        return dexmaker.declare(foo, modifiers);
+        return dexmaker.declare(foo, fixModifiers(modifiers));
+    }
+
+    private static int fixModifiers(int modifiers) {
+        return modifiers & (~AccessFlags.ACC_SYNTHETIC);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
