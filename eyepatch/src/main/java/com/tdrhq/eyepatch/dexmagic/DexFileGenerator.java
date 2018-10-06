@@ -82,8 +82,8 @@ public class DexFileGenerator {
 
             interfaces.add(TypeId.get((Class) iface));
         }
-        dexmaker.declare(
-                typeId,
+        dexmakerDeclare(
+                dexmaker, typeId,
                 name + ".generated",
                 Modifier.PUBLIC,
                 TypeId.get(original.getSuperclass()),
@@ -115,6 +115,10 @@ public class DexFileGenerator {
         return dexmaker;
     }
 
+    private void dexmakerDeclare(DexMaker dexmaker, TypeId<?> typeId, String s, int modifiers, TypeId parentClass, TypeId<?>[] interfaces) {
+        dexmaker.declare(typeId, s, modifiers, parentClass, interfaces);
+    }
+
     public List<Method> getSuperMethodsToDeclare(Class klass) {
         List<Method> ret = new ArrayList<>();
         for (Method method : klass.getDeclaredMethods()) {
@@ -142,6 +146,10 @@ public class DexFileGenerator {
             }
         }
 
+        dexmakerDeclareField(dexmaker, fieldId, modifiers, initialValue);
+    }
+
+    private static void dexmakerDeclareField(DexMaker dexmaker, FieldId<?, ?> fieldId, int modifiers, Object initialValue) {
         dexmaker.declare(fieldId, modifiers, initialValue);
     }
 
@@ -154,7 +162,7 @@ public class DexFileGenerator {
             arguments[i] = TypeId.get(parameterTypes[i]);
         }
         MethodId cons = typeId.getConstructor(arguments);
-        Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
+        Code  code = declareMethod(dexmaker, cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
         Local<SuperInvocation> superInvocation = code.newLocal(TypeId.get(SuperInvocation.class));
         Local<Class> thisClass = code.newLocal(TypeId.get(Class.class));
@@ -211,7 +219,7 @@ public class DexFileGenerator {
         }
 
         MethodId cons = typeId.getConstructor(arguments);
-        Code  code = dexmaker.declare(cons, Modifier.PUBLIC);
+        Code  code = declareMethod(dexmaker, cons, Modifier.PUBLIC);
         Locals locals = new Locals(code, returnType);
         Local<SuperInvocation> superInvocation = code.getParameter(parameterTypes.length - 1, TypeId.get(SuperInvocation.class));
         Local<Class> thisClass = code.newLocal(TypeId.get(Class.class));
@@ -241,7 +249,7 @@ public class DexFileGenerator {
         }
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
 
-        Code code = dexmaker.declare(foo, modifiers);
+        Code code = declareMethod(dexmaker, foo, modifiers);
         Locals locals = new Locals(code, returnType);
 
         generateMethodContentsInternal(code, typeId, returnType, parameterTypes, original, modifiers, methodName, locals);
@@ -264,7 +272,7 @@ public class DexFileGenerator {
         MethodId foo = typeId.getMethod(returnType, methodName, arguments);
         MethodId originalFoo = typeId.getMethod(returnType, methodTemplate.getName(), arguments);
 
-        Code code = dexmaker.declare(foo, modifiers);
+        Code code = declareMethod(dexmaker, foo, modifiers);
         Locals locals = new Locals(code, returnType);
 
         Local[] argumentLocals = new Local[arguments.length];
@@ -284,6 +292,10 @@ public class DexFileGenerator {
         } else {
             code.returnValue(locals.castedReturnValue);
         }
+    }
+
+    private Code declareMethod(DexMaker dexmaker, MethodId foo, int modifiers) {
+        return dexmaker.declare(foo, modifiers);
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
