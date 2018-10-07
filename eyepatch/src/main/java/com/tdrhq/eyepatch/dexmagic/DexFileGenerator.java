@@ -76,7 +76,7 @@ public class DexFileGenerator {
         DexMaker dexmaker = new DexMaker();
         TypeId<?> typeId = Util.createTypeIdForName(name);
         List<TypeId<?>> interfaces = new ArrayList<>();
-        for (Type iface : original.getGenericInterfaces()) {
+        for (Type iface : original.getInterfaces()) {
             if (!(iface instanceof Class)) {
                 continue;
             }
