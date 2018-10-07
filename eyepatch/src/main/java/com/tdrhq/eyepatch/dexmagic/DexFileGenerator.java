@@ -300,7 +300,7 @@ public class DexFileGenerator {
     }
 
     private static int fixModifiers(int modifiers) {
-        return modifiers & (~AccessFlags.ACC_SYNTHETIC);
+        return modifiers;
     }
 
     private void generateUnsupportedLabel(Code code, Locals locals) {
