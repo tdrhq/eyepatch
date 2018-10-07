@@ -21,6 +21,7 @@ import org.jf.dexlib2.iface.Method;
 import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.MethodParameter;
 import org.jf.dexlib2.immutable.ImmutableClassDef;
+import org.jf.dexlib2.immutable.ImmutableDexFile;
 import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.immutable.ImmutableMethodImplementation;
 import org.jf.dexlib2.immutable.ImmutableMethodParameter;
@@ -52,6 +53,32 @@ public class Merger {
 
         is.close();
         realCodeStream.close();
+    }
+
+    public void copyDexFile(Class realClass, InputStream realCode, File output) throws IOException {
+        DexBackedDexFile realDexFile = DexFileUtil.readDexFile(realCode);
+
+        ClassDef classDef = findClassDef(realDexFile, TypeId.get(realClass).getName());
+        if (classDef == null) {
+            throw new RuntimeException("couldn't find interface: " + realClass.getName() + " in " + realCode);
+        }
+        ImmutableDexFile updated = new ImmutableDexFile(
+                realDexFile.getOpcodes(),
+                ImmutableSet.of(
+                        classDef));
+
+        FileDataStore dataStore = new FileDataStore(output);
+        DexPool.writeTo(dataStore, updated);
+        dataStore.close();
+    }
+
+    private static ClassDef findClassDef(DexFile dexFile, String name) {
+        for (ClassDef r : dexFile.getClasses()) {
+            if (r.getType().equals(name)) {
+                return r;
+            }
+        }
+        return null;
     }
 
     public void mergeDexFile(InputStream template, InputStream realCode, File output) throws IOException {
@@ -89,13 +116,7 @@ public class Merger {
         @Override
         public ClassDef rewrite(ClassDef template) {
 
-            ClassDef realClass = null;
-            for (ClassDef r : real.getClasses()) {
-                if (r.getType().equals(template.getType())) {
-                    realClass = r;
-                    break;
-                }
-            }
+            ClassDef realClass = findClassDef(real, template.getType());
 
             List<Field> fields = Lists.newArrayList(template.getFields());
 

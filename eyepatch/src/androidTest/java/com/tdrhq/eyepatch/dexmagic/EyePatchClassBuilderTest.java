@@ -713,4 +713,13 @@ public class EyePatchClassBuilderTest {
     public static class StaticFinalExample {
         public static final int SOME_CONST = 10;
     }
+
+    @Test
+    public void testInterfaces() throws Throwable {
+        wrappedClass = wrapClass(FooInterface.class);
+    }
+
+    interface FooInterface {
+        int one();
+    }
 }

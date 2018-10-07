@@ -43,26 +43,36 @@ public class DexFileGenerator {
     }
 
     public DexFile generate(Class realClass) {
-        DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
         try {
             int suffix = (++counter);
             File mergedOf = new File(mDataDir, "EPG_merged" + suffix + ".dex");
+            File realDexFile = ClassLoaderIntrospector.getDefiningDexFile(realClass);
+            FileInputStream real = new FileInputStream(realDexFile);
 
-            ByteArrayInputStream template = new ByteArrayInputStream(dexmaker.generate());
-            FileInputStream real = new FileInputStream(ClassLoaderIntrospector.getDefiningDexFile(realClass));
-
-            try {
-                merger.mergeDexFile(
-                        template,
+            if (realClass.isInterface()) {
+                merger.copyDexFile(
+                        realClass,
                         real,
                         mergedOf);
-            } finally {
-                template.close();
-                real.close();
-            }
 
-            if (debugPrinter != null) {
-                debugPrinter.print(realClass, mergedOf);
+            } else {
+
+                DexMaker dexmaker = buildDexMaker(realClass.getName(), realClass);
+                ByteArrayInputStream template = new ByteArrayInputStream(dexmaker.generate());
+
+                try {
+                    merger.mergeDexFile(
+                            template,
+                            real,
+                            mergedOf);
+                } finally {
+                    template.close();
+                    real.close();
+                }
+
+                if (debugPrinter != null) {
+                    debugPrinter.print(realClass, mergedOf);
+                }
             }
 
             return Util.loadDexFile(mergedOf);
@@ -83,13 +93,20 @@ public class DexFileGenerator {
 
             interfaces.add(TypeId.get((Class) iface));
         }
+
+        Class parentClass = original.getSuperclass();
         dexmakerDeclare(
                 dexmaker, typeId,
                 name + ".generated",
                 Modifier.PUBLIC,
-                TypeId.get(original.getSuperclass()),
+                TypeId.get(parentClass),
                 interfaces.toArray(new TypeId<?>[0]));
 
+        generatePartsOfClass(original, dexmaker, typeId);
+        return dexmaker;
+    }
+
+    private void generatePartsOfClass(Class original, DexMaker dexmaker, TypeId<?> typeId) {
         for (Field field : original.getDeclaredFields()) {
             if ((field.getModifiers() & SYNTHETIC) != 0) {
                 continue;
@@ -113,7 +130,6 @@ public class DexFileGenerator {
         for (Method superMethod : Sorter.sortMethods(getSuperMethodsToDeclare(original))) {
             generateSuperMethod(dexmaker, superMethod, typeId, original);
         }
-        return dexmaker;
     }
 
     private void dexmakerDeclare(DexMaker dexmaker, TypeId<?> typeId, String s, int modifiers, TypeId parentClass, TypeId<?>[] interfaces) {
