@@ -278,7 +278,7 @@ public class DexFileGenerator {
      * For a method foo(), generate __super__foo() that does nothing but call super.foo().
      */
     private void generateSuperMethod(DexMaker dexmaker, Method methodTemplate, TypeId<?> typeId, Class original) {
-        String methodName = "__super__" + methodTemplate.getName();
+        String methodName = "zzz__super__" + methodTemplate.getName();
         int modifiers = methodTemplate.getModifiers();
         TypeId returnType = TypeId.get(methodTemplate.getReturnType());
         Class[] parameterTypes = methodTemplate.getParameterTypes();

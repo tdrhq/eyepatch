@@ -651,7 +651,7 @@ public class EyePatchClassBuilderTest {
 
         Object instance = wrappedClass.newInstance();
         assertEquals(null, Whitebox.invoke(instance, "foo"));
-        assertEquals("parent", Whitebox.invoke(instance, "__super__foo"));
+        assertEquals("parent", Whitebox.invoke(instance, "zzz__super__foo"));
     }
 
     @Test
@@ -659,7 +659,7 @@ public class EyePatchClassBuilderTest {
         wrappedClass = wrapClass(ChildClass.class);
 
         Object instance = wrappedClass.newInstance();
-        Whitebox.invoke(instance, "__super__voidMethod");
+        Whitebox.invoke(instance, "zzz__super__voidMethod");
         assertEquals(1, Whitebox.getField(instance, wrappedClass.getSuperclass(), "voidMethodCalled"));
     }
 
@@ -668,7 +668,7 @@ public class EyePatchClassBuilderTest {
         wrappedClass = wrapClass(ChildClass.class);
 
         Object instance = wrappedClass.newInstance();
-        assertEquals(1, Whitebox.invoke(instance, "__super__primitiveMethod"));
+        assertEquals(1, Whitebox.invoke(instance, "zzz__super__primitiveMethod"));
     }
 
     public static class ParentClass {
