@@ -139,7 +139,14 @@ public class DexFileGenerator {
 
     public List<Method> getSuperMethodsToDeclare(Class klass) {
         List<Method> ret = new ArrayList<>();
+        Class superClass = klass.getSuperclass();
+
         for (Method method : klass.getDeclaredMethods()) {
+            try {
+                superClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+            } catch (NoSuchMethodException e) {
+                continue; // no need to add a super invocation here
+            }
             if (!Modifier.isStatic(method.getModifiers()) &&
                 !Modifier.isPrivate(method.getModifiers())) {
                 ret.add(method);

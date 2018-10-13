@@ -672,6 +672,20 @@ public class EyePatchClassBuilderTest {
         assertEquals(1, Whitebox.invoke(instance, SUPER_PREFIX + "primitiveMethod"));
     }
 
+    @Test
+    public void testNoSuperCallForNonOverriden() throws Throwable {
+        wrappedClass = wrapClass(ChildClass.class);
+
+        String notOverriden = "notOverriden";
+        wrappedClass.getDeclaredMethod(notOverriden);
+        try {
+            wrappedClass.getDeclaredMethod(SUPER_PREFIX + notOverriden);
+            fail("expected exception");
+        } catch (NoSuchMethodException e) {
+            // expected
+        }
+    }
+
     public static class ParentClass {
         int voidMethodCalled = 0;
         public String foo() {
@@ -701,6 +715,9 @@ public class EyePatchClassBuilderTest {
         @Override
         public int primitiveMethod() {
             return 2;
+        }
+
+        public void notOverriden() {
         }
     }
 
