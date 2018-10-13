@@ -37,7 +37,7 @@ public class ClassLoaderHacks {
                 }
             }
 
-            if (Build.VERSION.SDK_INT >= 27) {
+            if (Build.VERSION.SDK_INT >= 29) {
                 loadedApkFieldName = "mLoadedApk";
             }
 
