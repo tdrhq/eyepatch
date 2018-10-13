@@ -27,6 +27,7 @@ import org.junit.Test;
 import static com.tdrhq.eyepatch.util.Whitebox.arg;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static com.tdrhq.eyepatch.dexmagic.DexFileGenerator.SUPER_PREFIX;
 
 public class EyePatchClassBuilderTest {
     private EyePatchClassBuilder classBuilder;
@@ -651,7 +652,7 @@ public class EyePatchClassBuilderTest {
 
         Object instance = wrappedClass.newInstance();
         assertEquals(null, Whitebox.invoke(instance, "foo"));
-        assertEquals("parent", Whitebox.invoke(instance, "zzz__super__foo"));
+        assertEquals("parent", Whitebox.invoke(instance, SUPER_PREFIX + "foo"));
     }
 
     @Test
@@ -668,7 +669,7 @@ public class EyePatchClassBuilderTest {
         wrappedClass = wrapClass(ChildClass.class);
 
         Object instance = wrappedClass.newInstance();
-        assertEquals(1, Whitebox.invoke(instance, "zzz__super__primitiveMethod"));
+        assertEquals(1, Whitebox.invoke(instance, SUPER_PREFIX + "primitiveMethod"));
     }
 
     public static class ParentClass {
