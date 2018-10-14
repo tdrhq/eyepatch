@@ -38,6 +38,13 @@ public class ClassLoaderIntrospector {
     public static File getDefiningDexFile(Class realClass) {
         List<String> dexPath = getOriginalDexPath(realClass.getClassLoader());
         for (String file : dexPath) {
+            if (file.endsWith(".jar")) {
+                // I see this with android.test.mock.jar and
+                // org.apache.http.legacy.boot.jar in
+                // /system/framework. These are empty jars. At some
+                // point I want to understand what this is all about.
+                continue;
+            }
             try {
                 DexFile dexFile = new DexFile(new File(file));
                 if (Collections.list(dexFile.entries()).contains(realClass.getName())) {
