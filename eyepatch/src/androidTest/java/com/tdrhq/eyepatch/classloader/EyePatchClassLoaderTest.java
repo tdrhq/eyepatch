@@ -32,6 +32,7 @@ public class EyePatchClassLoaderTest {
     public void testSimpleCreation() throws Throwable {
         Class<?> klass = classLoader.loadClass(Foo.class.getName());
 
+        assertNotSame(klass, Foo.class);
         assertSame(classLoader, klass.getClassLoader());
     }
 
@@ -39,6 +40,7 @@ public class EyePatchClassLoaderTest {
     public void testNestedCreation() throws Throwable {
         Class<?> klass = classLoader.loadClass(OtherClass.class.getName());
 
+        assertNotSame(klass, OtherClass.class);
         Whitebox.invoke(klass.newInstance(), "doStuff");
     }
 
