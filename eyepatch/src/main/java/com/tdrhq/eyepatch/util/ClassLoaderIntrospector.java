@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.util;
 
+import android.os.Build;
 import android.text.TextUtils;
 import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexFile;
@@ -40,7 +41,7 @@ public class ClassLoaderIntrospector {
     // /system/framework. These are empty jars. At some
     // point I want to understand what this is all about.
     public static boolean isJarToAvoid(String path) {
-        return path.endsWith(".jar");
+        return Build.VERSION.SDK_INT >= 27 && path.endsWith(".jar");
     }
     public static File getDefiningDexFile(Class realClass) {
         List<String> dexPath = getOriginalDexPath(realClass.getClassLoader());
