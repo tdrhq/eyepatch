@@ -135,6 +135,9 @@ public class EyePatchClassLoader extends ClassLoader
         List<String> path = ClassLoaderIntrospector.getOriginalDexPath(parent);
 
         for (String file : path) {
+            if (ClassLoaderIntrospector.isJarToAvoid(file)) {
+                continue;
+            }
             dexFiles.add(new DexFile(file));
         }
     }
