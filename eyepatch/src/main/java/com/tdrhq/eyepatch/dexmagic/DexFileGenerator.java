@@ -2,8 +2,14 @@
 
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.android.dx.*;
-import com.android.dx.rop.code.AccessFlags;
+import com.android.dx.Code;
+import com.android.dx.Comparison;
+import com.android.dx.DexMaker;
+import com.android.dx.FieldId;
+import com.android.dx.Label;
+import com.android.dx.Local;
+import com.android.dx.MethodId;
+import com.android.dx.TypeId;
 import com.tdrhq.eyepatch.iface.Dispatcher;
 import com.tdrhq.eyepatch.iface.GeneratedMethod;
 import com.tdrhq.eyepatch.iface.SuperInvocation;
@@ -11,8 +17,11 @@ import com.tdrhq.eyepatch.util.Checks;
 import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Sorter;
 import com.tdrhq.eyepatch.util.Util;
-import dalvik.system.DexFile;
-import java.io.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -21,6 +30,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import dalvik.system.DexFile;
 
 public class DexFileGenerator {
 

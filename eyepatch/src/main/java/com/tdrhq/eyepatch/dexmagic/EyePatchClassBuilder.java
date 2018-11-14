@@ -1,16 +1,12 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.android.dx.*;
 import com.tdrhq.eyepatch.util.Checks;
-import dalvik.system.DexFile;
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import dalvik.system.DexFile;
 
 public class EyePatchClassBuilder {
     public static final String PRE_CONSTRUCT = "__pre_construct__";
