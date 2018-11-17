@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 
 /**
@@ -30,14 +29,14 @@ public class EyePatchClassLoader extends ClassLoader
     implements HasStaticInvocationHandler, StaticVerificationHandler {
     private PathClassLoader parent;
     private StaticInvocationHandler mStaticInvocationHandler;
-
-    List<DexFile> dexFiles = new ArrayList<>();
+    private CopiedClassLoader copiedClassLoader;
     private ClassHandlerProvider classHandlerProvider;
 
 
     public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = (PathClassLoader) realClassLoader;
+        copiedClassLoader = new CopiedClassLoader(this, parent);
         classHandlerProvider = new DefaultClassHandlerProvider(new ArrayList<ClassHandler>());
     }
 
@@ -113,36 +112,9 @@ public class EyePatchClassLoader extends ClassLoader
     }
 
     public Class<?> findClass(String name) throws ClassNotFoundException {
-        if (dexFiles.size() == 0) {
-            try {
-                buildDexFiles();
-            } catch (IOException e) {
-                Log.e("EyePatchClassLoader", "Exception while loading class", e);
-                throw new ClassNotFoundException();
-            }
-        }
-
-        for (DexFile dexFile : dexFiles) {
-            Class klass;
-            klass = dexFile.loadClass(name, this);
-            if (klass != null) {
-                return klass;
-            }
-        }
-
-        throw new ClassNotFoundException(name);
+        return copiedClassLoader.findClass(name);
     }
 
-    private void buildDexFiles() throws IOException {
-        List<String> path = ClassLoaderIntrospector.getOriginalDexPath(parent);
-
-        for (String file : path) {
-            if (ClassLoaderIntrospector.isJarToAvoid(file)) {
-                continue;
-            }
-            dexFiles.add(new DexFile(file));
-        }
-    }
 
     @Override
     public StaticInvocationHandler getStaticInvocationHandler() {
