@@ -8,6 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * CopiedClassLoader is not a classLoader per-se, but it tries to
+ * provide copies of the same classes that loaded by the parent
+ * classloader. Remember, this is *copies*, it doesn't simply delegate
+ * to the parent classloader.
+ */
 class CopiedClassLoader {
     private ClassLoader classLoader;
     private PathClassLoader parent;
