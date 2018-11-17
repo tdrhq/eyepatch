@@ -19,15 +19,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dalvik.system.PathClassLoader;
-
 /**
  * A class-loader that's kind of like the build-in Android class
  * loader, with places to hook into it.
  */
 public class EyePatchClassLoader extends ClassLoader
     implements HasStaticInvocationHandler, StaticVerificationHandler {
-    private PathClassLoader parent;
+    private ClassLoader parent;
     private StaticInvocationHandler mStaticInvocationHandler;
     private CopiedClassLoader copiedClassLoader;
     private ClassHandlerProvider classHandlerProvider;
@@ -35,7 +33,7 @@ public class EyePatchClassLoader extends ClassLoader
 
     public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
-        parent = (PathClassLoader) realClassLoader;
+        parent = realClassLoader;
         copiedClassLoader = new CopiedClassLoader(this, parent);
         classHandlerProvider = new DefaultClassHandlerProvider(new ArrayList<ClassHandler>());
     }

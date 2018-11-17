@@ -19,9 +19,9 @@ class CopiedClassLoader {
     private PathClassLoader parent;
     private List<DexFile> dexFiles = new ArrayList<>();
 
-    public CopiedClassLoader(ClassLoader classLoader, PathClassLoader parent) {
+    public CopiedClassLoader(ClassLoader classLoader, ClassLoader parent) {
         this.classLoader = classLoader;
-        this.parent = parent;
+        this.parent = (PathClassLoader) parent;
     }
 
     public Class<?> findClass(String name) throws ClassNotFoundException {
