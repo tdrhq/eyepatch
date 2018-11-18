@@ -18,6 +18,8 @@ public class ClassLoaderIntrospectorTest {
     public void testDefiningDexFile() throws Throwable {
         File definingFile = ClassLoaderIntrospector.getDefiningDexFile(tmpdir.getRoot(), Foo.class);
         assertNotNull(definingFile);
+        assertTrue(definingFile.exists());
+        assertTrue(definingFile.length() > 0);
     }
 
     public static class Foo {

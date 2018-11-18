@@ -10,18 +10,19 @@ import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import com.android.dx.command.dexer.Main.Arguments;
-import com.android.dx.command.dexer.DxContext;
 
 public class ClassLoaderIntrospector {
     private ClassLoaderIntrospector() {
     }
+
+    static File dx;
 
 
     public static List<String> getOriginalDexPath(ClassLoader parent) {
@@ -103,17 +104,46 @@ public class ClassLoaderIntrospector {
     }
 
     private static void dx(File inputJar, File outputDex) throws IOException {
-        DxContext context = new DxContext();
-        Arguments args = new Arguments();
-        args.outName = outputDex.toString();
-        args.fileNames = new String[] {
-            inputJar.toString()
-        };
-        int ret = new com.android.dx.command.dexer.Main(context).run(
-                args
-        );
+        ProcessBuilder pb = new ProcessBuilder(
+                "java",
+                "-jar",
+                getDxPath(),
+                "--dex",
+                "--output=" + outputDex.toString(),
+                inputJar.toString());
+        Process process = pb.start();
+        int ret;
+        try {
+            ret = process.waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         if (ret != 0) {
-            throw new RuntimeException("dx failed");
+            throw new RuntimeException("dx failed with exit code: " + ret);
+        }
+    }
+
+    private static synchronized String getDxPath() {
+        if (dx != null) {
+            return dx.toString();
+        }
+
+        try {
+            dx = File.createTempFile("dxcopy", ".jar");
+            InputStream is = ClassLoaderIntrospector.class.getClassLoader().getResourceAsStream("dx.jar");
+            FileOutputStream os = new FileOutputStream(dx);
+
+            byte[] buff = new byte[2048];
+            int ret;
+            while ((ret = is.read(buff)) > 0) {
+                os.write(buff, 0, ret);
+            }
+            os.close();
+            is.close();
+
+            return dx.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
