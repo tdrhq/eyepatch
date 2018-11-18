@@ -62,4 +62,9 @@ public class Util {
 
         return os.toByteArray();
     }
+
+    public static boolean isJvm() {
+        String runtime = System.getProperty("java.vm.name");
+        return !runtime.equals("Dalvik");
+    }
 }
