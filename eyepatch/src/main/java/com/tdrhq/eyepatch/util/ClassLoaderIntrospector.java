@@ -8,11 +8,16 @@ import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import com.android.dx.command.dexer.Main.Arguments;
+import com.android.dx.command.dexer.DxContext;
 
 public class ClassLoaderIntrospector {
     private ClassLoaderIntrospector() {
@@ -47,7 +52,11 @@ public class ClassLoaderIntrospector {
     public static File getDefiningDexFile(File tmpdir, Class realClass) {
         Checks.notNull(tmpdir);
         if (Util.isJvm()) {
-            return getDefiningDexFileForJvm(tmpdir, realClass);
+            try {
+                return getDefiningDexFileForJvm(tmpdir, realClass);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             return getDefiningDexFileForAndroid(realClass);
         }
@@ -71,8 +80,56 @@ public class ClassLoaderIntrospector {
         return null;
     }
 
-    public static File getDefiningDexFileForJvm(File tmpdir, Class realClass) {
-        throw new RuntimeException("unsupported");
+    public static File getDefiningDexFileForJvm(File tmpdir, Class realClass) throws IOException {
+        byte[] data;
+        try {
+            data = Util.getClassBytes(realClass.getClassLoader(), realClass.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        File tmpJar = tmpdir.createTempFile("dexData",".jar");
+        writeJarEntry(tmpJar, realClass.getName(), data);
+
+        File tmpDex = tmpdir.createTempFile("dexData", ".dex");
+
+        try {
+            dx(tmpJar, tmpDex);
+        } finally {
+            tmpJar.delete();
+        }
+
+        return tmpDex;
+    }
+
+    private static void dx(File inputJar, File outputDex) throws IOException {
+        DxContext context = new DxContext();
+        Arguments args = new Arguments();
+        args.outName = outputDex.toString();
+        args.fileNames = new String[] {
+            inputJar.toString()
+        };
+        int ret = new com.android.dx.command.dexer.Main(context).run(
+                args
+        );
+        if (ret != 0) {
+            throw new RuntimeException("dx failed");
+        }
+    }
+
+    private static void writeJarEntry(File jar, String className, byte[] data) throws IOException {
+        FileOutputStream os = new FileOutputStream(jar);
+        try {
+            ZipOutputStream zos = new ZipOutputStream(os);
+
+            ZipEntry entry = new ZipEntry(className.replace(".", "/") + ".class");
+            zos.putNextEntry(entry);
+            zos.write(data, 0, data.length);
+            zos.closeEntry();
+            zos.finish();
+        } finally {
+            os.close();
+        }
     }
 
     public static String getOriginalDexPathAsStr(ClassLoader parent) {

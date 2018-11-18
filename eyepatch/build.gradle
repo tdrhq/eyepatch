@@ -40,6 +40,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly fileTree(dir: 'jvmLibs', include: ['*.jar'])
+
     implementation 'com.linkedin.dexmaker:dexmaker:2.19.1'
     implementation 'org.smali:dexlib2:2.2.4'
 
@@ -49,6 +51,7 @@ dependencies {
     androidTestImplementation 'junit:junit:4.12'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.21.0'
+    testImplementation fileTree(dir: 'jvmLibs', include: ['*.jar'])
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.19.1'
