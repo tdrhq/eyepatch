@@ -2,6 +2,7 @@
 
 package com.tdrhq.eyepatch.classloader;
 
+import com.tdrhq.eyepatch.util.Whitebox;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -25,8 +26,12 @@ public class EyePatchClassLoaderJvmTests {
 
         assertNotSame(klass, Foo.class);
         assertSame(classLoader, klass.getClassLoader());
+        assertEquals(5, Whitebox.invokeStatic(klass, "addTwo", Whitebox.arg(int.class, 3)));
     }
 
     public static class Foo {
+        public static int addTwo(int val) {
+            return val + 2;
+        }
     }
 }
