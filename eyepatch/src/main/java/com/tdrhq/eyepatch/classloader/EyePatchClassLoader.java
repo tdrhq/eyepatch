@@ -2,7 +2,6 @@
 
 package com.tdrhq.eyepatch.classloader;
 
-import android.util.Log;
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.ClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.DefaultClassHandlerProvider;
@@ -34,7 +33,7 @@ public class EyePatchClassLoader extends ClassLoader
         if (parent instanceof PathClassLoader) {
             copiedClassLoader = new AndroidCopiedClassLoader(this, parent);
         } else {
-            copiedClassLoader = null;
+            copiedClassLoader = new JvmCopiedClassLoader(this, parent);
         }
 
         classHandlerProvider = new DefaultClassHandlerProvider(new ArrayList<ClassHandler>());
@@ -83,6 +82,10 @@ public class EyePatchClassLoader extends ClassLoader
             return true;
         }
 
+        if (name.startsWith("java.")) {
+            return true;
+        }
+
         if (name.startsWith("org.hamcrest")) {
             return true;
         }
@@ -102,7 +105,6 @@ public class EyePatchClassLoader extends ClassLoader
                 name.endsWith("Tests") ||
                 name.contains("Tests$") ||
                 name.contains("Blacklisted")) {
-                Log.i("EyePatchClassLoader", "Whitelisting: " + name);
                 return false;
             }
             return true;
@@ -158,5 +160,9 @@ public class EyePatchClassLoader extends ClassLoader
             throw new RuntimeException("could not find MockitoClassHandler, this is a bad configuration", e);
         }
         return mockitoClassHandler.isAssignableFrom(handler.getClass());
+    }
+
+    Class<?> defineClassExposed(String name, byte[] data, int start, int end) {
+        return super.defineClass(name, data, start, end);
     }
 }
