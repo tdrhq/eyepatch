@@ -11,7 +11,6 @@ import dalvik.system.DexFile;
 public class EyePatchClassBuilder {
     public static final String PRE_CONSTRUCT = "__pre_construct__";
     public static final String CONSTRUCT = "__construct__";
-    private Map<Key, DexFile> cache = new HashMap<>();
 
     DexFileGenerator dexFileGenerator;
 
@@ -47,39 +46,7 @@ public class EyePatchClassBuilder {
     }
 
     private DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
-        Key key = new Key(realClass, classLoader);
-        if (cache.containsKey(key)) {
-            return cache.get(key);
-        } else {
-            DexFile ret = dexFileGenerator.generate(realClass);
-            cache.put(key, ret);
-            return ret;
-        }
-    }
-
-    private static class Key {
-        Class klass;
-        ClassLoader classLoader;
-
-        public Key(Class klass, ClassLoader classLoader) {
-            this.klass = Checks.notNull(klass);
-            this.classLoader = Checks.notNull(classLoader);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (!(other instanceof Key)) {
-                return false;
-            }
-
-            Key otherKey = (Key) other;
-            return klass == otherKey.klass &&
-                    classLoader == otherKey.classLoader;
-        }
-
-        @Override
-        public int hashCode() {
-            return klass.hashCode();
-        }
+        DexFile ret = dexFileGenerator.generate(realClass);
+        return ret;
     }
 }

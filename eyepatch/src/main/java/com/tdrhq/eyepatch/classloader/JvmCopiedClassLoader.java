@@ -2,9 +2,7 @@
 
 package com.tdrhq.eyepatch.classloader;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.tdrhq.eyepatch.util.Util;
 
 class JvmCopiedClassLoader implements CopiedClassLoader {
     private EyePatchClassLoader classLoader;
@@ -19,23 +17,8 @@ class JvmCopiedClassLoader implements CopiedClassLoader {
 
     @Override
     public Class<?> findClass(String klass) throws ClassNotFoundException {
-        String resource = klass.replace(".", "/") + ".class";
-        System.out.println("finding "+ resource);
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            InputStream stream = parent.getResourceAsStream(resource);
-            byte[] buff = new byte[2048];
-
-            int len;
-            while ((len = stream.read(buff)) > 0) {
-                os.write(buff, 0, len);
-            }
-        } catch (IOException e) {
-            throw new ClassNotFoundException("could not find class", e);
-        }
-
-        byte[] data = os.toByteArray();
+        byte[] data = Util.getClassBytes(parent, klass);
         return classLoader.defineClassExposed(klass, data, 0, data.length);
     }
+
 }

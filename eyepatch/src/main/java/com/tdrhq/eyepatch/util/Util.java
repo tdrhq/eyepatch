@@ -5,9 +5,12 @@ package com.tdrhq.eyepatch.util;
 import com.android.dx.DexMaker;
 import com.android.dx.TypeId;
 import dalvik.system.DexFile;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Util {
     private Util() {
@@ -38,5 +41,25 @@ public class Util {
 
     public static TypeId<?>  createTypeIdForName(String name) {
         return TypeId.get("L" + name.replace(".", "/") + ";");
+    }
+
+    public static byte[] getClassBytes(ClassLoader classLoader, String klass) throws ClassNotFoundException {
+        String resource = klass.replace(".", "/") + ".class";
+        System.out.println("finding "+ resource);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            InputStream stream = classLoader.getResourceAsStream(resource);
+            byte[] buff = new byte[2048];
+
+            int len;
+            while ((len = stream.read(buff)) > 0) {
+                os.write(buff, 0, len);
+            }
+        } catch (IOException e) {
+            throw new ClassNotFoundException("could not find class", e);
+        }
+
+        return os.toByteArray();
     }
 }
