@@ -37,8 +37,19 @@ public class EyePatchClassBuilder {
                     "The classLoader provided must be different from the one " +
                     "used to load realClass");
         }
+
+        File outputFile = dexFileGenerator.generate(realClass);
+
+        if (Util.isJvm()) {
+            throw new RuntimeException("unsupported");
+        } else {
+            return loadForAndroid(outputFile, realClass, classLoader);
+        }
+    }
+
+    private Class loadForAndroid(File outputFile, Class realClass, ClassLoader classLoader) {
         try {
-            DexFile dexFile = Util.loadDexFile(dexFileGenerator.generate(realClass));
+            DexFile dexFile = Util.loadDexFile(outputFile);
             return dexFile.loadClass(realClass.getName(), classLoader);
         } catch (IOException e) {
             throw new RuntimeException(e);
