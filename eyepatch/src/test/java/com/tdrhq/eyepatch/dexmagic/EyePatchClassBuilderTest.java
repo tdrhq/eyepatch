@@ -32,6 +32,12 @@ public class EyePatchClassBuilderTest {
         Dispatcher.setHandler(handler);
     }
 
+    @After
+    public void after() throws Throwable {
+        Dispatcher.setDefaultHandler();
+        DexFileGenerator.debugPrinter = null;
+    }
+
     @Test
     public void testPreconditions() throws Throwable {
     }
