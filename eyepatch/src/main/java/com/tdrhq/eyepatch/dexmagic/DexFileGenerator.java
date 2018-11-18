@@ -54,7 +54,7 @@ public class DexFileGenerator {
         constructorGeneratorFactory = mConstructorGeneratorFactory;
     }
 
-    public DexFile generate(Class realClass) {
+    public File generate(Class realClass) {
         try {
             int suffix = (++counter);
             File mergedOf = new File(mDataDir, "EPG_merged" + suffix + ".dex");
@@ -87,7 +87,7 @@ public class DexFileGenerator {
                 }
             }
 
-            return Util.loadDexFile(mergedOf);
+            return mergedOf;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,12 +1,9 @@
 package com.tdrhq.eyepatch.dexmagic;
 
-import com.tdrhq.eyepatch.util.Checks;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.tdrhq.eyepatch.util.Util;
 import dalvik.system.DexFile;
+import java.io.File;
+import java.io.IOException;
 
 public class EyePatchClassBuilder {
     public static final String PRE_CONSTRUCT = "__pre_construct__";
@@ -40,13 +37,11 @@ public class EyePatchClassBuilder {
                     "The classLoader provided must be different from the one " +
                     "used to load realClass");
         }
-        DexFile dexFile = generateDexFile(realClass, classLoader);
-        return dexFile.loadClass(realClass.getName(), classLoader);
-
-    }
-
-    private DexFile generateDexFile(Class realClass, ClassLoader classLoader) {
-        DexFile ret = dexFileGenerator.generate(realClass);
-        return ret;
+        try {
+            DexFile dexFile = Util.loadDexFile(dexFileGenerator.generate(realClass));
+            return dexFile.loadClass(realClass.getName(), classLoader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
