@@ -44,6 +44,11 @@ public class Util {
     }
 
     public static byte[] getClassBytes(ClassLoader classLoader, String klass) throws ClassNotFoundException {
+
+        if (!isJvm()) {
+            throw new RuntimeException("class bytes is only supported on JVM");
+        }
+
         String resource = klass.replace(".", "/") + ".class";
         System.out.println("finding "+ resource);
 
