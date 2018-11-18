@@ -43,7 +43,17 @@ public class ClassLoaderIntrospector {
     public static boolean isJarToAvoid(String path) {
         return Build.VERSION.SDK_INT >= 27 && path.endsWith(".jar");
     }
+
     public static File getDefiningDexFile(File tmpdir, Class realClass) {
+        Checks.notNull(tmpdir);
+        if (Util.isJvm()) {
+            return getDefiningDexFileForJvm(tmpdir, realClass);
+        } else {
+            return getDefiningDexFileForAndroid(realClass);
+        }
+    }
+
+    public static File getDefiningDexFileForAndroid(Class realClass) {
         List<String> dexPath = getOriginalDexPath(realClass.getClassLoader());
         for (String file : dexPath) {
             if (isJarToAvoid(file)) {
@@ -59,6 +69,10 @@ public class ClassLoaderIntrospector {
             }
         }
         return null;
+    }
+
+    public static File getDefiningDexFileForJvm(File tmpdir, Class realClass) {
+        throw new RuntimeException("unsupported");
     }
 
     public static String getOriginalDexPathAsStr(ClassLoader parent) {
