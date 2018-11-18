@@ -43,7 +43,7 @@ public class ClassLoaderIntrospector {
     public static boolean isJarToAvoid(String path) {
         return Build.VERSION.SDK_INT >= 27 && path.endsWith(".jar");
     }
-    public static File getDefiningDexFile(Class realClass) {
+    public static File getDefiningDexFile(File tmpdir, Class realClass) {
         List<String> dexPath = getOriginalDexPath(realClass.getClassLoader());
         for (String file : dexPath) {
             if (isJarToAvoid(file)) {

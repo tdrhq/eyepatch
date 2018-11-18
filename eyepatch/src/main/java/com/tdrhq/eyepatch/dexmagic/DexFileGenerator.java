@@ -58,7 +58,7 @@ public class DexFileGenerator {
         try {
             int suffix = (++counter);
             File mergedOf = new File(mDataDir, "EPG_merged" + suffix + ".dex");
-            File realDexFile = ClassLoaderIntrospector.getDefiningDexFile(realClass);
+            File realDexFile = ClassLoaderIntrospector.getDefiningDexFile(mDataDir, realClass);
             FileInputStream real = new FileInputStream(realDexFile);
 
             if (realClass.isInterface()) {

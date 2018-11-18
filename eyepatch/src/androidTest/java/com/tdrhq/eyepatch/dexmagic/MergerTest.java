@@ -117,7 +117,7 @@ public class MergerTest {
      * Creates a new DexFile with just the given class extracted out.
      */
     private File extractClass(Class klass)  throws IOException {
-        File ret = ClassLoaderIntrospector.getDefiningDexFile(klass);
+        File ret = ClassLoaderIntrospector.getDefiningDexFile(tmpdir.getRoot(), klass);
         DexBackedDexFile dexfile = DexFileUtil.readDexFile(ret);
         Log.i("MergerTest", "Finished reading the DexBackedDexFile");
 
