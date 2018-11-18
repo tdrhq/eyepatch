@@ -3,7 +3,6 @@
 package com.tdrhq.eyepatch.classloader;
 
 import android.util.Log;
-
 import com.tdrhq.eyepatch.iface.ClassHandler;
 import com.tdrhq.eyepatch.iface.ClassHandlerProvider;
 import com.tdrhq.eyepatch.iface.DefaultClassHandlerProvider;
@@ -12,10 +11,8 @@ import com.tdrhq.eyepatch.iface.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;
-import com.tdrhq.eyepatch.util.ClassLoaderIntrospector;
 import com.tdrhq.eyepatch.util.Whitebox;
-
-import java.io.IOException;
+import dalvik.system.PathClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +31,12 @@ public class EyePatchClassLoader extends ClassLoader
     public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = realClassLoader;
-        copiedClassLoader = new CopiedClassLoader(this, parent);
+        if (parent instanceof PathClassLoader) {
+            copiedClassLoader = new AndroidCopiedClassLoader(this, parent);
+        } else {
+            copiedClassLoader = null;
+        }
+
         classHandlerProvider = new DefaultClassHandlerProvider(new ArrayList<ClassHandler>());
     }
 
