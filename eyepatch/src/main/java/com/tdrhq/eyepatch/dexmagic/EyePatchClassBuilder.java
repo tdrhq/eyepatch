@@ -68,10 +68,16 @@ public class EyePatchClassBuilder {
         File outputJar = File.createTempFile("eyepatch", ".jar");
 
         ProcessBuilder pb = new ProcessBuilder(
+                "java",
+                "-classpath",
                 getDex2JarPath(),
+                "com.googlecode.dex2jar.tools.Dex2jarCmd",
                 "-f",
                 "-o", outputJar.toString(),
                 inputDexFile.toString());
+
+        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
 
         Process process = pb.start();
         int ret;
@@ -102,6 +108,10 @@ public class EyePatchClassBuilder {
 
 
     private String getDex2JarPath() {
-        return "../dex-tools-2.1-SNAPSHOT/d2j-dex2jar.sh";
+        String ret = "./dex2jar-full.jar";
+        if (!new File(ret).exists()) {
+            throw new RuntimeException("jar does not exist: " + ret);
+        }
+        return ret;
     }
 }
