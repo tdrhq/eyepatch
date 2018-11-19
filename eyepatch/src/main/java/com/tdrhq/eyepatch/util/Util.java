@@ -39,6 +39,10 @@ public class Util {
         os.close();
     }
 
+    public static String classToResourceName(String classname) {
+        return classname.replace(".", "/") + ".class";
+    }
+
     public static TypeId<?>  createTypeIdForName(String name) {
         return TypeId.get("L" + name.replace(".", "/") + ";");
     }

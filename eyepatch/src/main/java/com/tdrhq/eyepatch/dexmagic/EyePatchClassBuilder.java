@@ -1,9 +1,13 @@
 package com.tdrhq.eyepatch.dexmagic;
 
+import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.util.Util;
 import dalvik.system.DexFile;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 public class EyePatchClassBuilder {
     public static final String PRE_CONSTRUCT = "__pre_construct__";
@@ -41,7 +45,11 @@ public class EyePatchClassBuilder {
         File outputFile = dexFileGenerator.generate(realClass);
 
         if (Util.isJvm()) {
-            throw new RuntimeException("unsupported");
+            try {
+                return loadForJvm(outputFile, realClass, classLoader);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             return loadForAndroid(outputFile, realClass, classLoader);
         }
@@ -54,5 +62,46 @@ public class EyePatchClassBuilder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Class loadForJvm(File inputDexFile, Class realClass, ClassLoader classLoader) throws IOException {
+        File outputJar = File.createTempFile("eyepatch", ".jar");
+
+        ProcessBuilder pb = new ProcessBuilder(
+                getDex2JarPath(),
+                "-f",
+                "-o", outputJar.toString(),
+                inputDexFile.toString());
+
+        Process process = pb.start();
+        int ret;
+        try {
+            ret = process.waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (ret != 0) {
+            throw new RuntimeException("dex2jar failed with exit code: " + ret);
+        }
+
+        return loadFromJar(outputJar, realClass.getName(), classLoader);
+    }
+
+    Class loadFromJar(File outputJar, String className, ClassLoader _classLoader) throws IOException {
+        EyePatchClassLoader classLoader = (EyePatchClassLoader) _classLoader;
+        JarFile jar = new JarFile(outputJar);
+
+        ZipEntry entry = jar.getEntry(Util.classToResourceName(className));
+        InputStream is = jar.getInputStream(entry);
+
+        byte[] data = new byte[(int) entry.getSize()];
+        is.read(data);
+
+        return classLoader.defineClassExposed(className, data, 0, (int) entry.getSize());
+    }
+
+
+    private String getDex2JarPath() {
+        return "/home/arnold/builds/EyePatch/eyepatch/jvmLibs/dex-tools-2.1-SNAPSHOT/d2j-dex2jar.sh";
     }
 }

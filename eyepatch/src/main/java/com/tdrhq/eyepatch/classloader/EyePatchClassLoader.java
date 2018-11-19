@@ -162,7 +162,7 @@ public class EyePatchClassLoader extends ClassLoader
         return mockitoClassHandler.isAssignableFrom(handler.getClass());
     }
 
-    Class<?> defineClassExposed(String name, byte[] data, int start, int end) {
+    public Class<?> defineClassExposed(String name, byte[] data, int start, int end) {
         return super.defineClass(name, data, start, end);
     }
 }
