@@ -4,6 +4,7 @@ import com.tdrhq.eyepatch.classloader.EyePatchClassLoader;
 import com.tdrhq.eyepatch.util.Util;
 import dalvik.system.DexFile;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarFile;
@@ -12,6 +13,8 @@ import java.util.zip.ZipEntry;
 public class EyePatchClassBuilder {
     public static final String PRE_CONSTRUCT = "__pre_construct__";
     public static final String CONSTRUCT = "__construct__";
+
+    static File dex2jar = null;
 
     DexFileGenerator dexFileGenerator;
 
@@ -107,11 +110,27 @@ public class EyePatchClassBuilder {
     }
 
 
-    private String getDex2JarPath() {
-        String ret = "./dex2jar-full.jar";
-        if (!new File(ret).exists()) {
-            throw new RuntimeException("jar does not exist: " + ret);
+    private static synchronized String getDex2JarPath() {
+        if (dex2jar != null) {
+            return dex2jar.toString();
         }
-        return ret;
+
+        try {
+            dex2jar = File.createTempFile("dex2jar", ".jar");
+            InputStream is = EyePatchClassBuilder.class.getClassLoader().getResourceAsStream("dex2jar-full.jar");
+            FileOutputStream os = new FileOutputStream(dex2jar);
+
+            byte[] buff = new byte[2048];
+            int ret;
+            while ((ret = is.read(buff)) > 0) {
+                os.write(buff, 0, ret);
+            }
+            os.close();
+            is.close();
+
+            return dex2jar.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
