@@ -102,6 +102,6 @@ public class EyePatchClassBuilder {
 
 
     private String getDex2JarPath() {
-        return "/home/arnold/builds/EyePatch/eyepatch/jvmLibs/dex-tools-2.1-SNAPSHOT/d2j-dex2jar.sh";
+        return "../dex-tools-2.1-SNAPSHOT/d2j-dex2jar.sh";
     }
 }
