@@ -10,8 +10,8 @@ import com.tdrhq.eyepatch.iface.HasStaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticInvocationHandler;
 import com.tdrhq.eyepatch.iface.StaticVerificationHandler;
 import com.tdrhq.eyepatch.util.Checks;
+import com.tdrhq.eyepatch.util.Util;
 import com.tdrhq.eyepatch.util.Whitebox;
-import dalvik.system.PathClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class EyePatchClassLoader extends ClassLoader
     public EyePatchClassLoader(ClassLoader realClassLoader) {
         super(realClassLoader);
         parent = realClassLoader;
-        if (parent instanceof PathClassLoader) {
+        if (!Util.isJvm()) {
             copiedClassLoader = new AndroidCopiedClassLoader(this, parent);
         } else {
             copiedClassLoader = new JvmCopiedClassLoader(this, parent);
